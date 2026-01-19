@@ -1,0 +1,1 @@
+import 'package:get/get.dart';\nimport '../controllers/identification_controller.dart';\n\nclass IdentificationBinding extends Bindings {\n  @override\n  void dependencies() {\n    Get.lazyPut<IdentificationController>(() => IdentificationController());\n  }\n}

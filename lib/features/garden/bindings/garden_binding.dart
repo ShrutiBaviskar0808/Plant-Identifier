@@ -1,0 +1,1 @@
+import 'package:get/get.dart';\nimport '../controllers/garden_controller.dart';\n\nclass GardenBinding extends Bindings {\n  @override\n  void dependencies() {\n    Get.lazyPut<GardenController>(() => GardenController());\n  }\n}
