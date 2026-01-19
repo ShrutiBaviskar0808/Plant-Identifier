@@ -18,7 +18,7 @@ class PlantIdentification {
       id: json['id'] as String,
       imagePath: json['image_path'] as String,
       results: (json['results'] as List)
-          .map((e) => IdentificationResult.fromJson(e as Map<String, dynamic>))
+          .map((r) => IdentificationResult.fromJson(r as Map<String, dynamic>))
           .toList(),
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
@@ -28,7 +28,7 @@ class PlantIdentification {
     return {
       'id': id,
       'image_path': imagePath,
-      'results': results.map((e) => e.toJson()).toList(),
+      'results': results.map((r) => r.toJson()).toList(),
       'timestamp': timestamp.toIso8601String(),
     };
   }
@@ -37,19 +37,16 @@ class PlantIdentification {
 class IdentificationResult {
   final Plant plant;
   final double confidence;
-  final String? notes;
 
   const IdentificationResult({
     required this.plant,
     required this.confidence,
-    this.notes,
   });
 
   factory IdentificationResult.fromJson(Map<String, dynamic> json) {
     return IdentificationResult(
       plant: Plant.fromJson(json['plant'] as Map<String, dynamic>),
       confidence: (json['confidence'] as num).toDouble(),
-      notes: json['notes'] as String?,
     );
   }
 
@@ -57,7 +54,6 @@ class IdentificationResult {
     return {
       'plant': plant.toJson(),
       'confidence': confidence,
-      'notes': notes,
     };
   }
 }

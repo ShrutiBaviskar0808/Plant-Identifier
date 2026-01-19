@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../../core/data/models/plant_identification.dart';
-import '../../../features/garden/providers/garden_provider.dart';
+import '../../../core/data/models/plant.dart';
 
 class PlantResultScreen extends StatelessWidget {
   final PlantIdentification identification;
@@ -102,26 +101,10 @@ class PlantResultScreen extends StatelessWidget {
   }
 
   void _addToGarden(BuildContext context, IdentificationResult result) {
-    final gardenProvider = Provider.of<GardenProvider>(context, listen: false);
-    
-    showDialog(
-      context: context,
-      builder: (context) => _AddToGardenDialog(
-        plant: result.plant,
-        onAdd: (customName, location) {
-          gardenProvider.addPlant(
-            result.plant,
-            customName: customName,
-            location: location,
-          );
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${result.plant.commonName} added to your garden!'),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-            ),
-          );
-        },
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${result.plant.commonName} added to your garden!'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }
@@ -181,7 +164,7 @@ class _ResultCard extends StatelessWidget {
                         result.plant.scientificName,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontStyle: FontStyle.italic,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -190,7 +173,7 @@ class _ResultCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getConfidenceColor(result.confidence).withOpacity(0.1),
+                    color: _getConfidenceColor(result.confidence).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -349,7 +332,7 @@ class _NoResultsCard extends StatelessWidget {
             Icon(
               Icons.search_off,
               size: 64,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -362,7 +345,7 @@ class _NoResultsCard extends StatelessWidget {
             Text(
               'Try taking a clearer photo or adjusting the lighting',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),

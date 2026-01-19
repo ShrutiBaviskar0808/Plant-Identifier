@@ -1,1 +1,233 @@
-import 'package:flutter/material.dart';\nimport 'package:get/get.dart';\nimport '../controllers/home_controller.dart';\nimport '../../../app/controllers/theme_controller.dart';\nimport '../../identification/views/camera_view.dart';\nimport '../../garden/views/garden_view.dart';\nimport '../../care/views/care_view.dart';\nimport '../../profile/views/profile_view.dart';\n\nclass HomeView extends GetView<HomeController> {\n  const HomeView({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return Scaffold(\n      body: Obx(() => IndexedStack(\n        index: controller.currentIndex,\n        children: const [\n          HomeTabView(),\n          CameraView(),\n          GardenView(),\n          CareView(),\n          ProfileView(),\n        ],\n      )),\n      bottomNavigationBar: Obx(() => BottomNavigationBar(\n        type: BottomNavigationBarType.fixed,\n        currentIndex: controller.currentIndex,\n        onTap: controller.changeTabIndex,\n        selectedItemColor: Theme.of(context).colorScheme.primary,\n        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),\n        items: const [\n          BottomNavigationBarItem(\n            icon: Icon(Icons.home_outlined),\n            activeIcon: Icon(Icons.home),\n            label: 'Home',\n          ),\n          BottomNavigationBarItem(\n            icon: Icon(Icons.camera_alt_outlined),\n            activeIcon: Icon(Icons.camera_alt),\n            label: 'Identify',\n          ),\n          BottomNavigationBarItem(\n            icon: Icon(Icons.local_florist_outlined),\n            activeIcon: Icon(Icons.local_florist),\n            label: 'Garden',\n          ),\n          BottomNavigationBarItem(\n            icon: Icon(Icons.schedule_outlined),\n            activeIcon: Icon(Icons.schedule),\n            label: 'Care',\n          ),\n          BottomNavigationBarItem(\n            icon: Icon(Icons.person_outline),\n            activeIcon: Icon(Icons.person),\n            label: 'Profile',\n          ),\n        ],\n      )),\n    );\n  }\n}\n\nclass HomeTabView extends StatelessWidget {\n  const HomeTabView({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    final themeController = Get.find<ThemeController>();\n    \n    return Scaffold(\n      appBar: AppBar(\n        title: const Text('Plant Identifier'),\n        actions: [\n          Obx(() => IconButton(\n            icon: Icon(\n              themeController.isDarkMode ? Icons.light_mode : Icons.dark_mode,\n            ),\n            onPressed: themeController.toggleTheme,\n          )),\n        ],\n      ),\n      body: SingleChildScrollView(\n        padding: const EdgeInsets.all(16),\n        child: Column(\n          crossAxisAlignment: CrossAxisAlignment.start,\n          children: [\n            // Welcome Card\n            Card(\n              child: Padding(\n                padding: const EdgeInsets.all(20),\n                child: Column(\n                  crossAxisAlignment: CrossAxisAlignment.start,\n                  children: [\n                    Text(\n                      'Welcome to Plant Identifier',\n                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(\n                        fontWeight: FontWeight.bold,\n                      ),\n                    ),\n                    const SizedBox(height: 8),\n                    Text(\n                      'Discover and care for plants with AI-powered identification',\n                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(\n                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),\n                      ),\n                    ),\n                  ],\n                ),\n              ),\n            ),\n            const SizedBox(height: 24),\n            \n            // Quick Actions\n            Text(\n              'Quick Actions',\n              style: Theme.of(context).textTheme.titleLarge?.copyWith(\n                fontWeight: FontWeight.bold,\n              ),\n            ),\n            const SizedBox(height: 16),\n            \n            Row(\n              children: [\n                Expanded(\n                  child: _QuickActionCard(\n                    icon: Icons.camera_alt,\n                    title: 'Identify Plant',\n                    subtitle: 'Take a photo',\n                    onTap: () => Get.find<HomeController>().changeTabIndex(1),\n                  ),\n                ),\n                const SizedBox(width: 12),\n                Expanded(\n                  child: _QuickActionCard(\n                    icon: Icons.local_florist,\n                    title: 'My Garden',\n                    subtitle: 'View collection',\n                    onTap: () => Get.find<HomeController>().changeTabIndex(2),\n                  ),\n                ),\n              ],\n            ),\n            const SizedBox(height: 24),\n            \n            // Recent Activity\n            Text(\n              'Recent Activity',\n              style: Theme.of(context).textTheme.titleLarge?.copyWith(\n                fontWeight: FontWeight.bold,\n              ),\n            ),\n            const SizedBox(height: 16),\n            \n            Card(\n              child: Padding(\n                padding: const EdgeInsets.all(16),\n                child: Column(\n                  children: [\n                    Icon(\n                      Icons.history,\n                      size: 48,\n                      color: Theme.of(context).colorScheme.primary.withOpacity(0.5),\n                    ),\n                    const SizedBox(height: 8),\n                    Text(\n                      'No recent activity',\n                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(\n                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),\n                      ),\n                    ),\n                  ],\n                ),\n              ),\n            ),\n          ],\n        ),\n      ),\n    );\n  }\n}\n\nclass _QuickActionCard extends StatelessWidget {\n  final IconData icon;\n  final String title;\n  final String subtitle;\n  final VoidCallback onTap;\n\n  const _QuickActionCard({\n    required this.icon,\n    required this.title,\n    required this.subtitle,\n    required this.onTap,\n  });\n\n  @override\n  Widget build(BuildContext context) {\n    return Card(\n      child: InkWell(\n        onTap: onTap,\n        borderRadius: BorderRadius.circular(12),\n        child: Padding(\n          padding: const EdgeInsets.all(16),\n          child: Column(\n            children: [\n              Icon(\n                icon,\n                size: 32,\n                color: Theme.of(context).colorScheme.primary,\n              ),\n              const SizedBox(height: 8),\n              Text(\n                title,\n                style: Theme.of(context).textTheme.titleSmall?.copyWith(\n                  fontWeight: FontWeight.bold,\n                ),\n                textAlign: TextAlign.center,\n              ),\n              const SizedBox(height: 4),\n              Text(\n                subtitle,\n                style: Theme.of(context).textTheme.bodySmall?.copyWith(\n                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),\n                ),\n                textAlign: TextAlign.center,\n              ),\n            ],\n          ),\n        ),\n      ),\n    );\n  }\n}
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../controllers/home_controller.dart';
+import '../../../app/controllers/theme_controller.dart';
+import '../../identification/views/camera_view.dart';
+import '../../garden/views/garden_view.dart';
+import '../../care/views/care_view.dart';
+import '../../profile/views/profile_view.dart';
+
+class HomeView extends GetView<HomeController> {
+  const HomeView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Obx(() => IndexedStack(
+        index: controller.currentIndex,
+        children: const [
+          HomeTabView(),
+          CameraView(),
+          GardenView(),
+          CareView(),
+          ProfileView(),
+        ],
+      )),
+      bottomNavigationBar: Obx(() => BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: controller.currentIndex,
+        onTap: controller.changeTabIndex,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.camera_alt_outlined),
+            activeIcon: Icon(Icons.camera_alt),
+            label: 'Identify',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_florist_outlined),
+            activeIcon: Icon(Icons.local_florist),
+            label: 'Garden',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.schedule_outlined),
+            activeIcon: Icon(Icons.schedule),
+            label: 'Care',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            activeIcon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      )),
+    );
+  }
+}
+
+class HomeTabView extends StatelessWidget {
+  const HomeTabView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeController = Get.find<ThemeController>();
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Plant Identifier'),
+        actions: [
+          Obx(() => IconButton(
+            icon: Icon(
+              themeController.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+            ),
+            onPressed: themeController.toggleTheme,
+          )),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Welcome Card
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome to Plant Identifier',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Discover and care for plants with AI-powered identification',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            
+            // Quick Actions
+            Text(
+              'Quick Actions',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            Row(
+              children: [
+                Expanded(
+                  child: _QuickActionCard(
+                    icon: Icons.camera_alt,
+                    title: 'Identify Plant',
+                    subtitle: 'Take a photo',
+                    onTap: () => Get.find<HomeController>().changeTabIndex(1),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _QuickActionCard(
+                    icon: Icons.local_florist,
+                    title: 'My Garden',
+                    subtitle: 'View collection',
+                    onTap: () => Get.find<HomeController>().changeTabIndex(2),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            
+            // Recent Activity
+            Text(
+              'Recent Activity',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.history,
+                      size: 48,
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'No recent activity',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickActionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _QuickActionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                size: 32,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

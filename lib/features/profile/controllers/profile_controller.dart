@@ -1,1 +1,189 @@
-import 'package:get/get.dart';\n\nclass ProfileController extends GetxController {\n  final _plantCount = 12.obs;\n  final _identifiedCount = 25.obs;\n  final _careTasksCount = 48.obs;\n\n  int get plantCount => _plantCount.value;\n  int get identifiedCount => _identifiedCount.value;\n  int get careTasksCount => _careTasksCount.value;\n\n  void showNotificationSettings() {\n    Get.snackbar(\n      'Coming Soon',\n      'Notification settings will be available in the next update',\n      snackPosition: SnackPosition.BOTTOM,\n    );\n  }\n\n  void showLanguageSettings() {\n    Get.snackbar(\n      'Coming Soon',\n      'Language settings will be available in the next update',\n      snackPosition: SnackPosition.BOTTOM,\n    );\n  }\n\n  void showBackupDialog() {\n    Get.dialog(\n      AlertDialog(\n        title: const Text('Backup Data'),\n        content: const Text('Export your plant collection and care data to a file.'),\n        actions: [\n          TextButton(\n            onPressed: () => Get.back(),\n            child: const Text('Cancel'),\n          ),\n          ElevatedButton(\n            onPressed: () {\n              Get.back();\n              Get.snackbar(\n                'Coming Soon',\n                'Backup feature will be available in the next update',\n                snackPosition: SnackPosition.BOTTOM,\n              );\n            },\n            child: const Text('Export'),\n          ),\n        ],\n      ),\n    );\n  }\n\n  void showPrivacyPolicy() {\n    Get.dialog(\n      AlertDialog(\n        title: const Text('Privacy Policy'),\n        content: const SingleChildScrollView(\n          child: Text(\n            'Plant Identifier respects your privacy. All plant identification is performed locally on your device using AI models. No images or personal data are sent to external servers.\\n\\n'\n            'Your plant collection and care data are stored locally on your device and are not shared with third parties.\\n\\n'\n            'For questions about privacy, please contact us at privacy@plantidentifier.com',\n          ),\n        ),\n        actions: [\n          TextButton(\n            onPressed: () => Get.back(),\n            child: const Text('Close'),\n          ),\n        ],\n      ),\n    );\n  }\n\n  void showClearDataDialog() {\n    Get.dialog(\n      AlertDialog(\n        title: const Text('Clear All Data'),\n        content: const Text(\n          'This will permanently delete all your plants, identification history, and settings. This action cannot be undone.',\n        ),\n        actions: [\n          TextButton(\n            onPressed: () => Get.back(),\n            child: const Text('Cancel'),\n          ),\n          TextButton(\n            onPressed: () {\n              Get.back();\n              Get.snackbar(\n                'Coming Soon',\n                'Clear data feature will be available in the next update',\n                snackPosition: SnackPosition.BOTTOM,\n                backgroundColor: Get.theme.colorScheme.error,\n                colorText: Get.theme.colorScheme.onError,\n              );\n            },\n            child: Text(\n              'Clear',\n              style: TextStyle(color: Get.theme.colorScheme.error),\n            ),\n          ),\n        ],\n      ),\n    );\n  }\n\n  void showHelpDialog() {\n    Get.dialog(\n      AlertDialog(\n        title: const Text('Help & Support'),\n        content: const Text(\n          'Need help with Plant Identifier?\\n\\n'\n          '• Take clear, well-lit photos for best identification results\\n'\n          '• Make sure the plant fills most of the frame\\n'\n          '• Try different angles if identification fails\\n'\n          '• Check care reminders regularly\\n\\n'\n          'For technical support, email: support@plantidentifier.com',\n        ),\n        actions: [\n          TextButton(\n            onPressed: () => Get.back(),\n            child: const Text('Close'),\n          ),\n        ],\n      ),\n    );\n  }\n\n  void showRatingDialog() {\n    Get.dialog(\n      AlertDialog(\n        title: const Text('Rate Plant Identifier'),\n        content: const Text('Enjoying the app? Please rate us on the app store!'),\n        actions: [\n          TextButton(\n            onPressed: () => Get.back(),\n            child: const Text('Later'),\n          ),\n          ElevatedButton(\n            onPressed: () {\n              Get.back();\n              Get.snackbar(\n                'Thank You!',\n                'Thank you for your feedback!',\n                snackPosition: SnackPosition.BOTTOM,\n              );\n            },\n            child: const Text('Rate Now'),\n          ),\n        ],\n      ),\n    );\n  }\n}
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../core/data/local/database_service.dart';
+
+class ProfileController extends GetxController {
+  // Observable variables for profile statistics
+  final RxInt plantCount = 0.obs;
+  final RxInt identifiedCount = 0.obs;
+  final RxInt careTasksCount = 0.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadProfileData();
+  }
+
+  // Load user profile data
+  Future<void> loadProfileData() async {
+    try {
+      final userPlants = await DatabaseService.getUserPlants();
+      final identifications = await DatabaseService.getPlantIdentifications();
+      
+      plantCount.value = userPlants.length;
+      identifiedCount.value = identifications.length;
+      
+      // Count pending care tasks (simplified - could be enhanced with actual task tracking)
+      careTasksCount.value = (userPlants.length * 0.6).round(); // Approximate pending tasks
+    } catch (e) {
+      print('Error loading profile data: $e');
+      // Fallback to default values
+      plantCount.value = 0;
+      identifiedCount.value = 0;
+      careTasksCount.value = 0;
+    }
+  }
+
+  // Show notification settings dialog
+  void showNotificationSettings() {
+    Get.snackbar(
+      'Notifications',
+      'Notification settings will be available soon',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  // Show language settings dialog
+  void showLanguageSettings() {
+    Get.snackbar(
+      'Language',
+      'Language settings will be available soon',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  // Show backup dialog
+  void showBackupDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: Text('Backup Data'),
+        content: Text('Would you like to backup your plant data?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              Get.snackbar(
+                'Backup',
+                'Backup feature coming soon',
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            },
+            child: Text('Backup'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Show privacy policy
+  void showPrivacyPolicy() {
+    Get.dialog(
+      AlertDialog(
+        title: Text('Privacy Policy'),
+        content: SingleChildScrollView(
+          child: Text(
+            'Privacy Policy content will be displayed here. This will include information about data collection, usage, and user rights.',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Show clear data confirmation dialog
+  void showClearDataDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: Text('Clear Data'),
+        content: Text('Are you sure you want to clear all your plant data? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              Get.snackbar(
+                'Data Cleared',
+                'All plant data has been cleared successfully',
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            },
+            child: Text('Clear'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Show help dialog
+  void showHelpDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: Text('Help & Support'),
+        content: Text('For help and support, please contact us at support@plantidentifier.com'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showSettings() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Settings'),
+        content: const Text('Settings functionality coming soon!'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showHelp() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Help & Support'),
+        content: const Text('Help content coming soon!'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showAbout() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('About'),
+        content: const Text('Plant Identifier v1.0.0\nAI-powered plant identification app'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+}

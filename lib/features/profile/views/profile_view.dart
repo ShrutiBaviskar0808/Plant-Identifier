@@ -1,1 +1,97 @@
-import 'package:flutter/material.dart';\nimport 'package:get/get.dart';\nimport '../controllers/profile_controller.dart';\nimport '../../../app/controllers/theme_controller.dart';\n\nclass ProfileView extends GetView<ProfileController> {\n  const ProfileView({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return Scaffold(\n      appBar: AppBar(\n        title: const Text('Profile'),\n      ),\n      body: SingleChildScrollView(\n        padding: const EdgeInsets.all(16),\n        child: Column(\n          children: [\n            // Profile Header\n            Card(\n              child: Padding(\n                padding: const EdgeInsets.all(20),\n                child: Column(\n                  children: [\n                    CircleAvatar(\n                      radius: 40,\n                      backgroundColor: Theme.of(context).colorScheme.primaryContainer,\n                      child: Icon(\n                        Icons.person,\n                        size: 40,\n                        color: Theme.of(context).colorScheme.onPrimaryContainer,\n                      ),\n                    ),\n                    const SizedBox(height: 12),\n                    Text(\n                      'Plant Enthusiast',\n                      style: Theme.of(context).textTheme.titleLarge?.copyWith(\n                        fontWeight: FontWeight.bold,\n                      ),\n                    ),\n                    Text(\n                      'Member since 2024',\n                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(\n                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),\n                      ),\n                    ),\n                  ],\n                ),\n              ),\n            ),\n            const SizedBox(height: 20),\n\n            // Statistics\n            Card(\n              child: Padding(\n                padding: const EdgeInsets.all(16),\n                child: Column(\n                  crossAxisAlignment: CrossAxisAlignment.start,\n                  children: [\n                    Text(\n                      'Your Statistics',\n                      style: Theme.of(context).textTheme.titleMedium?.copyWith(\n                        fontWeight: FontWeight.bold,\n                      ),\n                    ),\n                    const SizedBox(height: 12),\n                    Obx(() => Row(\n                      mainAxisAlignment: MainAxisAlignment.spaceAround,\n                      children: [\n                        _StatItem(\n                          icon: Icons.local_florist,\n                          label: 'Plants',\n                          value: '${controller.plantCount}',\n                        ),\n                        _StatItem(\n                          icon: Icons.camera_alt,\n                          label: 'Identified',\n                          value: '${controller.identifiedCount}',\n                        ),\n                        _StatItem(\n                          icon: Icons.schedule,\n                          label: 'Care Tasks',\n                          value: '${controller.careTasksCount}',\n                        ),\n                      ],\n                    )),\n                  ],\n                ),\n              ),\n            ),\n            const SizedBox(height: 20),\n\n            // Settings\n            Card(\n              child: Column(\n                children: [\n                  const _SettingsHeader(title: 'Preferences'),\n                  GetBuilder<ThemeController>(\n                    builder: (themeController) {\n                      return _SettingsTile(\n                        icon: Icons.palette,\n                        title: 'Theme',\n                        subtitle: _getThemeText(themeController.themeMode),\n                        onTap: () => _showThemeDialog(themeController),\n                      );\n                    },\n                  ),\n                  _SettingsTile(\n                    icon: Icons.notifications,\n                    title: 'Notifications',\n                    subtitle: 'Manage care reminders',\n                    onTap: controller.showNotificationSettings,\n                  ),\n                  _SettingsTile(\n                    icon: Icons.language,\n                    title: 'Language',\n                    subtitle: 'English',\n                    onTap: controller.showLanguageSettings,\n                  ),\n                ],\n              ),\n            ),\n            const SizedBox(height: 12),\n\n            Card(\n              child: Column(\n                children: [\n                  const _SettingsHeader(title: 'Data & Privacy'),\n                  _SettingsTile(\n                    icon: Icons.backup,\n                    title: 'Backup Data',\n                    subtitle: 'Export your plant collection',\n                    onTap: controller.showBackupDialog,\n                  ),\n                  _SettingsTile(\n                    icon: Icons.privacy_tip,\n                    title: 'Privacy Policy',\n                    subtitle: 'How we protect your data',\n                    onTap: controller.showPrivacyPolicy,\n                  ),\n                  _SettingsTile(\n                    icon: Icons.delete_forever,\n                    title: 'Clear Data',\n                    subtitle: 'Remove all local data',\n                    onTap: controller.showClearDataDialog,\n                    isDestructive: true,\n                  ),\n                ],\n              ),\n            ),\n            const SizedBox(height: 12),\n\n            Card(\n              child: Column(\n                children: [\n                  const _SettingsHeader(title: 'About'),\n                  _SettingsTile(\n                    icon: Icons.info,\n                    title: 'App Version',\n                    subtitle: '1.0.0',\n                    onTap: () {},\n                  ),\n                  _SettingsTile(\n                    icon: Icons.help,\n                    title: 'Help & Support',\n                    subtitle: 'Get help with the app',\n                    onTap: controller.showHelpDialog,\n                  ),\n                  _SettingsTile(\n                    icon: Icons.star,\n                    title: 'Rate App',\n                    subtitle: 'Share your feedback',\n                    onTap: controller.showRatingDialog,\n                  ),\n                ],\n              ),\n            ),\n            const SizedBox(height: 20),\n          ],\n        ),\n      ),\n    );\n  }\n\n  String _getThemeText(ThemeMode themeMode) {\n    switch (themeMode) {\n      case ThemeMode.light:\n        return 'Light';\n      case ThemeMode.dark:\n        return 'Dark';\n      case ThemeMode.system:\n        return 'System';\n    }\n  }\n\n  void _showThemeDialog(ThemeController themeController) {\n    Get.dialog(\n      AlertDialog(\n        title: const Text('Choose Theme'),\n        content: Column(\n          mainAxisSize: MainAxisSize.min,\n          children: [\n            Obx(() => RadioListTile<ThemeMode>(\n              title: const Text('Light'),\n              value: ThemeMode.light,\n              groupValue: themeController.themeMode,\n              onChanged: (value) {\n                themeController.setThemeMode(value!);\n                Get.back();\n              },\n            )),\n            Obx(() => RadioListTile<ThemeMode>(\n              title: const Text('Dark'),\n              value: ThemeMode.dark,\n              groupValue: themeController.themeMode,\n              onChanged: (value) {\n                themeController.setThemeMode(value!);\n                Get.back();\n              },\n            )),\n            Obx(() => RadioListTile<ThemeMode>(\n              title: const Text('System'),\n              value: ThemeMode.system,\n              groupValue: themeController.themeMode,\n              onChanged: (value) {\n                themeController.setThemeMode(value!);\n                Get.back();\n              },\n            )),\n          ],\n        ),\n      ),\n    );\n  }\n}\n\nclass _StatItem extends StatelessWidget {\n  final IconData icon;\n  final String label;\n  final String value;\n\n  const _StatItem({\n    required this.icon,\n    required this.label,\n    required this.value,\n  });\n\n  @override\n  Widget build(BuildContext context) {\n    return Column(\n      children: [\n        Icon(\n          icon,\n          color: Theme.of(context).colorScheme.primary,\n          size: 28,\n        ),\n        const SizedBox(height: 4),\n        Text(\n          value,\n          style: Theme.of(context).textTheme.titleLarge?.copyWith(\n            fontWeight: FontWeight.bold,\n          ),\n        ),\n        Text(\n          label,\n          style: Theme.of(context).textTheme.bodySmall?.copyWith(\n            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),\n          ),\n        ),\n      ],\n    );\n  }\n}\n\nclass _SettingsHeader extends StatelessWidget {\n  final String title;\n\n  const _SettingsHeader({required this.title});\n\n  @override\n  Widget build(BuildContext context) {\n    return Container(\n      width: double.infinity,\n      padding: const EdgeInsets.all(16),\n      decoration: BoxDecoration(\n        color: Theme.of(context).colorScheme.surfaceVariant,\n        borderRadius: const BorderRadius.only(\n          topLeft: Radius.circular(12),\n          topRight: Radius.circular(12),\n        ),\n      ),\n      child: Text(\n        title,\n        style: Theme.of(context).textTheme.titleSmall?.copyWith(\n          fontWeight: FontWeight.bold,\n          color: Theme.of(context).colorScheme.onSurfaceVariant,\n        ),\n      ),\n    );\n  }\n}\n\nclass _SettingsTile extends StatelessWidget {\n  final IconData icon;\n  final String title;\n  final String subtitle;\n  final VoidCallback onTap;\n  final bool isDestructive;\n\n  const _SettingsTile({\n    required this.icon,\n    required this.title,\n    required this.subtitle,\n    required this.onTap,\n    this.isDestructive = false,\n  });\n\n  @override\n  Widget build(BuildContext context) {\n    return ListTile(\n      leading: Icon(\n        icon,\n        color: isDestructive \n            ? Theme.of(context).colorScheme.error \n            : Theme.of(context).colorScheme.onSurface,\n      ),\n      title: Text(\n        title,\n        style: TextStyle(\n          color: isDestructive \n              ? Theme.of(context).colorScheme.error \n              : null,\n        ),\n      ),\n      subtitle: Text(subtitle),\n      trailing: const Icon(Icons.chevron_right),\n      onTap: onTap,\n    );\n  }\n}"
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../controllers/profile_controller.dart';
+import '../../home/controllers/home_controller.dart';
+
+class ProfileView extends GetView<ProfileController> {
+  const ProfileView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Profile Header
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      child: const Icon(Icons.person, size: 40, color: Colors.white),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Plant Enthusiast',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'Member since 2024',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Menu Items
+            _buildMenuItem(
+              context,
+              Icons.local_florist,
+              'My Plants',
+              'View your plant collection',
+              () => Get.find<HomeController>().changeTabIndex(2),
+            ),
+            _buildMenuItem(
+              context,
+              Icons.settings,
+              'Settings',
+              'App preferences',
+              () => controller.showSettings(),
+            ),
+            _buildMenuItem(
+              context,
+              Icons.help,
+              'Help & Support',
+              'Get help and support',
+              () => controller.showHelp(),
+            ),
+            _buildMenuItem(
+              context,
+              Icons.info,
+              'About',
+              'About this app',
+              () => controller.showAbout(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(BuildContext context, IconData icon, String title, String subtitle, VoidCallback onTap) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
+      ),
+    );
+  }
+}

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as img;
 import '../../data/models/plant.dart';
@@ -90,12 +89,12 @@ class AIModelManager {
           List.generate(3, (c) {
             final pixel = resized.getPixel(x, y);
             switch (c) {
-              case 0: return img.getRed(pixel) / 255.0;
-              case 1: return img.getGreen(pixel) / 255.0;
-              case 2: return img.getBlue(pixel) / 255.0;
+              case 0: return (((pixel as int) >> 16) & 0xFF).toDouble() / 255.0;
+              case 1: return (((pixel as int) >> 8) & 0xFF).toDouble() / 255.0;
+              case 2: return ((pixel as int) & 0xFF).toDouble() / 255.0;
               default: return 0.0;
             }
-          })
+          }).cast<double>()
         )
       )
     );

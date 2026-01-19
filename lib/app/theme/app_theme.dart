@@ -1,1 +1,67 @@
-import 'package:flutter/material.dart';\n\nclass AppTheme {\n  static const Color primaryColor = Color(0xFF4CAF50);\n  static const Color secondaryColor = Color(0xFF8BC34A);\n  static const Color accentColor = Color(0xFF2E7D32);\n\n  static ThemeData get lightTheme {\n    return ThemeData(\n      useMaterial3: true,\n      colorScheme: ColorScheme.fromSeed(\n        seedColor: primaryColor,\n        brightness: Brightness.light,\n      ),\n      appBarTheme: const AppBarTheme(\n        centerTitle: true,\n        elevation: 0,\n        backgroundColor: Colors.transparent,\n        foregroundColor: Colors.black87,\n      ),\n      cardTheme: CardTheme(\n        elevation: 2,\n        shape: RoundedRectangleBorder(\n          borderRadius: BorderRadius.circular(12),\n        ),\n      ),\n      elevatedButtonTheme: ElevatedButtonThemeData(\n        style: ElevatedButton.styleFrom(\n          shape: RoundedRectangleBorder(\n            borderRadius: BorderRadius.circular(8),\n          ),\n          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),\n        ),\n      ),\n    );\n  }\n\n  static ThemeData get darkTheme {\n    return ThemeData(\n      useMaterial3: true,\n      colorScheme: ColorScheme.fromSeed(\n        seedColor: primaryColor,\n        brightness: Brightness.dark,\n      ),\n      appBarTheme: const AppBarTheme(\n        centerTitle: true,\n        elevation: 0,\n        backgroundColor: Colors.transparent,\n        foregroundColor: Colors.white,\n      ),\n      cardTheme: CardTheme(\n        elevation: 2,\n        shape: RoundedRectangleBorder(\n          borderRadius: BorderRadius.circular(12),\n        ),\n      ),\n      elevatedButtonTheme: ElevatedButtonThemeData(\n        style: ElevatedButton.styleFrom(\n          shape: RoundedRectangleBorder(\n            borderRadius: BorderRadius.circular(8),\n          ),\n          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),\n        ),\n      ),\n    );\n  }\n}
+import 'package:flutter/material.dart';
+
+class AppTheme {
+  static const Color primaryColor = Color(0xFF4CAF50);
+  static const Color secondaryColor = Color(0xFF8BC34A);
+  static const Color accentColor = Color(0xFF2E7D32);
+
+  static ThemeData get lightTheme {
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: primaryColor,
+        brightness: Brightness.light,
+      ),
+      appBarTheme: const AppBarTheme(
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.black87,
+      ),
+      cardTheme: const CardThemeData(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        ),
+      ),
+    );
+  }
+
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: primaryColor,
+        brightness: Brightness.dark,
+      ),
+      appBarTheme: const AppBarTheme(
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
+      ),
+      cardTheme: const CardThemeData(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        ),
+      ),
+    );
+  }
+}

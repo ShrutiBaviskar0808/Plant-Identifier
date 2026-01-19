@@ -1,1 +1,85 @@
-import 'package:flutter/material.dart';\nimport 'package:get/get.dart';\nimport '../controllers/identification_controller.dart';\n\nclass CameraView extends GetView<IdentificationController> {\n  const CameraView({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    return Scaffold(\n      appBar: AppBar(\n        title: const Text('Identify Plant'),\n        backgroundColor: Colors.black,\n        foregroundColor: Colors.white,\n      ),\n      backgroundColor: Colors.black,\n      body: Obx(() {\n        if (!controller.isInitialized) {\n          return const Center(\n            child: CircularProgressIndicator(color: Colors.white),\n          );\n        }\n\n        return Stack(\n          children: [\n            // Camera Preview\n            Positioned.fill(\n              child: controller.cameraController != null\n                  ? CameraPreview(controller.cameraController!)\n                  : const Center(\n                      child: Text(\n                        'Camera not available',\n                        style: TextStyle(color: Colors.white),\n                      ),\n                    ),\n            ),\n\n            // Camera Overlay\n            Positioned.fill(\n              child: Container(\n                decoration: BoxDecoration(\n                  border: Border.all(\n                    color: Colors.white.withOpacity(0.5),\n                    width: 2,\n                  ),\n                ),\n                margin: const EdgeInsets.all(50),\n              ),\n            ),\n\n            // Instructions\n            Positioned(\n              top: 50,\n              left: 20,\n              right: 20,\n              child: Container(\n                padding: const EdgeInsets.all(16),\n                decoration: BoxDecoration(\n                  color: Colors.black.withOpacity(0.7),\n                  borderRadius: BorderRadius.circular(8),\n                ),\n                child: Text(\n                  'Position the plant within the frame and tap the capture button',\n                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(\n                    color: Colors.white,\n                  ),\n                  textAlign: TextAlign.center,\n                ),\n              ),\n            ),\n\n            // Bottom Controls\n            Positioned(\n              bottom: 0,\n              left: 0,\n              right: 0,\n              child: Container(\n                padding: const EdgeInsets.all(20),\n                decoration: BoxDecoration(\n                  color: Colors.black.withOpacity(0.8),\n                ),\n                child: Row(\n                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,\n                  children: [\n                    // Gallery Button\n                    IconButton(\n                      onPressed: controller.isProcessing ? null : controller.pickFromGallery,\n                      icon: const Icon(Icons.photo_library),\n                      iconSize: 32,\n                      color: Colors.white,\n                    ),\n\n                    // Capture Button\n                    GestureDetector(\n                      onTap: controller.isProcessing ? null : controller.takePicture,\n                      child: Container(\n                        width: 70,\n                        height: 70,\n                        decoration: BoxDecoration(\n                          shape: BoxShape.circle,\n                          color: controller.isProcessing ? Colors.grey : Colors.white,\n                          border: Border.all(\n                            color: Colors.white,\n                            width: 3,\n                          ),\n                        ),\n                        child: controller.isProcessing\n                            ? const Center(\n                                child: CircularProgressIndicator(\n                                  strokeWidth: 2,\n                                  color: Colors.black,\n                                ),\n                              )\n                            : const Icon(\n                                Icons.camera_alt,\n                                color: Colors.black,\n                                size: 32,\n                              ),\n                      ),\n                    ),\n\n                    // Flash Button (placeholder)\n                    IconButton(\n                      onPressed: () {},\n                      icon: const Icon(Icons.flash_off),\n                      iconSize: 32,\n                      color: Colors.white,\n                    ),\n                  ],\n                ),\n              ),\n            ),\n          ],\n        );\n      }),\n    );\n  }\n}
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:camera/camera.dart';
+import '../controllers/identification_controller.dart';
+
+class CameraView extends GetView<IdentificationController> {
+  const CameraView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Identify Plant'),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+      ),
+      body: Obx(() {
+        if (!controller.isInitialized) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return Stack(
+          children: [
+            // Camera Preview
+            SizedBox.expand(
+              child: CameraPreview(controller.cameraController!),
+            ),
+            
+            // Controls
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.8),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // Gallery Button
+                    IconButton(
+                      onPressed: controller.pickFromGallery,
+                      icon: const Icon(Icons.photo_library, color: Colors.white, size: 32),
+                    ),
+                    
+                    // Capture Button
+                    GestureDetector(
+                      onTap: controller.takePicture,
+                      child: Container(
+                        width: 70,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 3),
+                        ),
+                        child: controller.isProcessing
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : const Icon(Icons.camera, color: Colors.white, size: 32),
+                      ),
+                    ),
+                    
+                    // Flash Button
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.flash_off, color: Colors.white, size: 32),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+}

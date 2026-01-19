@@ -24,23 +24,21 @@ dependencies:
   camera: ^0.10.5
   image_picker: ^1.0.4
   
-  # Local Storage
+  # Storage
   sqflite: ^2.3.0
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
   path_provider: ^2.1.1
-  shared_preferences: ^2.2.2
   
-  # Analytics & Crashlytics
+  # Firebase
   firebase_core: ^2.24.2
   firebase_analytics: ^10.7.4
   firebase_crashlytics: ^3.4.8
   
   # State Management
   get: ^4.6.6
+  provider: ^6.1.1
   
   # Search
-  fuzzy: ^0.4.1
+  fuzzy: ^0.5.1
   
   # Notifications
   flutter_local_notifications: ^16.3.0
@@ -56,9 +54,9 @@ dependencies:
   # Splash screen
   flutter_native_splash: ^2.3.10
 
-  # Utils
+  # Utilities
   uuid: ^4.2.1
-  intl: ^0.19.0
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

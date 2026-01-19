@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -85,9 +85,7 @@ class HomeTabScreen extends StatelessWidget {
                   themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
                 ),
                 onPressed: () {
-                  themeProvider.setThemeMode(
-                    themeProvider.isDarkMode ? ThemeMode.light : ThemeMode.dark,
-                  );
+                  themeProvider.toggleTheme();
                 },
               );
             },
@@ -116,7 +114,7 @@ class HomeTabScreen extends StatelessWidget {
                     Text(
                       'Discover and care for plants with AI-powered identification',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -174,13 +172,13 @@ class HomeTabScreen extends StatelessWidget {
                     Icon(
                       Icons.history,
                       size: 48,
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'No recent activity',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -234,7 +232,7 @@ class _QuickActionCard extends StatelessWidget {
               Text(
                 subtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 textAlign: TextAlign.center,
               ),

@@ -1,1 +1,142 @@
-import 'dart:io';\nimport 'package:flutter/material.dart';\nimport 'package:get/get.dart';\nimport '../controllers/identification_controller.dart';\nimport '../../garden/controllers/garden_controller.dart';\nimport '../../../core/data/models/plant_identification.dart';\nimport '../../../core/data/models/plant.dart';\n\nclass PlantResultView extends GetView<IdentificationController> {\n  const PlantResultView({super.key});\n\n  @override\n  Widget build(BuildContext context) {\n    final identification = Get.arguments as PlantIdentification? ?? controller.currentIdentification;\n    \n    if (identification == null) {\n      return Scaffold(\n        appBar: AppBar(title: const Text('Error')),\n        body: const Center(\n          child: Text('No identification data available'),\n        ),\n      );\n    }\n\n    return Scaffold(\n      appBar: AppBar(\n        title: const Text('Identification Results'),\n        actions: [\n          IconButton(\n            icon: const Icon(Icons.share),\n            onPressed: () => _shareResults(),\n          ),\n        ],\n      ),\n      body: SingleChildScrollView(\n        child: Column(\n          crossAxisAlignment: CrossAxisAlignment.start,\n          children: [\n            // Image\n            Container(\n              width: double.infinity,\n              height: 300,\n              decoration: BoxDecoration(\n                image: DecorationImage(\n                  image: FileImage(File(identification.imagePath)),\n                  fit: BoxFit.cover,\n                ),\n              ),\n            ),\n\n            Padding(\n              padding: const EdgeInsets.all(16),\n              child: Column(\n                crossAxisAlignment: CrossAxisAlignment.start,\n                children: [\n                  // Results Header\n                  Text(\n                    'Identification Results',\n                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(\n                      fontWeight: FontWeight.bold,\n                    ),\n                  ),\n                  const SizedBox(height: 16),\n\n                  // Results List\n                  if (identification.results.isEmpty)\n                    const _NoResultsCard()\n                  else\n                    ...identification.results.asMap().entries.map(\n                      (entry) => _ResultCard(\n                        result: entry.value,\n                        rank: entry.key + 1,\n                        onAddToGarden: () => _addToGarden(entry.value),\n                      ),\n                    ),\n\n                  const SizedBox(height: 24),\n\n                  // Action Buttons\n                  Row(\n                    children: [\n                      Expanded(\n                        child: ElevatedButton.icon(\n                          onPressed: () => Get.back(),\n                          icon: const Icon(Icons.camera_alt),\n                          label: const Text('Try Again'),\n                        ),\n                      ),\n                      const SizedBox(width: 12),\n                      Expanded(\n                        child: OutlinedButton.icon(\n                          onPressed: () => Get.offAllNamed('/home'),\n                          icon: const Icon(Icons.home),\n                          label: const Text('Home'),\n                        ),\n                      ),\n                    ],\n                  ),\n                ],\n              ),\n            ),\n          ],\n        ),\n      ),\n    );\n  }\n\n  void _addToGarden(IdentificationResult result) {\n    Get.dialog(\n      _AddToGardenDialog(\n        plant: result.plant,\n        onAdd: (customName, location) {\n          final gardenController = Get.find<GardenController>();\n          gardenController.addPlant(\n            result.plant,\n            customName: customName,\n            location: location,\n          );\n          Get.back();\n        },\n      ),\n    );\n  }\n\n  void _shareResults() {\n    Get.snackbar(\n      'Share',\n      'Share functionality coming soon!',\n      snackPosition: SnackPosition.BOTTOM,\n    );\n  }\n}\n\nclass _ResultCard extends StatelessWidget {\n  final IdentificationResult result;\n  final int rank;\n  final VoidCallback onAddToGarden;\n\n  const _ResultCard({\n    required this.result,\n    required this.rank,\n    required this.onAddToGarden,\n  });\n\n  @override\n  Widget build(BuildContext context) {\n    return Card(\n      margin: const EdgeInsets.only(bottom: 12),\n      child: Padding(\n        padding: const EdgeInsets.all(16),\n        child: Column(\n          crossAxisAlignment: CrossAxisAlignment.start,\n          children: [\n            Row(\n              children: [\n                CircleAvatar(\n                  backgroundColor: Theme.of(context).colorScheme.primary,\n                  child: Text(\n                    '$rank',\n                    style: const TextStyle(\n                      color: Colors.white,\n                      fontWeight: FontWeight.bold,\n                    ),\n                  ),\n                ),\n                const SizedBox(width: 12),\n                Expanded(\n                  child: Column(\n                    crossAxisAlignment: CrossAxisAlignment.start,\n                    children: [\n                      Text(\n                        result.plant.commonName,\n                        style: Theme.of(context).textTheme.titleMedium?.copyWith(\n                          fontWeight: FontWeight.bold,\n                        ),\n                      ),\n                      Text(\n                        result.plant.scientificName,\n                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(\n                          fontStyle: FontStyle.italic,\n                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),\n                        ),\n                      ),\n                    ],\n                  ),\n                ),\n                Container(\n                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),\n                  decoration: BoxDecoration(\n                    color: _getConfidenceColor(result.confidence).withOpacity(0.1),\n                    borderRadius: BorderRadius.circular(12),\n                  ),\n                  child: Text(\n                    '${(result.confidence * 100).toInt()}%',\n                    style: TextStyle(\n                      color: _getConfidenceColor(result.confidence),\n                      fontWeight: FontWeight.bold,\n                      fontSize: 12,\n                    ),\n                  ),\n                ),\n              ],\n            ),\n            const SizedBox(height: 12),\n            \n            Text(\n              result.plant.description,\n              style: Theme.of(context).textTheme.bodyMedium,\n            ),\n            const SizedBox(height: 12),\n            \n            Row(\n              children: [\n                Expanded(\n                  child: OutlinedButton.icon(\n                    onPressed: onAddToGarden,\n                    icon: const Icon(Icons.add),\n                    label: const Text('Add to Garden'),\n                  ),\n                ),\n                const SizedBox(width: 8),\n                IconButton(\n                  onPressed: () => _showPlantDetails(context),\n                  icon: const Icon(Icons.info_outline),\n                ),\n              ],\n            ),\n          ],\n        ),\n      ),\n    );\n  }\n\n  Color _getConfidenceColor(double confidence) {\n    if (confidence >= 0.8) return Colors.green;\n    if (confidence >= 0.6) return Colors.orange;\n    return Colors.red;\n  }\n\n  void _showPlantDetails(BuildContext context) {\n    Get.bottomSheet(\n      Container(\n        padding: const EdgeInsets.all(16),\n        decoration: BoxDecoration(\n          color: Theme.of(context).scaffoldBackgroundColor,\n          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),\n        ),\n        child: SingleChildScrollView(\n          child: Column(\n            crossAxisAlignment: CrossAxisAlignment.start,\n            mainAxisSize: MainAxisSize.min,\n            children: [\n              Text(\n                result.plant.commonName,\n                style: Theme.of(context).textTheme.headlineSmall?.copyWith(\n                  fontWeight: FontWeight.bold,\n                ),\n              ),\n              Text(\n                result.plant.scientificName,\n                style: Theme.of(context).textTheme.titleMedium?.copyWith(\n                  fontStyle: FontStyle.italic,\n                ),\n              ),\n              const SizedBox(height: 16),\n              \n              _CareInfoSection(care: result.plant.care),\n            ],\n          ),\n        ),\n      ),\n      isScrollControlled: true,\n    );\n  }\n}\n\nclass _CareInfoSection extends StatelessWidget {\n  final CareRequirements care;\n\n  const _CareInfoSection({required this.care});\n\n  @override\n  Widget build(BuildContext context) {\n    return Column(\n      crossAxisAlignment: CrossAxisAlignment.start,\n      children: [\n        Text(\n          'Care Requirements',\n          style: Theme.of(context).textTheme.titleMedium?.copyWith(\n            fontWeight: FontWeight.bold,\n          ),\n        ),\n        const SizedBox(height: 12),\n        \n        _CareItem(icon: Icons.water_drop, label: 'Water', value: care.waterFrequency),\n        _CareItem(icon: Icons.wb_sunny, label: 'Light', value: care.lightRequirement),\n        _CareItem(icon: Icons.grass, label: 'Soil', value: care.soilType),\n        _CareItem(icon: Icons.thermostat, label: 'Temperature', value: care.temperature),\n        _CareItem(icon: Icons.opacity, label: 'Humidity', value: care.humidity),\n        _CareItem(icon: Icons.eco, label: 'Fertilizer', value: care.fertilizer),\n      ],\n    );\n  }\n}\n\nclass _CareItem extends StatelessWidget {\n  final IconData icon;\n  final String label;\n  final String value;\n\n  const _CareItem({\n    required this.icon,\n    required this.label,\n    required this.value,\n  });\n\n  @override\n  Widget build(BuildContext context) {\n    return Padding(\n      padding: const EdgeInsets.symmetric(vertical: 4),\n      child: Row(\n        children: [\n          Icon(icon, size: 20),\n          const SizedBox(width: 12),\n          Text(\n            '$label: ',\n            style: const TextStyle(fontWeight: FontWeight.w500),\n          ),\n          Expanded(child: Text(value)),\n        ],\n      ),\n    );\n  }\n}\n\nclass _NoResultsCard extends StatelessWidget {\n  const _NoResultsCard();\n\n  @override\n  Widget build(BuildContext context) {\n    return Card(\n      child: Padding(\n        padding: const EdgeInsets.all(24),\n        child: Column(\n          children: [\n            Icon(\n              Icons.search_off,\n              size: 64,\n              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),\n            ),\n            const SizedBox(height: 16),\n            Text(\n              'No plants identified',\n              style: Theme.of(context).textTheme.titleMedium?.copyWith(\n                fontWeight: FontWeight.bold,\n              ),\n            ),\n            const SizedBox(height: 8),\n            Text(\n              'Try taking a clearer photo or adjusting the lighting',\n              style: Theme.of(context).textTheme.bodyMedium?.copyWith(\n                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),\n              ),\n              textAlign: TextAlign.center,\n            ),\n          ],\n        ),\n      ),\n    );\n  }\n}\n\nclass _AddToGardenDialog extends StatelessWidget {\n  final Plant plant;\n  final Function(String?, String?) onAdd;\n\n  const _AddToGardenDialog({\n    required this.plant,\n    required this.onAdd,\n  });\n\n  @override\n  Widget build(BuildContext context) {\n    final customNameController = TextEditingController();\n    final locationController = TextEditingController();\n\n    return AlertDialog(\n      title: Text('Add ${plant.commonName} to Garden'),\n      content: Column(\n        mainAxisSize: MainAxisSize.min,\n        children: [\n          TextField(\n            controller: customNameController,\n            decoration: const InputDecoration(\n              labelText: 'Custom Name (Optional)',\n              hintText: 'My favorite rose',\n            ),\n          ),\n          const SizedBox(height: 16),\n          TextField(\n            controller: locationController,\n            decoration: const InputDecoration(\n              labelText: 'Location (Optional)',\n              hintText: 'Living room, Garden bed 1',\n            ),\n          ),\n        ],\n      ),\n      actions: [\n        TextButton(\n          onPressed: () => Get.back(),\n          child: const Text('Cancel'),\n        ),\n        ElevatedButton(\n          onPressed: () => onAdd(\n            customNameController.text.isEmpty ? null : customNameController.text,\n            locationController.text.isEmpty ? null : locationController.text,\n          ),\n          child: const Text('Add'),\n        ),\n      ],\n    );\n  }\n}
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../controllers/identification_controller.dart';
+
+class PlantResultView extends GetView<IdentificationController> {
+  const PlantResultView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final String imagePath = Get.arguments as String? ?? '';
+    
+    if (imagePath.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Plant Results')),
+        body: const Center(
+          child: Text('No image provided'),
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Plant Results'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () => _shareResults(),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                imagePath,
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: double.infinity,
+                  height: 200,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.image_not_supported, size: 50),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Results
+            Text(
+              'Identification Results',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Mock results for now
+            _buildResultCard(
+              context,
+              'Rose',
+              'Rosa rubiginosa',
+              0.95,
+              'A beautiful flowering plant known for its fragrance.',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResultCard(BuildContext context, String commonName, String scientificName, double confidence, String description) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        commonName,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        scientificName,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontStyle: FontStyle.italic,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${(confidence * 100).toInt()}%',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(description),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => _addToGarden(),
+              child: const Text('Add to My Garden'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _shareResults() {
+    Get.snackbar('Share', 'Sharing functionality coming soon!');
+  }
+
+  void _addToGarden() {
+    Get.snackbar('Success', 'Plant added to your garden!');
+  }
+}

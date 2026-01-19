@@ -1,1 +1,19 @@
-import 'package:get/get.dart';\n\nclass HomeController extends GetxController {\n  final _currentIndex = 0.obs;\n  \n  int get currentIndex => _currentIndex.value;\n  \n  void changeTabIndex(int index) {\n    _currentIndex.value = index;\n  }\n  \n  void navigateToCamera() {\n    Get.toNamed('/camera');\n  }\n  \n  void navigateToGarden() {\n    Get.toNamed('/garden');\n  }\n}
+import 'package:get/get.dart';
+
+class HomeController extends GetxController {
+  final RxInt _currentIndex = 0.obs;
+
+  int get currentIndex => _currentIndex.value;
+
+  void changeTabIndex(int index) {
+    _currentIndex.value = index;
+  }
+
+  void navigateToCamera() {
+    Get.toNamed('/camera');
+  }
+
+  void navigateToGarden() {
+    Get.toNamed('/garden');
+  }
+}

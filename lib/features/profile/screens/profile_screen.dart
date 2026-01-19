@@ -40,7 +40,7 @@ class ProfileScreen extends StatelessWidget {
                     Text(
                       'Member since 2024',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -200,28 +200,19 @@ class ProfileScreen extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            RadioListTile<ThemeMode>(
+            RadioListTile<bool>(
               title: const Text('Light'),
-              value: ThemeMode.light,
-              groupValue: themeProvider.themeMode,
+              value: false,
+              groupValue: themeProvider.isDarkMode,
               onChanged: (value) {
                 themeProvider.setThemeMode(value!);
                 Navigator.pop(context);
               },
             ),
-            RadioListTile<ThemeMode>(
+            RadioListTile<bool>(
               title: const Text('Dark'),
-              value: ThemeMode.dark,
-              groupValue: themeProvider.themeMode,
-              onChanged: (value) {
-                themeProvider.setThemeMode(value!);
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              title: const Text('System'),
-              value: ThemeMode.system,
-              groupValue: themeProvider.themeMode,
+              value: true,
+              groupValue: themeProvider.isDarkMode,
               onChanged: (value) {
                 themeProvider.setThemeMode(value!);
                 Navigator.pop(context);
@@ -401,7 +392,7 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ],
@@ -420,7 +411,7 @@ class _SettingsHeader extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),

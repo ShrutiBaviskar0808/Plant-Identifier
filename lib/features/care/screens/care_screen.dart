@@ -168,7 +168,7 @@ class _TaskItem extends StatelessWidget {
             isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
             color: isCompleted 
                 ? Theme.of(context).colorScheme.primary 
-                : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(width: 12),
           Icon(icon, size: 20),
@@ -179,7 +179,7 @@ class _TaskItem extends StatelessWidget {
               style: TextStyle(
                 decoration: isCompleted ? TextDecoration.lineThrough : null,
                 color: isCompleted 
-                    ? Theme.of(context).colorScheme.onSurface.withOpacity(0.6)
+                    ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
                     : null,
               ),
             ),
@@ -187,7 +187,7 @@ class _TaskItem extends StatelessWidget {
           Text(
             time,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -413,7 +413,7 @@ class _CalculatorTabState extends State<_CalculatorTab> {
                     Text(
                       'Water slowly until soil is moist but not soggy',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                       textAlign: TextAlign.center,
                     ),

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/ai/services/ai_model_manager.dart';
-import '../../../core/data/models/plant_identification.dart';
 import '../../../core/data/local/database_service.dart';
 import 'plant_result_screen.dart';
 
@@ -152,7 +151,7 @@ class _CameraScreenState extends State<CameraScreen> {
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withValues(alpha: 0.5),
                   width: 2,
                 ),
               ),
@@ -168,7 +167,7 @@ class _CameraScreenState extends State<CameraScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -189,7 +188,7 @@ class _CameraScreenState extends State<CameraScreen> {
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.8),
+                color: Colors.black.withValues(alpha: 0.8),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

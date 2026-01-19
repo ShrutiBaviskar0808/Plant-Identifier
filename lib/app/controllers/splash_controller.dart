@@ -1,1 +1,51 @@
-import 'package:get/get.dart';\nimport 'package:flutter/services.dart';\nimport '../routes/app_routes.dart';\n\nclass SplashController extends GetxController {\n  final _isLoading = true.obs;\n  final _loadingProgress = 0.0.obs;\n  \n  bool get isLoading => _isLoading.value;\n  double get loadingProgress => _loadingProgress.value;\n\n  @override\n  void onInit() {\n    super.onInit();\n    _initializeApp();\n  }\n\n  Future<void> _initializeApp() async {\n    try {\n      // Simulate app initialization with progress\n      await _updateProgress(0.2, 'Loading AI models...');\n      await Future.delayed(const Duration(milliseconds: 800));\n      \n      await _updateProgress(0.5, 'Setting up database...');\n      await Future.delayed(const Duration(milliseconds: 600));\n      \n      await _updateProgress(0.8, 'Preparing interface...');\n      await Future.delayed(const Duration(milliseconds: 500));\n      \n      await _updateProgress(1.0, 'Ready!');\n      await Future.delayed(const Duration(milliseconds: 300));\n      \n      _isLoading.value = false;\n      \n      // Navigate to home after splash\n      Get.offAllNamed(AppRoutes.home);\n      \n    } catch (e) {\n      // Handle initialization error\n      Get.snackbar(\n        'Initialization Error',\n        'Failed to initialize app: $e',\n        snackPosition: SnackPosition.BOTTOM,\n      );\n    }\n  }\n\n  Future<void> _updateProgress(double progress, String message) async {\n    _loadingProgress.value = progress;\n    // Haptic feedback for progress updates\n    if (progress == 1.0) {\n      HapticFeedback.lightImpact();\n    }\n  }\n}
+import 'package:get/get.dart';
+import 'package:flutter/services.dart';
+import '../routes/app_routes.dart';
+
+class SplashController extends GetxController {
+  final _isLoading = true.obs;
+  final _loadingProgress = 0.0.obs;
+  
+  bool get isLoading => _isLoading.value;
+  double get loadingProgress => _loadingProgress.value;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    try {
+      await _updateProgress(0.2, 'Loading AI models...');
+      await Future.delayed(const Duration(milliseconds: 800));
+      
+      await _updateProgress(0.5, 'Setting up database...');
+      await Future.delayed(const Duration(milliseconds: 600));
+      
+      await _updateProgress(0.8, 'Preparing interface...');
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      await _updateProgress(1.0, 'Ready!');
+      await Future.delayed(const Duration(milliseconds: 300));
+      
+      _isLoading.value = false;
+      
+      Get.offAllNamed(AppRoutes.home);
+      
+    } catch (e) {
+      Get.snackbar(
+        'Initialization Error',
+        'Failed to initialize app: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> _updateProgress(double progress, String message) async {
+    _loadingProgress.value = progress;
+    if (progress == 1.0) {
+      HapticFeedback.lightImpact();
+    }
+  }
+}

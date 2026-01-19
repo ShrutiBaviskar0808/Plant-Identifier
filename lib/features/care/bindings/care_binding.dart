@@ -1,1 +1,9 @@
-import 'package:get/get.dart';\nimport '../controllers/care_controller.dart';\n\nclass CareBinding extends Bindings {\n  @override\n  void dependencies() {\n    Get.lazyPut<CareController>(() => CareController());\n  }\n}
+import 'package:get/get.dart';
+import '../controllers/care_controller.dart';
+
+class CareBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<CareController>(() => CareController());
+  }
+}

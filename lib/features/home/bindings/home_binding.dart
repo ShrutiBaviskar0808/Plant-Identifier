@@ -1,1 +1,11 @@
-import 'package:get/get.dart';\nimport '../controllers/home_controller.dart';\nimport '../../garden/controllers/garden_controller.dart';\n\nclass HomeBinding extends Bindings {\n  @override\n  void dependencies() {\n    Get.lazyPut<HomeController>(() => HomeController());\n    Get.lazyPut<GardenController>(() => GardenController());\n  }\n}
+import 'package:get/get.dart';
+import '../controllers/home_controller.dart';
+import '../../garden/controllers/garden_controller.dart';
+
+class HomeBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<HomeController>(() => HomeController());
+    Get.lazyPut<GardenController>(() => GardenController());
+  }
+}

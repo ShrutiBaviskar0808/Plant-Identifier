@@ -1,1 +1,86 @@
-import 'dart:io';\nimport 'package:get/get.dart';\nimport 'package:camera/camera.dart';\nimport 'package:image_picker/image_picker.dart';\nimport '../../../core/ai/services/ai_model_manager.dart';\nimport '../../../core/data/models/plant_identification.dart';\nimport '../../../core/data/local/database_service.dart';\n\nclass IdentificationController extends GetxController {\n  CameraController? _cameraController;\n  final _cameras = <CameraDescription>[].obs;\n  final _isInitialized = false.obs;\n  final _isProcessing = false.obs;\n  final _currentIdentification = Rxn<PlantIdentification>();\n  final ImagePicker _imagePicker = ImagePicker();\n\n  CameraController? get cameraController => _cameraController;\n  List<CameraDescription> get cameras => _cameras;\n  bool get isInitialized => _isInitialized.value;\n  bool get isProcessing => _isProcessing.value;\n  PlantIdentification? get currentIdentification => _currentIdentification.value;\n\n  @override\n  void onInit() {\n    super.onInit();\n    initializeCamera();\n  }\n\n  @override\n  void onClose() {\n    _cameraController?.dispose();\n    super.onClose();\n  }\n\n  Future<void> initializeCamera() async {\n    try {\n      final availableCameras = await availableCameras();\n      _cameras.assignAll(availableCameras);\n      \n      if (_cameras.isNotEmpty) {\n        _cameraController = CameraController(\n          _cameras[0],\n          ResolutionPreset.high,\n          enableAudio: false,\n        );\n        await _cameraController!.initialize();\n        _isInitialized.value = true;\n      }\n    } catch (e) {\n      Get.snackbar(\n        'Camera Error',\n        'Failed to initialize camera: $e',\n        snackPosition: SnackPosition.BOTTOM,\n      );\n    }\n  }\n\n  Future<void> takePicture() async {\n    if (_cameraController == null || !_cameraController!.value.isInitialized) {\n      return;\n    }\n\n    _isProcessing.value = true;\n\n    try {\n      final XFile picture = await _cameraController!.takePicture();\n      await _processImage(File(picture.path));\n    } catch (e) {\n      Get.snackbar(\n        'Error',\n        'Failed to take picture: $e',\n        snackPosition: SnackPosition.BOTTOM,\n      );\n    } finally {\n      _isProcessing.value = false;\n    }\n  }\n\n  Future<void> pickFromGallery() async {\n    _isProcessing.value = true;\n\n    try {\n      final XFile? image = await _imagePicker.pickImage(\n        source: ImageSource.gallery,\n        maxWidth: 1024,\n        maxHeight: 1024,\n        imageQuality: 85,\n      );\n\n      if (image != null) {\n        await _processImage(File(image.path));\n      }\n    } catch (e) {\n      Get.snackbar(\n        'Error',\n        'Failed to pick image: $e',\n        snackPosition: SnackPosition.BOTTOM,\n      );\n    } finally {\n      _isProcessing.value = false;\n    }\n  }\n\n  Future<void> _processImage(File imageFile) async {\n    try {\n      if (!AIModelManager.isInitialized) {\n        Get.snackbar(\n          'Error',\n          'AI models not initialized',\n          snackPosition: SnackPosition.BOTTOM,\n        );\n        return;\n      }\n\n      // Identify plant using AI\n      final identification = await AIModelManager.identifyPlant(imageFile);\n      \n      // Save identification to database\n      await DatabaseService.insertPlantIdentification(identification);\n      \n      // Set current identification\n      _currentIdentification.value = identification;\n\n      // Navigate to results\n      Get.toNamed('/plant-result', arguments: identification);\n    } catch (e) {\n      Get.snackbar(\n        'Error',\n        'Failed to identify plant: $e',\n        snackPosition: SnackPosition.BOTTOM,\n      );\n    }\n  }\n\n  void setCurrentIdentification(PlantIdentification identification) {\n    _currentIdentification.value = identification;\n  }\n}
+import 'package:get/get.dart';
+import 'package:camera/camera.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+
+class IdentificationController extends GetxController {
+  CameraController? _cameraController;
+  final RxList<CameraDescription> _cameras = <CameraDescription>[].obs;
+  final RxBool _isInitialized = false.obs;
+  final RxBool _isProcessing = false.obs;
+  final ImagePicker _imagePicker = ImagePicker();
+
+  CameraController? get cameraController => _cameraController;
+  List<CameraDescription> get cameras => _cameras;
+  bool get isInitialized => _isInitialized.value;
+  bool get isProcessing => _isProcessing.value;
+
+  @override
+  void onInit() {
+    super.onInit();
+    initializeCamera();
+  }
+
+  @override
+  void onClose() {
+    _cameraController?.dispose();
+    super.onClose();
+  }
+
+  Future<void> initializeCamera() async {
+    try {
+      final cameras = await availableCameras();
+      _cameras.assignAll(cameras);
+      
+      if (_cameras.isNotEmpty) {
+        _cameraController = CameraController(
+          _cameras.first,
+          ResolutionPreset.high,
+          enableAudio: false,
+        );
+        await _cameraController!.initialize();
+        _isInitialized.value = true;
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Camera Error',
+        'Failed to initialize camera',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> takePicture() async {
+    if (_cameraController?.value.isInitialized != true) return;
+
+    _isProcessing.value = true;
+    try {
+      final XFile picture = await _cameraController!.takePicture();
+      _processImage(File(picture.path));
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to take picture');
+    } finally {
+      _isProcessing.value = false;
+    }
+  }
+
+  Future<void> pickFromGallery() async {
+    _isProcessing.value = true;
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+      );
+      if (image != null) {
+        _processImage(File(image.path));
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to pick image');
+    } finally {
+      _isProcessing.value = false;
+    }
+  }
+
+  void _processImage(File imageFile) {
+    Get.toNamed('/plant-result', arguments: imageFile.path);
+  }
+}
