@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:glassmorphism/glassmorphism.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../controllers/home_controller.dart';
 import '../../../app/controllers/theme_controller.dart';
 import '../../identification/views/camera_view.dart';
@@ -16,47 +18,533 @@ class HomeView extends GetView<HomeController> {
       body: Obx(() => IndexedStack(
         index: controller.currentIndex,
         children: const [
-          HomeTabView(),
+          PremiumHomeTabView(),
           CameraView(),
           GardenView(),
           CareView(),
           ProfileView(),
         ],
       )),
-      bottomNavigationBar: Obx(() => BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: controller.currentIndex,
-        onTap: controller.changeTabIndex,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
+      bottomNavigationBar: Obx(() => Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.white.withOpacity(0.9),
+              Colors.white,
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.camera_alt_outlined),
-            activeIcon: Icon(Icons.camera_alt),
-            label: 'Identify',
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
+              offset: Offset(0, -5),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          currentIndex: controller.currentIndex,
+          onTap: controller.changeTabIndex,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          selectedItemColor: Colors.green,
+          unselectedItemColor: Colors.grey,
+          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.camera_alt_outlined),
+              activeIcon: Icon(Icons.camera_alt),
+              label: 'Identify',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.local_florist_outlined),
+              activeIcon: Icon(Icons.local_florist),
+              label: 'Garden',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.schedule_outlined),
+              activeIcon: Icon(Icons.schedule),
+              label: 'Care',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+          ],
+        ),
+      )),
+    );
+  }
+}
+
+class PremiumHomeTabView extends StatelessWidget {
+  const PremiumHomeTabView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF4CAF50).withOpacity(0.1),
+              Color(0xFF8BC34A).withOpacity(0.05),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_florist_outlined),
-            activeIcon: Icon(Icons.local_florist),
-            label: 'Garden',
+        ),
+        child: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              // Premium App Bar
+              SliverAppBar(
+                expandedHeight: 120,
+                floating: true,
+                pinned: true,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 40),
+                        Text(
+                          'Good ${_getGreeting()},',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        Text(
+                          'Plant Lover! 🌱',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
+                actions: [
+                  IconButton(
+                    icon: Icon(Icons.notifications_outlined, color: Colors.black87),
+                    onPressed: () => _showNotifications(context),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.person_outline, color: Colors.black87),
+                    onPressed: () => Get.find<HomeController>().changeTabIndex(4),
+                  ),
+                ],
+              ),
+              
+              // Main Content
+              SliverToBoxAdapter(
+                child: AnimationLimiter(
+                  child: Column(
+                    children: AnimationConfiguration.toStaggeredList(
+                      duration: Duration(milliseconds: 375),
+                      childAnimationBuilder: (widget) => SlideAnimation(
+                        horizontalOffset: 50.0,
+                        child: FadeInAnimation(child: widget),
+                      ),
+                      children: [
+                        // Quick Actions
+                        _buildQuickActions(context),
+                        
+                        // Featured Section
+                        _buildFeaturedSection(),
+                        
+                        // Plant Tips
+                        _buildPlantTips(),
+                        
+                        SizedBox(height: 100), // Bottom padding
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.schedule_outlined),
-            activeIcon: Icon(Icons.schedule),
-            label: 'Care',
+        ),
+      ),
+      floatingActionButton: _buildFloatingActionButton(context),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildActionCard(
+              icon: Icons.camera_alt,
+              title: 'Identify Plant',
+              subtitle: 'Take a photo',
+              color: Colors.green,
+              onTap: () => Get.find<HomeController>().changeTabIndex(1),
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
+          SizedBox(width: 16),
+          Expanded(
+            child: _buildActionCard(
+              icon: Icons.local_florist,
+              title: 'My Garden',
+              subtitle: 'View collection',
+              color: Colors.blue,
+              onTap: () => Get.find<HomeController>().changeTabIndex(2),
+            ),
           ),
         ],
-      )),
+      ),
+    );
+  }
+
+  Widget _buildActionCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: GlassmorphicContainer(
+        width: double.infinity,
+        height: 100,
+        borderRadius: 20,
+        blur: 20,
+        alignment: Alignment.bottomCenter,
+        border: 2,
+        linearGradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withOpacity(0.1),
+            color.withOpacity(0.05),
+          ],
+        ),
+        borderGradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withOpacity(0.5),
+            color.withOpacity(0.2),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: 28),
+              SizedBox(height: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeaturedSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Text(
+            'Featured Plants',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        Container(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              return Container(
+                width: 160,
+                margin: EdgeInsets.only(right: 16),
+                child: _buildFeaturedPlantCard(index),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeaturedPlantCard(int index) {
+    final plants = [
+      {'name': 'Monstera Deliciosa', 'image': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300'},
+      {'name': 'Snake Plant', 'image': 'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=300'},
+      {'name': 'Fiddle Leaf Fig', 'image': 'https://images.unsplash.com/photo-1545239705-1564e58b9e4a?w=300'},
+      {'name': 'Peace Lily', 'image': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300'},
+      {'name': 'Rubber Plant', 'image': 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300'},
+    ];
+    
+    final plant = plants[index % plants.length];
+    
+    return GestureDetector(
+      onTap: () {},
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            children: [
+              Image.network(
+                plant['image']!,
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: Icon(Icons.local_florist, size: 40, color: Colors.grey[600]),
+                  );
+                },
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.8),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 12,
+                left: 12,
+                right: 12,
+                child: Text(
+                  plant['name']!,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlantTips() {
+    final tips = [
+      'Water plants early morning for best absorption',
+      'Rotate plants weekly for even growth',
+      'Check soil moisture before watering',
+      'Clean leaves regularly for better photosynthesis',
+      'Group plants with similar care needs together',
+    ];
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Text(
+            'Plant Care Tips',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        Container(
+          height: 100,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            itemCount: tips.length,
+            itemBuilder: (context, index) {
+              return Container(
+                width: 250,
+                margin: EdgeInsets.only(right: 16),
+                child: _buildTipCard(tips[index]),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTipCard(String tip) {
+    return GlassmorphicContainer(
+      width: double.infinity,
+      height: 100,
+      borderRadius: 16,
+      blur: 15,
+      alignment: Alignment.center,
+      border: 2,
+      linearGradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.orange.withOpacity(0.1),
+          Colors.orange.withOpacity(0.05),
+        ],
+      ),
+      borderGradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Colors.orange.withOpacity(0.5),
+          Colors.orange.withOpacity(0.2),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(Icons.lightbulb_outline, color: Colors.orange, size: 24),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                tip,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFloatingActionButton(BuildContext context) {
+    return Container(
+      width: 200,
+      height: 56,
+      child: FloatingActionButton.extended(
+        onPressed: () => Get.find<HomeController>().changeTabIndex(1),
+        backgroundColor: Colors.green,
+        elevation: 8,
+        icon: Icon(Icons.camera_alt, color: Colors.white),
+        label: Text(
+          'Identify Plant',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Morning';
+    if (hour < 17) return 'Afternoon';
+    return 'Evening';
+  }
+
+  void _showNotifications(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: 400,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Notifications',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'No new notifications',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
