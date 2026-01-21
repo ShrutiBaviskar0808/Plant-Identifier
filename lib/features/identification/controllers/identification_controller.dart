@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../../app/routes/app_routes.dart';
+import '../../../core/ai/services/plant_api_service.dart';
 
 class IdentificationController extends GetxController {
   CameraController? _cameraController;
@@ -10,11 +11,13 @@ class IdentificationController extends GetxController {
   final RxBool _isInitialized = false.obs;
   final RxBool _isProcessing = false.obs;
   final ImagePicker _imagePicker = ImagePicker();
+  final RxMap<String, dynamic> _analysisResult = <String, dynamic>{}.obs;
 
   CameraController? get cameraController => _cameraController;
   List<CameraDescription> get cameras => _cameras;
   bool get isInitialized => _isInitialized.value;
   bool get isProcessing => _isProcessing.value;
+  Map<String, dynamic> get analysisResult => _analysisResult;
 
   @override
   void onInit() {
@@ -57,7 +60,7 @@ class IdentificationController extends GetxController {
     _isProcessing.value = true;
     try {
       final XFile picture = await _cameraController!.takePicture();
-      _processImage(File(picture.path));
+      await _analyzeImage(File(picture.path));
     } catch (e) {
       Get.snackbar('Error', 'Failed to take picture');
     } finally {
@@ -72,7 +75,7 @@ class IdentificationController extends GetxController {
         source: ImageSource.gallery,
       );
       if (image != null) {
-        _processImage(File(image.path));
+        await _analyzeImage(File(image.path));
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to pick image');
@@ -81,7 +84,27 @@ class IdentificationController extends GetxController {
     }
   }
 
-  void _processImage(File imageFile) {
-    Get.toNamed(AppRoutes.plantResult, arguments: imageFile.path);
+  Future<void> _analyzeImage(File imageFile) async {
+    try {
+      Get.snackbar(
+        'Analyzing',
+        'AI is analyzing your plant...',
+        duration: Duration(seconds: 2),
+      );
+      
+      final result = await PlantAPIService.analyzeImage(imageFile);
+      _analysisResult.value = result;
+      
+      Get.toNamed(AppRoutes.plantResult, arguments: {
+        'imagePath': imageFile.path,
+        'analysisResult': result,
+      });
+    } catch (e) {
+      Get.snackbar(
+        'Analysis Failed',
+        'Failed to analyze image: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 }

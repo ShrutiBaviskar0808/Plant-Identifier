@@ -1,36 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:io';
-import '../controllers/identification_controller.dart';
 
-class PlantResultView extends GetView<IdentificationController> {
+class PlantResultView extends StatelessWidget {
   const PlantResultView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final String imagePath = Get.arguments as String? ?? '';
-    
-    if (imagePath.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Plant Results')),
-        body: const Center(
-          child: Text('No image provided'),
-        ),
-      );
-    }
+    final args = Get.arguments as Map<String, dynamic>;
+    final imagePath = args['imagePath'] as String;
+    final analysisResult = args['analysisResult'] as Map<String, dynamic>;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Plant Results'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () => _shareResults(),
-          ),
-        ],
+        title: Text('Analysis Results'),
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -39,105 +27,141 @@ class PlantResultView extends GetView<IdentificationController> {
               borderRadius: BorderRadius.circular(12),
               child: Image.file(
                 File(imagePath),
-                width: double.infinity,
                 height: 200,
+                width: double.infinity,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: double.infinity,
-                  height: 200,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.image_not_supported, size: 50),
-                ),
               ),
             ),
-            const SizedBox(height: 16),
             
-            // Results
-            Text(
-              'Identification Results',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
+            SizedBox(height: 20),
             
-            // Mock results for now
-            _buildResultCard(
-              context,
-              'Rose',
-              'Rosa rubiginosa',
-              0.95,
-              'A beautiful flowering plant known for its fragrance.',
+            // Plant Identification Results
+            _buildSection(
+              'Plant Identification',
+              analysisResult['plant_identification'],
+              Icons.local_florist,
+              Colors.green,
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildResultCard(BuildContext context, String commonName, String scientificName, double confidence, String description) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+            
+            SizedBox(height: 20),
+            
+            // Disease Detection Results
+            _buildSection(
+              'Disease Analysis',
+              analysisResult['disease_detection'],
+              Icons.health_and_safety,
+              Colors.orange,
+            ),
+            
+            SizedBox(height: 30),
+            
+            // Action Buttons
             Row(
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        commonName,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        scientificName,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontStyle: FontStyle.italic,
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ],
+                  child: ElevatedButton.icon(
+                    onPressed: () => Get.back(),
+                    icon: Icon(Icons.camera_alt),
+                    label: Text('Scan Another'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                    ),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '${(confidence * 100).toInt()}%',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _saveToGarden(analysisResult),
+                    icon: Icon(Icons.add),
+                    label: Text('Save to Garden'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(description),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => _addToGarden(),
-              child: const Text('Add to My Garden'),
-            ),
           ],
         ),
       ),
     );
   }
 
-  void _shareResults() {
-    Get.snackbar('Share', 'Sharing functionality coming soon!');
+  Widget _buildSection(String title, Map<String, dynamic>? data, IconData icon, Color color) {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, color: color),
+                SizedBox(width: 8),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+            
+            SizedBox(height: 12),
+            
+            if (data != null) ...[
+              ...data.entries.map((entry) => Padding(
+                padding: EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${_formatKey(entry.key)}: ',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '${entry.value}',
+                        style: TextStyle(color: Colors.grey[700]),
+                      ),
+                    ),
+                  ],
+                ),
+              )).toList(),
+            ] else ...[
+              Text(
+                'No data available',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 
-  void _addToGarden() {
-    Get.snackbar('Success', 'Plant added to your garden!');
+  String _formatKey(String key) {
+    return key
+        .split('_')
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .join(' ');
+  }
+
+  void _saveToGarden(Map<String, dynamic> analysisResult) {
+    Get.snackbar(
+      'Saved!',
+      'Plant added to your garden',
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
   }
 }
