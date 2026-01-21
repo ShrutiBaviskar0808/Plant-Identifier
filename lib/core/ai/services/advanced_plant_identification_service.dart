@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
+import '../models/plant_identification_result.dart';
+import '../models/identification_type.dart';
 
 class AdvancedPlantIdentificationService {
-  static const String _baseUrl = 'https://api.plantnet.org/v2';
-  static const String _apiKey = 'YOUR_API_KEY'; // Replace with actual API key
   
   // Multiple identification methods
   Future<Map<String, dynamic>> identifyPlant({
@@ -87,13 +87,13 @@ class AdvancedPlantIdentificationService {
     await for (final imageData in imageStream) {
       try {
         final tempFile = await _createTempFile(imageData);
-        final result = await identifyPlant(
+        final resultMap = await identifyPlant(
           imageFile: tempFile,
-          type: type,
+          type: type.value,
           latitude: latitude,
           longitude: longitude,
         );
-        yield result;
+        yield PlantIdentificationResult.fromMap(resultMap);
         await tempFile.delete();
       } catch (e) {
         yield PlantIdentificationResult(
@@ -102,7 +102,7 @@ class AdvancedPlantIdentificationService {
           confidence: 0.0,
           processingTime: 0,
           imageUrl: '',
-          identificationType: type,
+          identificationType: type.value,
           error: e.toString(),
         );
       }

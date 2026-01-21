@@ -5,7 +5,6 @@ import '../models/comprehensive_plant.dart';
 
 class SmartPlantCareService {
   final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
-  final Map<String, Timer> _activeTimers = {};
   
   // Initialize the care service
   Future<void> initialize() async {
@@ -261,7 +260,6 @@ class SmartPlantCareService {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       payload: careItem.id,
     );
   }
