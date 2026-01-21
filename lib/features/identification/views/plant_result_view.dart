@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:io';
+import '../../../core/data/local/garden_service.dart';
 
 class PlantResultView extends StatelessWidget {
   const PlantResultView({super.key});
@@ -22,7 +23,6 @@ class PlantResultView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.file(
@@ -35,17 +35,14 @@ class PlantResultView extends StatelessWidget {
             
             SizedBox(height: 20),
             
-            // Plant Identification Results
             _buildPlantSection(analysisResult['plant_identification']),
             
             SizedBox(height: 20),
             
-            // Disease Detection Results
             _buildDiseaseSection(analysisResult['disease_detection']),
             
             SizedBox(height: 30),
             
-            // Action Buttons
             Row(
               children: [
                 Expanded(
@@ -63,7 +60,7 @@ class PlantResultView extends StatelessWidget {
                 SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => _saveToGarden(analysisResult),
+                    onPressed: () => _saveToGarden(analysisResult, imagePath),
                     icon: Icon(Icons.add),
                     label: Text('Save to Garden'),
                     style: ElevatedButton.styleFrom(
@@ -123,7 +120,6 @@ class PlantResultView extends StatelessWidget {
   }
 
   Widget _buildPlantInfo(Map<String, dynamic> plantData) {
-    // Extract plant name from the complex data structure
     String plantName = 'Unknown Plant';
     double confidence = 0.0;
     
@@ -142,8 +138,6 @@ class PlantResultView extends StatelessWidget {
         _buildInfoRow('Plant Name', plantName),
         _buildInfoRow('Confidence', '${(confidence * 100).toStringAsFixed(1)}%'),
         _buildInfoRow('Plant Detected', plantData['plant_detected']?.toString() ?? 'Unknown'),
-        if (plantData['is_healthy'] != null)
-          _buildInfoRow('Health Status', plantData['is_healthy'] == true ? 'Healthy' : 'Needs Attention'),
       ],
     );
   }
@@ -190,21 +184,24 @@ class PlantResultView extends StatelessWidget {
   }
 
   Widget _buildDiseaseInfo(Map<String, dynamic> diseaseData) {
-    double confidence = 0.0;
-    String diseaseType = 'No disease detected';
-    String treatment = 'No treatment needed';
+    double confidence = (diseaseData['confidence'] ?? 0.0).toDouble();
+    bool isHealthy = diseaseData['is_healthy'] == true;
+    String diseaseType = 'Healthy - No disease detected';
+    String treatment = '';
     
-    if (diseaseData['disease_info'] != null) {
-      final diseaseInfo = diseaseData['disease_info'];
-      confidence = (diseaseData['confidence'] ?? 0.0).toDouble();
-      
-      if (diseaseInfo['sections'] != null && diseaseInfo['sections'].isNotEmpty) {
-        final section = diseaseInfo['sections'][0];
-        diseaseType = section['theader'] ?? 'Unknown Disease';
-        
-        // Extract clean treatment text
-        String rawText = section['text'] ?? '';
-        treatment = _extractTreatment(rawText);
+    // Check if disease is actually detected
+    if (!isHealthy && confidence > 0.3) {
+      if (diseaseData['disease_info'] != null) {
+        final diseaseInfo = diseaseData['disease_info'];
+        if (diseaseInfo['sections'] != null && diseaseInfo['sections'].isNotEmpty) {
+          final section = diseaseInfo['sections'][0];
+          diseaseType = section['theader'] ?? 'Disease Detected';
+          String rawText = section['text'] ?? '';
+          treatment = _extractTreatment(rawText);
+        }
+      } else {
+        diseaseType = 'Disease Detected';
+        treatment = 'Consult a plant specialist for proper diagnosis and treatment.';
       }
     }
 
@@ -213,9 +210,9 @@ class PlantResultView extends StatelessWidget {
       children: [
         _buildInfoRow('Disease Type', diseaseType),
         _buildInfoRow('Confidence', '${(confidence * 100).toStringAsFixed(1)}%'),
-        _buildInfoRow('Health Status', diseaseData['is_healthy'] == true ? 'Healthy' : 'Disease Detected'),
+        _buildInfoRow('Health Status', isHealthy ? 'Healthy' : 'Disease Detected'),
         
-        if (treatment.isNotEmpty && treatment != 'No treatment needed') ...[
+        if (!isHealthy && treatment.isNotEmpty) ...[
           SizedBox(height: 8),
           Text(
             'Treatment Advice:',
@@ -239,10 +236,8 @@ class PlantResultView extends StatelessWidget {
   }
 
   String _extractTreatment(String rawText) {
-    // Extract meaningful treatment advice from raw text
-    if (rawText.isEmpty) return 'No treatment needed';
+    if (rawText.isEmpty) return 'Consult a plant specialist for treatment';
     
-    // Split by sentences and take first few meaningful ones
     List<String> sentences = rawText.split('.');
     List<String> treatmentSentences = [];
     
@@ -254,12 +249,12 @@ class PlantResultView extends StatelessWidget {
           !sentence.contains('probability') &&
           sentence.length > 20) {
         treatmentSentences.add(sentence);
-        if (treatmentSentences.length >= 3) break; // Limit to 3 sentences
+        if (treatmentSentences.length >= 2) break;
       }
     }
     
     return treatmentSentences.isEmpty 
-        ? 'Consult a plant specialist for proper treatment'
+        ? 'Consult a plant specialist for treatment'
         : treatmentSentences.join('. ') + '.';
   }
 
@@ -287,12 +282,65 @@ class PlantResultView extends StatelessWidget {
     );
   }
 
-  void _saveToGarden(Map<String, dynamic> analysisResult) {
-    Get.snackbar(
-      'Saved!',
-      'Plant added to your garden',
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-    );
+  Future<void> _saveToGarden(Map<String, dynamic> analysisResult, String imagePath) async {
+    try {
+      String plantName = 'Unknown Plant';
+      double confidence = 0.0;
+      String healthStatus = 'Unknown';
+      String diseaseInfo = '';
+      
+      // Extract plant info
+      if (analysisResult['plant_identification'] != null) {
+        final plantData = analysisResult['plant_identification'];
+        if (plantData['any_plants'] != null && plantData['any_plants'].isNotEmpty) {
+          final plant = plantData['any_plants'][0];
+          plantName = plant['name'] ?? plant['en_name'] ?? 'Unknown Plant';
+          if (plant['images'] != null && plant['images'].isNotEmpty) {
+            confidence = (plant['images'][0]['score'] ?? 0.0).toDouble();
+          }
+        }
+      }
+      
+      // Extract disease info
+      if (analysisResult['disease_detection'] != null) {
+        final diseaseData = analysisResult['disease_detection'];
+        bool isHealthy = diseaseData['is_healthy'] == true;
+        healthStatus = isHealthy ? 'Healthy' : 'Disease Detected';
+        
+        if (!isHealthy && diseaseData['disease_info'] != null) {
+          final diseaseInfoData = diseaseData['disease_info'];
+          if (diseaseInfoData['sections'] != null && diseaseInfoData['sections'].isNotEmpty) {
+            diseaseInfo = diseaseInfoData['sections'][0]['theader'] ?? 'Disease Detected';
+          }
+        }
+      }
+      
+      await GardenService.savePlant(
+        name: plantName,
+        confidence: confidence,
+        imagePath: imagePath,
+        diseaseInfo: diseaseInfo.isNotEmpty ? diseaseInfo : null,
+        healthStatus: healthStatus,
+        analysisData: analysisResult,
+      );
+      
+      Get.snackbar(
+        'Success!',
+        'Plant saved to your garden successfully',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        icon: Icon(Icons.check_circle, color: Colors.white),
+        duration: Duration(seconds: 3),
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to save plant: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        icon: Icon(Icons.error, color: Colors.white),
+        duration: Duration(seconds: 3),
+      );
+    }
   }
 }
