@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../../../app/routes/app_routes.dart';
 
 class IdentificationController extends GetxController {
   CameraController? _cameraController;
@@ -81,6 +82,6 @@ class IdentificationController extends GetxController {
   }
 
   void _processImage(File imageFile) {
-    Get.toNamed('/plant-result', arguments: imageFile.path);
+    Get.toNamed(AppRoutes.plantResult, arguments: imageFile.path);
   }
 }

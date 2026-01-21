@@ -1,1 +1,73 @@
-android {\n    namespace \"com.plantidentifier.app\"\n    compileSdk 35\n    ndkVersion flutter.ndkVersion\n\n    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_1_8\n        targetCompatibility JavaVersion.VERSION_1_8\n    }\n\n    kotlinOptions {\n        jvmTarget = '1.8'\n    }\n\n    sourceSets {\n        main.java.srcDirs += 'src/main/kotlin'\n    }\n\n    defaultConfig {\n        applicationId \"com.plantidentifier.app\"\n        minSdkVersion 23\n        targetSdkVersion 35\n        versionCode flutterVersionCode.toInteger()\n        versionName flutterVersionName\n        \n        // Edge-to-edge support\n        manifestPlaceholders = [\n            'android:windowSoftInputMode': 'adjustResize',\n            'android:fitsSystemWindows': 'false'\n        ]\n    }\n\n    buildTypes {\n        release {\n            signingConfig signingConfigs.debug\n            minifyEnabled true\n            shrinkResources true\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\n        }\n    }\n}
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+android {
+    namespace "com.plantidentifier.app"
+    compileSdk 36
+    ndkVersion flutter.ndkVersion
+
+   compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+    coreLibraryDesugaringEnabled true
+}
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        applicationId "com.plantidentifier.app"
+        minSdkVersion 23
+        targetSdkVersion 36
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+
+        manifestPlaceholders = [
+            'android:windowSoftInputMode': 'adjustResize',
+            'android:fitsSystemWindows': 'false'
+        ]
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile(
+                'proguard-android-optimize.txt'
+            ), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+}
+

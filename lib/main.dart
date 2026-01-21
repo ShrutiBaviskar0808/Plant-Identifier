@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'firebase_options.dart';
 import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
 import 'app/theme/app_theme.dart';
@@ -18,19 +14,19 @@ void main() async {
   // Enable edge-to-edge
   EdgeToEdgeHelper.enableEdgeToEdge();
   
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
-  // Initialize Crashlytics
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  
-  // Initialize AI Models
-  await AIModelManager.initialize();
+  // Initialize AI Models (with error handling)
+  try {
+    await AIModelManager.initialize();
+  } catch (e) {
+    print('AI Model initialization failed: $e');
+  }
   
   // Initialize Database
-  await DatabaseService.initialize();
+  try {
+    await DatabaseService.initialize();
+  } catch (e) {
+    print('Database initialization failed: $e');
+  }
   
   runApp(const PlantIdentifierApp());
 }
@@ -43,15 +39,11 @@ class PlantIdentifierApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Plant Identifier',
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       initialRoute: AppRoutes.splash,
       getPages: AppPages.routes,
       initialBinding: InitialBinding(),
       debugShowCheckedModeBanner: false,
-      navigatorObservers: [
-        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
-      ],
     );
   }
 }

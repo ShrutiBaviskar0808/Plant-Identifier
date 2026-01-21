@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:io';
 import '../controllers/identification_controller.dart';
 
 class PlantResultView extends GetView<IdentificationController> {
@@ -36,8 +37,8 @@ class PlantResultView extends GetView<IdentificationController> {
             // Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                imagePath,
+              child: Image.file(
+                File(imagePath),
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,
