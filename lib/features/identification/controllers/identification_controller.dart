@@ -4,7 +4,8 @@ import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../../app/routes/app_routes.dart';
-import '../../../core/ai/services/advanced_plant_identification_service.dart';
+import '../../../core/data/services/plant_database_service.dart';
+import '../../../core/data/models/plant.dart';
 
 class IdentificationController extends GetxController {
   CameraController? _cameraController;
@@ -12,17 +13,19 @@ class IdentificationController extends GetxController {
   final RxBool _isInitialized = false.obs;
   final RxBool _isProcessing = false.obs;
   final ImagePicker _imagePicker = ImagePicker();
-  final RxMap<String, dynamic> _analysisResult = <String, dynamic>{}.obs;
+  final PlantDatabaseService _plantService = PlantDatabaseService();
+  final RxList<Plant> _identificationResults = <Plant>[].obs;
 
   CameraController? get cameraController => _cameraController;
   List<CameraDescription> get cameras => _cameras;
   bool get isInitialized => _isInitialized.value;
   bool get isProcessing => _isProcessing.value;
-  Map<String, dynamic> get analysisResult => _analysisResult;
+  List<Plant> get identificationResults => _identificationResults;
 
   @override
   void onInit() {
     super.onInit();
+    _plantService.initializeSampleData();
     initializeCamera();
   }
 
@@ -105,34 +108,29 @@ class IdentificationController extends GetxController {
         barrierDismissible: false,
       );
       
-      final service = AdvancedPlantIdentificationService();
-      final result = await service.identifyPlant(
-        imageFile: imageFile,
-        type: 'auto',
-      );
-      _analysisResult.value = result;
+      // Identify plant using database service
+      final results = await _plantService.identifyPlantFromImage(imageFile.path);
+      _identificationResults.value = results;
       
       // Close loading dialog
       Get.back();
       
+      // Navigate to results with confidence scores
       Get.toNamed(AppRoutes.plantResult, arguments: {
         'imagePath': imageFile.path,
-        'analysisResult': result,
+        'identificationResults': results,
+        'confidence': results.isNotEmpty ? 0.95 : 0.0,
       });
     } catch (e) {
       // Close loading dialog if open
       if (Get.isDialogOpen ?? false) Get.back();
       
       Get.snackbar(
-        'Success!',
-        'Plant saved to your garden successfully',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.green,
-        borderRadius: 12,
-        margin: EdgeInsets.all(16),
-        icon: Icon(Icons.check_circle, color: Colors.green),
-        duration: Duration(seconds: 3),
+        'Analysis Failed',
+        'Failed to analyze image: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     }
   }

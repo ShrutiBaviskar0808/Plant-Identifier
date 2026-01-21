@@ -252,7 +252,7 @@ class _ResultCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 
-                _CareInfoSection(care: result.plant.care),
+                _CareInfoSection(care: result.plant.careRequirements),
               ],
             ),
           ),
@@ -263,7 +263,7 @@ class _ResultCard extends StatelessWidget {
 }
 
 class _CareInfoSection extends StatelessWidget {
-  final CareRequirements care;
+  final PlantCareRequirements care;
 
   const _CareInfoSection({required this.care});
 
@@ -280,12 +280,12 @@ class _CareInfoSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         
-        _CareItem(icon: Icons.water_drop, label: 'Water', value: care.waterFrequency),
-        _CareItem(icon: Icons.wb_sunny, label: 'Light', value: care.lightRequirement),
+        _CareItem(icon: Icons.water_drop, label: 'Water', value: '${care.water.frequency} - ${care.water.amount}'),
+        _CareItem(icon: Icons.wb_sunny, label: 'Light', value: '${care.light.level} (${care.light.hoursPerDay}h/day)'),
         _CareItem(icon: Icons.grass, label: 'Soil', value: care.soilType),
-        _CareItem(icon: Icons.thermostat, label: 'Temperature', value: care.temperature),
-        _CareItem(icon: Icons.opacity, label: 'Humidity', value: care.humidity),
+        _CareItem(icon: Icons.thermostat, label: 'Temperature', value: '${care.temperature.minTemp}-${care.temperature.maxTemp}°${care.temperature.unit}'),
         _CareItem(icon: Icons.eco, label: 'Fertilizer', value: care.fertilizer),
+        _CareItem(icon: Icons.content_cut, label: 'Pruning', value: care.pruning),
       ],
     );
   }

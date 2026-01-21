@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:glassmorphism/glassmorphism.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../controllers/home_controller.dart';
 import '../../../app/controllers/theme_controller.dart';
@@ -8,6 +7,7 @@ import '../../identification/views/camera_view.dart';
 import '../../garden/views/garden_view.dart';
 import '../../care/views/care_view.dart';
 import '../../profile/views/profile_view.dart';
+import '../../browse/views/plant_browse_view.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -61,7 +61,7 @@ class HomeView extends GetView<HomeController> {
             BottomNavigationBarItem(
               icon: Icon(Icons.camera_alt_outlined),
               activeIcon: Icon(Icons.camera_alt),
-              label: 'Identify',
+              label: 'Scan',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.local_florist_outlined),
@@ -107,7 +107,7 @@ class PremiumHomeTabView extends StatelessWidget {
             slivers: [
               // Premium App Bar
               SliverAppBar(
-                expandedHeight: 130,
+                expandedHeight: 140,
                 floating: true,
                 pinned: true,
                 backgroundColor: Colors.transparent,
@@ -119,7 +119,7 @@ class PremiumHomeTabView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 50),
+                        SizedBox(height: 60),
                         Text(
                           'Good ${_getGreeting()},',
                           style: TextStyle(
@@ -135,7 +135,7 @@ class PremiumHomeTabView extends StatelessWidget {
                             color: Colors.black87,
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 25),
                       ],
                     ),
                   ),
@@ -169,8 +169,8 @@ class PremiumHomeTabView extends StatelessWidget {
                         // Featured Section
                         _buildFeaturedSection(),
                         
-                        // Plant Tips
-                        _buildPlantTips(),
+                        // Plant Care Tools
+                        _buildPlantCareTools(),
                         
                         SizedBox(height: 100), // Bottom padding
                       ],
@@ -182,8 +182,6 @@ class PremiumHomeTabView extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: _buildFloatingActionButton(context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -204,11 +202,11 @@ class PremiumHomeTabView extends StatelessWidget {
           SizedBox(width: 16),
           Expanded(
             child: _buildActionCard(
-              icon: Icons.local_florist,
-              title: 'My Garden',
-              subtitle: 'View collection',
+              icon: Icons.search,
+              title: 'Browse Plants',
+              subtitle: 'Explore plant database',
               color: Colors.blue,
-              onTap: () => Get.find<HomeController>().changeTabIndex(2),
+              onTap: () => Get.to(() => PlantBrowseView()),
             ),
           ),
         ],
@@ -226,8 +224,8 @@ class PremiumHomeTabView extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 110,
-        padding: EdgeInsets.all(16),
+        height: 130,
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
@@ -243,12 +241,12 @@ class PremiumHomeTabView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 24),
-            SizedBox(height: 8),
+            Icon(icon, color: color, size: 32),
+            SizedBox(height: 12),
             Text(
               title,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
@@ -260,7 +258,7 @@ class PremiumHomeTabView extends StatelessWidget {
             Text(
               subtitle,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 14,
                 color: Colors.black54,
               ),
               textAlign: TextAlign.center,
@@ -282,21 +280,21 @@ class PremiumHomeTabView extends StatelessWidget {
           child: Text(
             'Featured Plants',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
           ),
         ),
         Container(
-          height: 200,
+          height: 250,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16),
             itemCount: 5,
             itemBuilder: (context, index) {
               return Container(
-                width: 160,
+                width: 180,
                 margin: EdgeInsets.only(right: 16),
                 child: _buildFeaturedPlantCard(index),
               );
@@ -381,115 +379,115 @@ class PremiumHomeTabView extends StatelessWidget {
     );
   }
 
-  Widget _buildPlantTips() {
-    final tips = [
-      'Water plants early morning for best absorption',
-      'Rotate plants weekly for even growth',
-      'Check soil moisture before watering',
-      'Clean leaves regularly for better photosynthesis',
-      'Group plants with similar care needs together',
-    ];
-    
+  Widget _buildPlantCareTools() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Text(
-            'Plant Care Tips',
+            'Plant Care Tools',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
           ),
         ),
         Container(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            itemCount: tips.length,
-            itemBuilder: (context, index) {
-              return Container(
-                width: 250,
-                margin: EdgeInsets.only(right: 16),
-                child: _buildTipCard(tips[index]),
-              );
-            },
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: GridView.count(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 1.0,
+            children: [
+              _buildFeatureCard(
+                icon: Icons.health_and_safety,
+                title: 'Disease Doctor',
+                subtitle: 'Diagnose issues',
+                color: Colors.red,
+              ),
+              _buildFeatureCard(
+                icon: Icons.water_drop,
+                title: 'Care Calendar',
+                subtitle: 'Watering reminders',
+                color: Colors.cyan,
+              ),
+              _buildFeatureCard(
+                icon: Icons.wb_sunny,
+                title: 'Light Meter',
+                subtitle: 'Check sunlight',
+                color: Colors.orange,
+              ),
+              _buildFeatureCard(
+                icon: Icons.quiz,
+                title: 'Plant Quiz',
+                subtitle: 'Test knowledge',
+                color: Colors.purple,
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  Widget _buildTipCard(String tip) {
-    return GlassmorphicContainer(
-      width: double.infinity,
-      height: 100,
-      borderRadius: 16,
-      blur: 15,
-      alignment: Alignment.center,
-      border: 2,
-      linearGradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Colors.orange.withValues(alpha: 0.1),
-          Colors.orange.withValues(alpha: 0.05),
-        ],
-      ),
-      borderGradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Colors.orange.withValues(alpha: 0.5),
-          Colors.orange.withValues(alpha: 0.2),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(Icons.lightbulb_outline, color: Colors.orange, size: 24),
-            SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                tip,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black87,
-                ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
+  Widget _buildFeatureCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withValues(alpha: 0.1),
+            color.withValues(alpha: 0.05),
           ],
         ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 32),
+          SizedBox(height: 10),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          SizedBox(height: 2),
+          Text(
+            subtitle,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.black54,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildFloatingActionButton(BuildContext context) {
-    return Container(
-      width: 200,
-      height: 56,
-      child: FloatingActionButton.extended(
-        heroTag: "home_identify_fab",
-        onPressed: () => Get.find<HomeController>().changeTabIndex(1),
-        backgroundColor: Colors.green,
-        elevation: 8,
-        icon: Icon(Icons.camera_alt, color: Colors.white),
-        label: Text(
-          'Identify Plant',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
+
 
   String _getGreeting() {
     final hour = DateTime.now().hour;

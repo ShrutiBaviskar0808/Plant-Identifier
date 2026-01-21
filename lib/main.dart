@@ -4,31 +4,32 @@ import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
 import 'app/theme/app_theme.dart';
 import 'app/bindings/initial_binding.dart';
-import 'core/ai/services/ai_model_manager.dart';
-import 'core/data/local/database_service.dart';
-import 'core/utils/edge_to_edge_helper.dart';
+import 'core/data/services/plant_database_service.dart';
+import 'core/data/services/user_plant_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Enable edge-to-edge
-  EdgeToEdgeHelper.enableEdgeToEdge();
-  
-  // Initialize AI Models (with error handling)
-  try {
-    await AIModelManager.initialize();
-  } catch (e) {
-    print('AI Model initialization failed: $e');
-  }
-  
-  // Initialize Database
-  try {
-    await DatabaseService.initialize();
-  } catch (e) {
-    print('Database initialization failed: $e');
-  }
+  // Initialize core services for MVP
+  await _initializeServices();
   
   runApp(const PlantIdentifierApp());
+}
+
+Future<void> _initializeServices() async {
+  try {
+    // Initialize plant database
+    final plantService = PlantDatabaseService();
+    plantService.initializeSampleData();
+    
+    // Initialize user plant service
+    final userPlantService = UserPlantService();
+    await userPlantService.loadUserPlants();
+    
+    print('Services initialized successfully');
+  } catch (e) {
+    print('Service initialization failed: $e');
+  }
 }
 
 class PlantIdentifierApp extends StatelessWidget {

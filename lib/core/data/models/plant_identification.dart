@@ -6,7 +6,7 @@ class PlantIdentification {
   final List<IdentificationResult> results;
   final DateTime timestamp;
 
-  const PlantIdentification({
+  PlantIdentification({
     required this.id,
     required this.imagePath,
     required this.results,
@@ -15,20 +15,20 @@ class PlantIdentification {
 
   factory PlantIdentification.fromJson(Map<String, dynamic> json) {
     return PlantIdentification(
-      id: json['id'] as String,
-      imagePath: json['image_path'] as String,
-      results: (json['results'] as List)
-          .map((r) => IdentificationResult.fromJson(r as Map<String, dynamic>))
-          .toList(),
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      id: json['id'] ?? '',
+      imagePath: json['imagePath'] ?? '',
+      results: (json['results'] as List<dynamic>?)
+          ?.map((e) => IdentificationResult.fromJson(e as Map<String, dynamic>))
+          .toList() ?? [],
+      timestamp: DateTime.tryParse(json['timestamp'] ?? '') ?? DateTime.now(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'image_path': imagePath,
-      'results': results.map((r) => r.toJson()).toList(),
+      'imagePath': imagePath,
+      'results': results.map((e) => e.toJson()).toList(),
       'timestamp': timestamp.toIso8601String(),
     };
   }
@@ -38,15 +38,15 @@ class IdentificationResult {
   final Plant plant;
   final double confidence;
 
-  const IdentificationResult({
+  IdentificationResult({
     required this.plant,
     required this.confidence,
   });
 
   factory IdentificationResult.fromJson(Map<String, dynamic> json) {
     return IdentificationResult(
-      plant: Plant.fromJson(json['plant'] as Map<String, dynamic>),
-      confidence: (json['confidence'] as num).toDouble(),
+      plant: Plant.fromJson(json['plant'] ?? {}),
+      confidence: (json['confidence'] ?? 0.0).toDouble(),
     );
   }
 
@@ -54,6 +54,46 @@ class IdentificationResult {
     return {
       'plant': plant.toJson(),
       'confidence': confidence,
+    };
+  }
+}
+
+class CareRequirements {
+  final String waterFrequency;
+  final String lightRequirement;
+  final String soilType;
+  final String temperature;
+  final String humidity;
+  final String fertilizer;
+
+  const CareRequirements({
+    required this.waterFrequency,
+    required this.lightRequirement,
+    required this.soilType,
+    required this.temperature,
+    required this.humidity,
+    required this.fertilizer,
+  });
+
+  factory CareRequirements.fromJson(Map<String, dynamic> json) {
+    return CareRequirements(
+      waterFrequency: json['waterFrequency'] ?? '',
+      lightRequirement: json['lightRequirement'] ?? '',
+      soilType: json['soilType'] ?? '',
+      temperature: json['temperature'] ?? '',
+      humidity: json['humidity'] ?? '',
+      fertilizer: json['fertilizer'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'waterFrequency': waterFrequency,
+      'lightRequirement': lightRequirement,
+      'soilType': soilType,
+      'temperature': temperature,
+      'humidity': humidity,
+      'fertilizer': fertilizer,
     };
   }
 }

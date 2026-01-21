@@ -98,15 +98,26 @@ class AIModelManager {
       family: 'Plant Family',
       category: 'Flowering Plant',
       description: 'A beautiful $name plant.',
-      imageUrl: 'assets/images/plants/${name.toLowerCase()}.jpg',
-      care: const CareRequirements(
-        waterFrequency: 'Weekly',
-        lightRequirement: 'Bright indirect light',
+      careRequirements: PlantCareRequirements(
+        water: WaterRequirement(
+          frequency: 'weekly',
+          amount: 'medium',
+        ),
+        light: LightRequirement(
+          level: 'medium',
+          hoursPerDay: 6,
+          placement: 'indoor',
+        ),
         soilType: 'Well-draining',
-        temperature: '18-24°C',
-        humidity: '40-60%',
+        growthSeason: 'Spring-Summer',
+        temperature: TemperatureRange(
+          minTemp: 18,
+          maxTemp: 24,
+        ),
         fertilizer: 'Monthly during growing season',
+        pruning: 'As needed',
       ),
+      imageUrls: ['assets/images/plants/${name.toLowerCase()}.jpg'],
       tags: ['indoor', 'easy-care'],
     );
   }

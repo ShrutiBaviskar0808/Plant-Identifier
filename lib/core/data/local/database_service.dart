@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/plant.dart';
-import '../models/user_plant.dart';
 import '../models/plant_identification.dart';
 
 class DatabaseService {
@@ -23,7 +22,6 @@ class DatabaseService {
         onCreate: _createTables,
       );
 
-      await _insertInitialData();
       print('Database initialized successfully');
     } catch (e) {
       print('Error initializing database: $e');
@@ -40,9 +38,10 @@ class DatabaseService {
         family TEXT NOT NULL,
         category TEXT NOT NULL,
         description TEXT NOT NULL,
-        image_url TEXT NOT NULL,
-        care_data TEXT NOT NULL,
-        tags TEXT NOT NULL
+        care_requirements TEXT NOT NULL,
+        image_urls TEXT NOT NULL,
+        tags TEXT NOT NULL,
+        created_at TEXT NOT NULL
       )
     ''');
 
@@ -52,10 +51,10 @@ class DatabaseService {
         id TEXT PRIMARY KEY,
         plant_data TEXT NOT NULL,
         custom_name TEXT,
-        notes TEXT NOT NULL,
+        notes TEXT,
+        group_name TEXT,
         date_added TEXT NOT NULL,
-        location TEXT,
-        photos TEXT NOT NULL
+        image_path TEXT
       )
     ''');
 
@@ -64,68 +63,10 @@ class DatabaseService {
       CREATE TABLE plant_identifications (
         id TEXT PRIMARY KEY,
         image_path TEXT NOT NULL,
-        results_data TEXT NOT NULL,
+        results TEXT NOT NULL,
         timestamp TEXT NOT NULL
       )
     ''');
-  }
-
-  static Future<void> _insertInitialData() async {
-    if (_database == null) return;
-
-    // Check if data already exists
-    final count = Sqflite.firstIntValue(
-      await _database!.rawQuery('SELECT COUNT(*) FROM plants')
-    );
-
-    if (count != null && count > 0) return;
-
-    // Insert sample plants
-    final samplePlants = _getSamplePlants();
-    for (final plant in samplePlants) {
-      await insertPlant(plant);
-    }
-  }
-
-  static List<Plant> _getSamplePlants() {
-    return [
-      Plant(
-        id: 'rose_001',
-        commonName: 'Rose',
-        scientificName: 'Rosa rubiginosa',
-        family: 'Rosaceae',
-        category: 'Flowering Plant',
-        description: 'A classic flowering plant known for its beauty and fragrance.',
-        imageUrl: 'assets/images/plants/rose.jpg',
-        care: const CareRequirements(
-          waterFrequency: 'Twice weekly',
-          lightRequirement: 'Full sun',
-          soilType: 'Well-draining, fertile',
-          temperature: '15-25°C',
-          humidity: '40-70%',
-          fertilizer: 'Monthly during growing season',
-        ),
-        tags: ['outdoor', 'flowering', 'fragrant'],
-      ),
-      Plant(
-        id: 'monstera_001',
-        commonName: 'Monstera Deliciosa',
-        scientificName: 'Monstera deliciosa',
-        family: 'Araceae',
-        category: 'Houseplant',
-        description: 'Popular indoor plant with distinctive split leaves.',
-        imageUrl: 'assets/images/plants/monstera.jpg',
-        care: const CareRequirements(
-          waterFrequency: 'Weekly',
-          lightRequirement: 'Bright indirect light',
-          soilType: 'Well-draining potting mix',
-          temperature: '18-27°C',
-          humidity: '50-80%',
-          fertilizer: 'Monthly in spring/summer',
-        ),
-        tags: ['indoor', 'tropical', 'easy-care'],
-      ),
-    ];
   }
 
   // Plant operations
@@ -141,9 +82,10 @@ class DatabaseService {
         'family': plant.family,
         'category': plant.category,
         'description': plant.description,
-        'image_url': plant.imageUrl,
-        'care_data': jsonEncode(plant.care.toJson()),
+        'care_requirements': jsonEncode(plant.careRequirements.toJson()),
+        'image_urls': jsonEncode(plant.imageUrls),
         'tags': jsonEncode(plant.tags),
+        'created_at': plant.createdAt.toIso8601String(),
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -171,18 +113,6 @@ class DatabaseService {
     return null;
   }
 
-  static Future<List<Plant>> searchPlants(String query) async {
-    if (_database == null) return [];
-
-    final maps = await _database!.query(
-      'plants',
-      where: 'common_name LIKE ? OR scientific_name LIKE ? OR tags LIKE ?',
-      whereArgs: ['%$query%', '%$query%', '%$query%'],
-    );
-
-    return maps.map((map) => _plantFromMap(map)).toList();
-  }
-
   // User plant operations
   static Future<void> insertUserPlant(UserPlant userPlant) async {
     if (_database == null) return;
@@ -193,10 +123,10 @@ class DatabaseService {
         'id': userPlant.id,
         'plant_data': jsonEncode(userPlant.plant.toJson()),
         'custom_name': userPlant.customName,
-        'notes': jsonEncode(userPlant.notes),
+        'notes': userPlant.notes,
+        'group_name': userPlant.group,
         'date_added': userPlant.dateAdded.toIso8601String(),
-        'location': userPlant.location,
-        'photos': jsonEncode(userPlant.photos),
+        'image_path': userPlant.imagePath,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -228,7 +158,7 @@ class DatabaseService {
       {
         'id': identification.id,
         'image_path': identification.imagePath,
-        'results_data': jsonEncode(identification.results.map((r) => r.toJson()).toList()),
+        'results': jsonEncode(identification.results.map((r) => r.toJson()).toList()),
         'timestamp': identification.timestamp.toIso8601String(),
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
@@ -238,12 +168,18 @@ class DatabaseService {
   static Future<List<PlantIdentification>> getPlantIdentifications() async {
     if (_database == null) return [];
 
-    final maps = await _database!.query(
-      'plant_identifications',
-      orderBy: 'timestamp DESC',
-    );
-
+    final maps = await _database!.query('plant_identifications', orderBy: 'timestamp DESC');
     return maps.map((map) => _identificationFromMap(map)).toList();
+  }
+
+  static Future<void> deletePlantIdentification(String id) async {
+    if (_database == null) return;
+
+    await _database!.delete(
+      'plant_identifications',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   // Helper methods
@@ -255,9 +191,12 @@ class DatabaseService {
       family: map['family'] as String,
       category: map['category'] as String,
       description: map['description'] as String,
-      imageUrl: map['image_url'] as String,
-      care: CareRequirements.fromJson(jsonDecode(map['care_data'] as String)),
+      careRequirements: PlantCareRequirements.fromJson(
+        jsonDecode(map['care_requirements'] as String)
+      ),
+      imageUrls: List<String>.from(jsonDecode(map['image_urls'] as String)),
       tags: List<String>.from(jsonDecode(map['tags'] as String)),
+      createdAt: DateTime.parse(map['created_at'] as String),
     );
   }
 
@@ -266,19 +205,17 @@ class DatabaseService {
       id: map['id'] as String,
       plant: Plant.fromJson(jsonDecode(map['plant_data'] as String)),
       customName: map['custom_name'] as String?,
-      notes: List<String>.from(jsonDecode(map['notes'] as String)),
+      notes: map['notes'] as String?,
+      group: map['group_name'] as String?,
       dateAdded: DateTime.parse(map['date_added'] as String),
-      location: map['location'] as String?,
-      photos: List<String>.from(jsonDecode(map['photos'] as String)),
+      imagePath: map['image_path'] as String?,
     );
   }
 
   static PlantIdentification _identificationFromMap(Map<String, dynamic> map) {
-    final resultsData = jsonDecode(map['results_data'] as String) as List;
-    final results = resultsData
-        .map((r) => IdentificationResult.fromJson(r as Map<String, dynamic>))
-        .toList();
-
+    final resultsJson = jsonDecode(map['results'] as String) as List<dynamic>;
+    final results = resultsJson.map((r) => IdentificationResult.fromJson(r as Map<String, dynamic>)).toList();
+    
     return PlantIdentification(
       id: map['id'] as String,
       imagePath: map['image_path'] as String,

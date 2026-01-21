@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/garden_controller.dart';
-import '../../../core/data/models/user_plant.dart';
+import '../../../core/data/models/plant.dart';
 import '../../home/controllers/home_controller.dart';
 
 class GardenView extends GetView<GardenController> {
@@ -109,6 +109,7 @@ class GardenView extends GetView<GardenController> {
         );
       }),
       floatingActionButton: FloatingActionButton(
+        heroTag: "garden_add_fab",
         onPressed: () => Get.find<HomeController>().changeTabIndex(1),
         child: const Icon(Icons.add),
       ),
@@ -306,8 +307,8 @@ class _EmptyGardenView extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () => Get.find<HomeController>().changeTabIndex(1),
-              icon: const Icon(Icons.camera_alt),
-              label: const Text('Identify Plant'),
+              icon: const Icon(Icons.add),
+              label: const Text('Add Plant'),
             ),
           ],
         ),
