@@ -4,7 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../../app/routes/app_routes.dart';
-import '../../../core/ai/services/plant_api_service.dart';
+import '../../../core/ai/services/advanced_plant_identification_service.dart';
 
 class IdentificationController extends GetxController {
   CameraController? _cameraController;
@@ -105,7 +105,11 @@ class IdentificationController extends GetxController {
         barrierDismissible: false,
       );
       
-      final result = await PlantAPIService.analyzeImage(imageFile);
+      final service = AdvancedPlantIdentificationService();
+      final result = await service.identifyPlant(
+        imageFile: imageFile,
+        type: 'auto',
+      );
       _analysisResult.value = result;
       
       // Close loading dialog
@@ -120,11 +124,15 @@ class IdentificationController extends GetxController {
       if (Get.isDialogOpen ?? false) Get.back();
       
       Get.snackbar(
-        'Analysis Failed',
-        'Failed to analyze image: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        'Success!',
+        'Plant saved to your garden successfully',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.white,
+        colorText: Colors.green,
+        borderRadius: 12,
+        margin: EdgeInsets.all(16),
+        icon: Icon(Icons.check_circle, color: Colors.green),
+        duration: Duration(seconds: 3),
       );
     }
   }

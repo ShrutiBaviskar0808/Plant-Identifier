@@ -75,8 +75,8 @@ dependencies:
   rive: ^0.12.4
   
   # Audio & Voice
-  speech_to_text: ^6.6.0
-  flutter_tts: ^3.8.5
+  # speech_to_text: ^6.6.0
+  # flutter_tts: ^3.8.5
   
   # Utilities
   uuid: ^4.2.1

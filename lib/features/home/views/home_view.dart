@@ -107,7 +107,7 @@ class PremiumHomeTabView extends StatelessWidget {
             slivers: [
               // Premium App Bar
               SliverAppBar(
-                expandedHeight: 120,
+                expandedHeight: 130,
                 floating: true,
                 pinned: true,
                 backgroundColor: Colors.transparent,
@@ -119,18 +119,18 @@ class PremiumHomeTabView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 40),
+                        SizedBox(height: 50),
                         Text(
                           'Good ${_getGreeting()},',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             color: Colors.black54,
                           ),
                         ),
                         Text(
                           'Plant Lover! 🌱',
                           style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
@@ -189,7 +189,7 @@ class PremiumHomeTabView extends StatelessWidget {
 
   Widget _buildQuickActions(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      margin: EdgeInsets.only(left: 20, right: 20, top: 40, bottom: 16),
       child: Row(
         children: [
           Expanded(
@@ -225,55 +225,49 @@ class PremiumHomeTabView extends StatelessWidget {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: GlassmorphicContainer(
-        width: double.infinity,
-        height: 100,
-        borderRadius: 20,
-        blur: 20,
-        alignment: Alignment.bottomCenter,
-        border: 2,
-        linearGradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            color.withValues(alpha: 0.1),
-            color.withValues(alpha: 0.05),
-          ],
-        ),
-        borderGradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            color.withValues(alpha: 0.5),
-            color.withValues(alpha: 0.2),
-          ],
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: color, size: 28),
-              SizedBox(height: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.black54,
-                ),
-                textAlign: TextAlign.center,
-              ),
+      child: Container(
+        height: 110,
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withValues(alpha: 0.1),
+              color.withValues(alpha: 0.05),
             ],
           ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 24),
+            SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.black54,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
         ),
       ),
     );
@@ -481,6 +475,7 @@ class PremiumHomeTabView extends StatelessWidget {
       width: 200,
       height: 56,
       child: FloatingActionButton.extended(
+        heroTag: "home_identify_fab",
         onPressed: () => Get.find<HomeController>().changeTabIndex(1),
         backgroundColor: Colors.green,
         elevation: 8,
