@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
@@ -86,24 +87,44 @@ class IdentificationController extends GetxController {
 
   Future<void> _analyzeImage(File imageFile) async {
     try {
-      Get.snackbar(
-        'Analyzing',
-        'AI is analyzing your plant...',
-        duration: Duration(seconds: 2),
+      // Show loading dialog
+      Get.dialog(
+        AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(color: Colors.green),
+              SizedBox(height: 16),
+              Text(
+                'AI is analyzing your plant...',
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+        barrierDismissible: false,
       );
       
       final result = await PlantAPIService.analyzeImage(imageFile);
       _analysisResult.value = result;
+      
+      // Close loading dialog
+      Get.back();
       
       Get.toNamed(AppRoutes.plantResult, arguments: {
         'imagePath': imageFile.path,
         'analysisResult': result,
       });
     } catch (e) {
+      // Close loading dialog if open
+      if (Get.isDialogOpen ?? false) Get.back();
+      
       Get.snackbar(
         'Analysis Failed',
         'Failed to analyze image: $e',
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     }
   }
