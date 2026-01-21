@@ -1,5 +1,6 @@
 import '../models/care_models.dart';
 import '../models/plant.dart';
+import 'notification_service.dart';
 
 class CareReminderService {
   static final List<CareReminder> _reminders = [];
@@ -8,6 +9,13 @@ class CareReminderService {
   // Reminder Management
   static Future<void> addReminder(CareReminder reminder) async {
     _reminders.add(reminder);
+    
+    // Schedule notification
+    NotificationService.scheduleReminderNotification(
+      'Your Plant',
+      reminder.type.displayName.toLowerCase(),
+      reminder.nextDue,
+    );
   }
 
   static List<CareReminder> getRemindersForPlant(String plantId) {
@@ -42,6 +50,13 @@ class CareReminderService {
     
     final index = _reminders.indexWhere((r) => r.id == reminderId);
     _reminders[index] = updatedReminder;
+    
+    // Schedule next notification
+    NotificationService.scheduleReminderNotification(
+      'Your Plant',
+      reminder.type.displayName.toLowerCase(),
+      nextDue,
+    );
   }
 
   // Auto-suggest reminders based on plant type

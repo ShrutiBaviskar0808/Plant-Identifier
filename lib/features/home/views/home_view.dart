@@ -8,6 +8,8 @@ import '../../garden/views/garden_view.dart';
 import '../../care/views/care_view.dart';
 import '../../profile/views/profile_view.dart';
 import '../../browse/views/plant_browse_view.dart';
+import '../../notifications/views/notifications_view.dart';
+import '../../../core/data/services/notification_service.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -142,8 +144,37 @@ class PremiumHomeTabView extends StatelessWidget {
                 ),
                 actions: [
                   IconButton(
-                    icon: Icon(Icons.notifications_outlined, color: Colors.black87),
-                    onPressed: () => _showNotifications(context),
+                    icon: Stack(
+                      children: [
+                        const Icon(Icons.notifications_outlined, color: Colors.black87),
+                        if (NotificationService.getUnreadCount() > 0)
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Text(
+                                '${NotificationService.getUnreadCount()}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    onPressed: () => Get.to(() => const NotificationsView()),
                   ),
                   IconButton(
                     icon: Icon(Icons.person_outline, color: Colors.black87),
