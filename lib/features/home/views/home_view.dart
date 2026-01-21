@@ -31,13 +31,13 @@ class HomeView extends GetView<HomeController> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.white.withOpacity(0.9),
+              Colors.white.withValues(alpha: 0.9),
               Colors.white,
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: Offset(0, -5),
             ),
@@ -97,8 +97,8 @@ class PremiumHomeTabView extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF4CAF50).withOpacity(0.1),
-              Color(0xFF8BC34A).withOpacity(0.05),
+              Color(0xFF4CAF50).withValues(alpha: 0.1),
+              Color(0xFF8BC34A).withValues(alpha: 0.05),
             ],
           ),
         ),
@@ -236,16 +236,16 @@ class PremiumHomeTabView extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color.withOpacity(0.1),
-            color.withOpacity(0.05),
+            color.withValues(alpha: 0.1),
+            color.withValues(alpha: 0.05),
           ],
         ),
         borderGradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color.withOpacity(0.5),
-            color.withOpacity(0.2),
+            color.withValues(alpha: 0.5),
+            color.withValues(alpha: 0.2),
           ],
         ),
         child: Padding(
@@ -331,7 +331,7 @@ class PremiumHomeTabView extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: Offset(0, 4),
             ),
@@ -360,7 +360,7 @@ class PremiumHomeTabView extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.8),
+                      Colors.black.withValues(alpha: 0.8),
                     ],
                   ),
                 ),
@@ -441,16 +441,16 @@ class PremiumHomeTabView extends StatelessWidget {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Colors.orange.withOpacity(0.1),
-          Colors.orange.withOpacity(0.05),
+          Colors.orange.withValues(alpha: 0.1),
+          Colors.orange.withValues(alpha: 0.05),
         ],
       ),
       borderGradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Colors.orange.withOpacity(0.5),
-          Colors.orange.withOpacity(0.2),
+          Colors.orange.withValues(alpha: 0.5),
+          Colors.orange.withValues(alpha: 0.2),
         ],
       ),
       child: Padding(

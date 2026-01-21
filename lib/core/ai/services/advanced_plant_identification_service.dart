@@ -1,17 +1,15 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
-import '../models/comprehensive_plant.dart';
-import '../models/plant_identification.dart';
 
 class AdvancedPlantIdentificationService {
   static const String _baseUrl = 'https://api.plantnet.org/v2';
   static const String _apiKey = 'YOUR_API_KEY'; // Replace with actual API key
   
   // Multiple identification methods
-  Future<PlantIdentificationResult> identifyPlant({
+  Future<Map<String, dynamic>> identifyPlant({
     required File imageFile,
-    required IdentificationType type,
+    required String type,
     double? latitude,
     double? longitude,
     String? region,
@@ -22,37 +20,36 @@ class AdvancedPlantIdentificationService {
       
       // Use different models based on identification type
       switch (type) {
-        case IdentificationType.leaf:
+        case 'leaf':
           return await _identifyByLeaf(processedImage, latitude, longitude);
-        case IdentificationType.flower:
+        case 'flower':
           return await _identifyByFlower(processedImage, latitude, longitude);
-        case IdentificationType.fruit:
+        case 'fruit':
           return await _identifyByFruit(processedImage, latitude, longitude);
-        case IdentificationType.bark:
+        case 'bark':
           return await _identifyByBark(processedImage, latitude, longitude);
-        case IdentificationType.habit:
+        case 'habit':
           return await _identifyByHabit(processedImage, latitude, longitude);
-        case IdentificationType.disease:
+        case 'disease':
           return await _identifyDisease(processedImage);
-        case IdentificationType.pest:
+        case 'pest':
           return await _identifyPest(processedImage);
-        case IdentificationType.auto:
         default:
           return await _autoIdentify(processedImage, latitude, longitude);
       }
     } catch (e) {
-      throw PlantIdentificationException('Failed to identify plant: $e');
+      throw Exception('Failed to identify plant: $e');
     }
   }
 
   // Batch identification for multiple images
-  Future<List<PlantIdentificationResult>> identifyMultiplePlants({
+  Future<List<Map<String, dynamic>>> identifyMultiplePlants({
     required List<File> imageFiles,
-    required IdentificationType type,
+    required String type,
     double? latitude,
     double? longitude,
   }) async {
-    final results = <PlantIdentificationResult>[];
+    final results = <Map<String, dynamic>>[];
     
     for (final imageFile in imageFiles) {
       try {
@@ -65,15 +62,15 @@ class AdvancedPlantIdentificationService {
         results.add(result);
       } catch (e) {
         // Add failed result
-        results.add(PlantIdentificationResult(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          matches: [],
-          confidence: 0.0,
-          processingTime: 0,
-          imageUrl: imageFile.path,
-          identificationType: type,
-          error: e.toString(),
-        ));
+        results.add({
+          'id': DateTime.now().millisecondsSinceEpoch.toString(),
+          'matches': [],
+          'confidence': 0.0,
+          'processingTime': 0,
+          'imageUrl': imageFile.path,
+          'identificationType': type,
+          'error': e.toString(),
+        });
       }
     }
     
@@ -113,7 +110,7 @@ class AdvancedPlantIdentificationService {
   }
 
   // Image preprocessing for better accuracy
-  Future<File> _preprocessImage(File imageFile, IdentificationType type) async {
+  Future<File> _preprocessImage(File imageFile, String type) async {
     final bytes = await imageFile.readAsBytes();
     final image = img.decodeImage(bytes);
     
@@ -123,13 +120,13 @@ class AdvancedPlantIdentificationService {
     
     // Apply type-specific preprocessing
     switch (type) {
-      case IdentificationType.leaf:
+      case 'leaf':
         processedImage = _enhanceLeafFeatures(image);
         break;
-      case IdentificationType.flower:
+      case 'flower':
         processedImage = _enhanceFlowerFeatures(image);
         break;
-      case IdentificationType.disease:
+      case 'disease':
         processedImage = _enhanceDiseaseFeatures(image);
         break;
       default:
@@ -153,7 +150,7 @@ class AdvancedPlantIdentificationService {
     );
     
     // Apply edge enhancement
-    enhanced = img.convolution(enhanced, [
+    enhanced = img.convolution(enhanced, filter: [
       -1, -1, -1,
       -1,  9, -1,
       -1, -1, -1
@@ -188,7 +185,7 @@ class AdvancedPlantIdentificationService {
     );
   }
 
-  Future<PlantIdentificationResult> _identifyByLeaf(
+  Future<Map<String, dynamic>> _identifyByLeaf(
     File imageFile, 
     double? latitude, 
     double? longitude
@@ -202,7 +199,7 @@ class AdvancedPlantIdentificationService {
     );
   }
 
-  Future<PlantIdentificationResult> _identifyByFlower(
+  Future<Map<String, dynamic>> _identifyByFlower(
     File imageFile, 
     double? latitude, 
     double? longitude
@@ -216,7 +213,7 @@ class AdvancedPlantIdentificationService {
     );
   }
 
-  Future<PlantIdentificationResult> _identifyByFruit(
+  Future<Map<String, dynamic>> _identifyByFruit(
     File imageFile, 
     double? latitude, 
     double? longitude
@@ -230,7 +227,7 @@ class AdvancedPlantIdentificationService {
     );
   }
 
-  Future<PlantIdentificationResult> _identifyByBark(
+  Future<Map<String, dynamic>> _identifyByBark(
     File imageFile, 
     double? latitude, 
     double? longitude
@@ -244,7 +241,7 @@ class AdvancedPlantIdentificationService {
     );
   }
 
-  Future<PlantIdentificationResult> _identifyByHabit(
+  Future<Map<String, dynamic>> _identifyByHabit(
     File imageFile, 
     double? latitude, 
     double? longitude
@@ -258,17 +255,17 @@ class AdvancedPlantIdentificationService {
     );
   }
 
-  Future<PlantIdentificationResult> _identifyDisease(File imageFile) async {
+  Future<Map<String, dynamic>> _identifyDisease(File imageFile) async {
     // Implement disease identification logic
     return await _callDiseaseAPI(imageFile);
   }
 
-  Future<PlantIdentificationResult> _identifyPest(File imageFile) async {
+  Future<Map<String, dynamic>> _identifyPest(File imageFile) async {
     // Implement pest identification logic
     return await _callPestAPI(imageFile);
   }
 
-  Future<PlantIdentificationResult> _autoIdentify(
+  Future<Map<String, dynamic>> _autoIdentify(
     File imageFile, 
     double? latitude, 
     double? longitude
@@ -285,7 +282,7 @@ class AdvancedPlantIdentificationService {
     );
   }
 
-  Future<PlantIdentificationResult> _callIdentificationAPI(
+  Future<Map<String, dynamic>> _callIdentificationAPI(
     File imageFile,
     String organ,
     double? latitude,
@@ -299,42 +296,39 @@ class AdvancedPlantIdentificationService {
     final processingTime = DateTime.now().difference(startTime).inMilliseconds;
     
     // Mock response - replace with actual API response parsing
-    return PlantIdentificationResult(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      matches: [
-        PlantMatch(
-          plantId: 'sample_plant_1',
-          scientificName: 'Monstera deliciosa',
-          commonName: 'Swiss Cheese Plant',
-          confidence: 0.95,
-          family: 'Araceae',
-          genus: 'Monstera',
-          species: 'deliciosa',
-        ),
-        PlantMatch(
-          plantId: 'sample_plant_2',
-          scientificName: 'Philodendron bipinnatifidum',
-          commonName: 'Tree Philodendron',
-          confidence: 0.78,
-          family: 'Araceae',
-          genus: 'Philodendron',
-          species: 'bipinnatifidum',
-        ),
+    return {
+      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      'matches': [
+        {
+          'plantId': 'sample_plant_1',
+          'scientificName': 'Monstera deliciosa',
+          'commonName': 'Swiss Cheese Plant',
+          'confidence': 0.95,
+          'family': 'Araceae',
+          'genus': 'Monstera',
+          'species': 'deliciosa',
+        },
+        {
+          'plantId': 'sample_plant_2',
+          'scientificName': 'Philodendron bipinnatifidum',
+          'commonName': 'Tree Philodendron',
+          'confidence': 0.78,
+          'family': 'Araceae',
+          'genus': 'Philodendron',
+          'species': 'bipinnatifidum',
+        },
       ],
-      confidence: 0.95,
-      processingTime: processingTime,
-      imageUrl: imageFile.path,
-      identificationType: IdentificationType.values.firstWhere(
-        (type) => type.name == organ,
-        orElse: () => IdentificationType.auto,
-      ),
-      location: latitude != null && longitude != null 
-        ? PlantLocation(latitude: latitude, longitude: longitude)
+      'confidence': 0.95,
+      'processingTime': processingTime,
+      'imageUrl': imageFile.path,
+      'identificationType': organ,
+      'location': latitude != null && longitude != null 
+        ? {'latitude': latitude, 'longitude': longitude}
         : null,
-    );
+    };
   }
 
-  Future<PlantIdentificationResult> _callDiseaseAPI(File imageFile) async {
+  Future<Map<String, dynamic>> _callDiseaseAPI(File imageFile) async {
     final startTime = DateTime.now();
     
     // Simulate disease identification API call
@@ -342,27 +336,27 @@ class AdvancedPlantIdentificationService {
     
     final processingTime = DateTime.now().difference(startTime).inMilliseconds;
     
-    return PlantIdentificationResult(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      matches: [
-        PlantMatch(
-          plantId: 'disease_1',
-          scientificName: 'Powdery Mildew',
-          commonName: 'Powdery Mildew Disease',
-          confidence: 0.87,
-          family: 'Disease',
-          genus: 'Fungal',
-          species: 'mildew',
-        ),
+    return {
+      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      'matches': [
+        {
+          'plantId': 'disease_1',
+          'scientificName': 'Powdery Mildew',
+          'commonName': 'Powdery Mildew Disease',
+          'confidence': 0.87,
+          'family': 'Disease',
+          'genus': 'Fungal',
+          'species': 'mildew',
+        },
       ],
-      confidence: 0.87,
-      processingTime: processingTime,
-      imageUrl: imageFile.path,
-      identificationType: IdentificationType.disease,
-    );
+      'confidence': 0.87,
+      'processingTime': processingTime,
+      'imageUrl': imageFile.path,
+      'identificationType': 'disease',
+    };
   }
 
-  Future<PlantIdentificationResult> _callPestAPI(File imageFile) async {
+  Future<Map<String, dynamic>> _callPestAPI(File imageFile) async {
     final startTime = DateTime.now();
     
     // Simulate pest identification API call
@@ -370,24 +364,24 @@ class AdvancedPlantIdentificationService {
     
     final processingTime = DateTime.now().difference(startTime).inMilliseconds;
     
-    return PlantIdentificationResult(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      matches: [
-        PlantMatch(
-          plantId: 'pest_1',
-          scientificName: 'Aphidoidea',
-          commonName: 'Aphids',
-          confidence: 0.92,
-          family: 'Pest',
-          genus: 'Insect',
-          species: 'aphid',
-        ),
+    return {
+      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      'matches': [
+        {
+          'plantId': 'pest_1',
+          'scientificName': 'Aphidoidea',
+          'commonName': 'Aphids',
+          'confidence': 0.92,
+          'family': 'Pest',
+          'genus': 'Insect',
+          'species': 'aphid',
+        },
       ],
-      confidence: 0.92,
-      processingTime: processingTime,
-      imageUrl: imageFile.path,
-      identificationType: IdentificationType.pest,
-    );
+      'confidence': 0.92,
+      'processingTime': processingTime,
+      'imageUrl': imageFile.path,
+      'identificationType': 'pest',
+    };
   }
 
   Future<ImageAnalysis> _analyzeImageContent(File imageFile) async {
@@ -409,13 +403,13 @@ class AdvancedPlantIdentificationService {
     return analysis;
   }
 
-  IdentificationType _determineBestIdentificationType(ImageAnalysis analysis) {
-    if (analysis.hasSymptoms) return IdentificationType.disease;
-    if (analysis.hasFlowers) return IdentificationType.flower;
-    if (analysis.hasFruit) return IdentificationType.fruit;
-    if (analysis.hasBark) return IdentificationType.bark;
-    if (analysis.hasLeaves) return IdentificationType.leaf;
-    return IdentificationType.habit;
+  String _determineBestIdentificationType(ImageAnalysis analysis) {
+    if (analysis.hasSymptoms) return 'disease';
+    if (analysis.hasFlowers) return 'flower';
+    if (analysis.hasFruit) return 'fruit';
+    if (analysis.hasBark) return 'bark';
+    if (analysis.hasLeaves) return 'leaf';
+    return 'habit';
   }
 
   bool _detectFlowers(img.Image image) {
@@ -452,17 +446,6 @@ class AdvancedPlantIdentificationService {
   }
 }
 
-enum IdentificationType {
-  auto,
-  leaf,
-  flower,
-  fruit,
-  bark,
-  habit,
-  disease,
-  pest,
-}
-
 class ImageAnalysis {
   final bool hasFlowers;
   final bool hasLeaves;
@@ -477,64 +460,4 @@ class ImageAnalysis {
     required this.hasBark,
     required this.hasSymptoms,
   });
-}
-
-class PlantMatch {
-  final String plantId;
-  final String scientificName;
-  final String commonName;
-  final double confidence;
-  final String family;
-  final String genus;
-  final String species;
-
-  PlantMatch({
-    required this.plantId,
-    required this.scientificName,
-    required this.commonName,
-    required this.confidence,
-    required this.family,
-    required this.genus,
-    required this.species,
-  });
-}
-
-class PlantLocation {
-  final double latitude;
-  final double longitude;
-
-  PlantLocation({
-    required this.latitude,
-    required this.longitude,
-  });
-}
-
-class PlantIdentificationResult {
-  final String id;
-  final List<PlantMatch> matches;
-  final double confidence;
-  final int processingTime;
-  final String imageUrl;
-  final IdentificationType identificationType;
-  final PlantLocation? location;
-  final String? error;
-
-  PlantIdentificationResult({
-    required this.id,
-    required this.matches,
-    required this.confidence,
-    required this.processingTime,
-    required this.imageUrl,
-    required this.identificationType,
-    this.location,
-    this.error,
-  });
-}
-
-class PlantIdentificationException implements Exception {
-  final String message;
-  PlantIdentificationException(this.message);
-  
-  @override
-  String toString() => 'PlantIdentificationException: $message';
 }

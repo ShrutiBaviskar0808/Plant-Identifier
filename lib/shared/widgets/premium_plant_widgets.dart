@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:shimmer/shimmer.dart';
-import '../models/comprehensive_plant.dart';
 
 class PremiumPlantCard extends StatelessWidget {
-  final ComprehensivePlant plant;
+  final String plantName;
+  final String scientificName;
+  final String imageUrl;
   final VoidCallback? onTap;
   final bool showHealthScore;
   final double? healthScore;
 
   const PremiumPlantCard({
     Key? key,
-    required this.plant,
+    required this.plantName,
+    required this.scientificName,
+    required this.imageUrl,
     this.onTap,
     this.showHealthScore = false,
     this.healthScore,
@@ -35,25 +38,25 @@ class PremiumPlantCard extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFffffff).withOpacity(0.1),
-              Color(0xFFffffff).withOpacity(0.05),
+              Color(0xFFffffff).withValues(alpha: 0.1),
+              Color(0xFFffffff).withValues(alpha: 0.05),
             ],
           ),
           borderGradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFffffff).withOpacity(0.5),
-              Color(0xFFffffff).withOpacity(0.2),
+              Color(0xFFffffff).withValues(alpha: 0.5),
+              Color(0xFFffffff).withValues(alpha: 0.2),
             ],
           ),
           child: Stack(
             children: [
-              // Background Image
+              // Plant Image
               ClipRRect(
                 borderRadius: BorderRadius.circular(18),
                 child: Image.network(
-                  plant.thumbnailUrl,
+                  imageUrl,
                   width: double.infinity,
                   height: double.infinity,
                   fit: BoxFit.cover,
@@ -75,7 +78,7 @@ class PremiumPlantCard extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.7),
+                      Colors.black.withValues(alpha: 0.7),
                     ],
                   ),
                 ),
@@ -90,7 +93,7 @@ class PremiumPlantCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      plant.commonName,
+                      plantName,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -99,9 +102,9 @@ class PremiumPlantCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      plant.scientificName,
+                      scientificName,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         fontSize: 14,
                         fontStyle: FontStyle.italic,
                       ),
@@ -113,25 +116,6 @@ class PremiumPlantCard extends StatelessWidget {
                   ],
                 ),
               ),
-              
-              // Toxicity Warning
-              if (plant.toxicityInfo.isToxic)
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Container(
-                    padding: EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.warning,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ),
-                ),
             ],
           ),
         ),
@@ -164,7 +148,7 @@ class PlantHealthIndicator extends StatelessWidget {
             size: Size(size, size / 2),
             painter: HealthArcPainter(
               progress: 1.0,
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               strokeWidth: 4,
             ),
           ),
@@ -236,8 +220,8 @@ class HealthArcPainter extends CustomPainter {
 }
 
 class AnimatedPlantGrid extends StatelessWidget {
-  final List<ComprehensivePlant> plants;
-  final Function(ComprehensivePlant) onPlantTap;
+  final List<Map<String, String>> plants;
+  final Function(Map<String, String>) onPlantTap;
   final bool isLoading;
 
   const AnimatedPlantGrid({
@@ -309,7 +293,7 @@ class AnimatedPlantGrid extends StatelessWidget {
 }
 
 class PlantGridCard extends StatelessWidget {
-  final ComprehensivePlant plant;
+  final Map<String, String> plant;
   final VoidCallback onTap;
 
   const PlantGridCard({
@@ -327,7 +311,7 @@ class PlantGridCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: Offset(0, 4),
             ),
@@ -339,7 +323,7 @@ class PlantGridCard extends StatelessWidget {
             children: [
               // Background Image
               Image.network(
-                plant.thumbnailUrl,
+                plant['image'] ?? '',
                 width: double.infinity,
                 height: double.infinity,
                 fit: BoxFit.cover,
@@ -359,7 +343,7 @@ class PlantGridCard extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.8),
+                      Colors.black.withValues(alpha: 0.8),
                     ],
                   ),
                 ),
@@ -374,7 +358,7 @@ class PlantGridCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      plant.commonName,
+                      plant['name'] ?? 'Unknown Plant',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -385,9 +369,9 @@ class PlantGridCard extends StatelessWidget {
                     ),
                     SizedBox(height: 2),
                     Text(
-                      plant.scientificName,
+                      plant['scientific'] ?? '',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         fontSize: 11,
                         fontStyle: FontStyle.italic,
                       ),
@@ -405,11 +389,11 @@ class PlantGridCard extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _getDifficultyColor(plant.careRequirements),
+                    color: Colors.green,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    _getDifficultyText(plant.careRequirements),
+                    'Easy',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 10,
@@ -423,15 +407,6 @@ class PlantGridCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _getDifficultyColor(CareRequirements care) {
-    // Simple difficulty calculation based on care requirements
-    return Colors.green; // Placeholder
-  }
-
-  String _getDifficultyText(CareRequirements care) {
-    return 'Easy'; // Placeholder
   }
 }
 
@@ -470,16 +445,16 @@ class CareReminderCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            (isOverdue ? Colors.red : Colors.blue).withOpacity(0.1),
-            (isOverdue ? Colors.red : Colors.blue).withOpacity(0.05),
+            (isOverdue ? Colors.red : Colors.blue).withValues(alpha: 0.1),
+            (isOverdue ? Colors.red : Colors.blue).withValues(alpha: 0.05),
           ],
         ),
         borderGradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            (isOverdue ? Colors.red : Colors.blue).withOpacity(0.5),
-            (isOverdue ? Colors.red : Colors.blue).withOpacity(0.2),
+            (isOverdue ? Colors.red : Colors.blue).withValues(alpha: 0.5),
+            (isOverdue ? Colors.red : Colors.blue).withValues(alpha: 0.2),
           ],
         ),
         child: Padding(
@@ -491,7 +466,7 @@ class CareReminderCard extends StatelessWidget {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: (isOverdue ? Colors.red : Colors.blue).withOpacity(0.2),
+                  color: (isOverdue ? Colors.red : Colors.blue).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: Icon(
@@ -621,16 +596,16 @@ class _PlantSearchBarState extends State<PlantSearchBar> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFFffffff).withOpacity(0.1),
-            Color(0xFFffffff).withOpacity(0.05),
+            Color(0xFFffffff).withValues(alpha: 0.1),
+            Color(0xFFffffff).withValues(alpha: 0.05),
           ],
         ),
         borderGradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFFffffff).withOpacity(0.5),
-            Color(0xFFffffff).withOpacity(0.2),
+            Color(0xFFffffff).withValues(alpha: 0.5),
+            Color(0xFFffffff).withValues(alpha: 0.2),
           ],
         ),
         child: TextField(
