@@ -10,7 +10,7 @@ class ProfileView extends GetView<ProfileController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('Profile', style: TextStyle(fontSize: 22)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

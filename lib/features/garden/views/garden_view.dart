@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/garden_controller.dart';
 import '../../../core/data/models/plant.dart';
-import '../../home/controllers/home_controller.dart';
+
 
 class GardenView extends GetView<GardenController> {
   const GardenView({super.key});
@@ -11,7 +11,7 @@ class GardenView extends GetView<GardenController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Garden'),
+        title: const Text('My Garden', style: TextStyle(fontSize: 22)),
       ),
       body: Obx(() {
         if (controller.isLoading) {
@@ -93,7 +93,7 @@ class GardenView extends GetView<GardenController> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  childAspectRatio: 0.8,
+                  childAspectRatio: 0.85,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                 ),
@@ -108,11 +108,6 @@ class GardenView extends GetView<GardenController> {
           ],
         );
       }),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "garden_add_fab",
-        onPressed: () => Get.find<HomeController>().changeTabIndex(1),
-        child: const Icon(Icons.add),
-      ),
     );
   }
 
@@ -215,22 +210,26 @@ class _PlantCard extends StatelessWidget {
             Expanded(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       plant.customName ?? plant.plant.commonName,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
+                        fontSize: 13,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       plant.plant.scientificName,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontStyle: FontStyle.italic,
+                        fontSize: 11,
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                       maxLines: 1,
@@ -241,22 +240,25 @@ class _PlantCard extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.calendar_today,
-                          size: 12,
+                          size: 10,
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${plant.dateAdded.day}/${plant.dateAdded.month}/${plant.dateAdded.year}',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            '${plant.dateAdded.day}/${plant.dateAdded.month}/${plant.dateAdded.year}',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              fontSize: 10,
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const Spacer(),
                         GestureDetector(
                           onTap: onDelete,
                           child: Icon(
                             Icons.delete_outline,
-                            size: 16,
+                            size: 14,
                             color: Theme.of(context).colorScheme.error,
                           ),
                         ),
@@ -298,17 +300,11 @@ class _EmptyGardenView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Start by identifying your first plant using the camera',
+              'Use the Scan tab to identify and add plants to your garden',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () => Get.find<HomeController>().changeTabIndex(1),
-              icon: const Icon(Icons.add),
-              label: const Text('Add Plant'),
             ),
           ],
         ),

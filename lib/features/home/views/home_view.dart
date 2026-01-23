@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../controllers/home_controller.dart';
-import '../../../app/controllers/theme_controller.dart';
+
 import '../../identification/views/camera_view.dart';
+import '../../identification/views/plant_search_view.dart';
 import '../../garden/views/garden_view.dart';
 import '../../care/views/care_view.dart';
 import '../../profile/views/profile_view.dart';
-import '../../browse/views/plant_browse_view.dart';
 import '../../notifications/views/notifications_view.dart';
 import '../../../core/data/services/notification_service.dart';
 
@@ -53,7 +53,8 @@ class HomeView extends GetView<HomeController> {
           elevation: 0,
           selectedItemColor: Colors.green,
           unselectedItemColor: Colors.grey,
-          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          unselectedLabelStyle: TextStyle(fontSize: 14),
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
@@ -107,13 +108,14 @@ class PremiumHomeTabView extends StatelessWidget {
         child: SafeArea(
           child: CustomScrollView(
             slivers: [
-              // Premium App Bar
               SliverAppBar(
-                expandedHeight: 140,
-                floating: true,
+                expandedHeight: 100,
+                floating: false,
                 pinned: true,
-                backgroundColor: Colors.transparent,
+                snap: false,
+                backgroundColor: Colors.white.withValues(alpha: 0.9),
                 elevation: 0,
+                leading: Container(),
                 flexibleSpace: FlexibleSpaceBar(
                   background: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20),
@@ -121,9 +123,9 @@ class PremiumHomeTabView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 60),
+                        SizedBox(height: 40),
                         Text(
-                          'Good ${_getGreeting()},',
+                          'Good ${Get.find<HomeController>().getIndianTimeGreeting()},',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.black54,
@@ -132,58 +134,63 @@ class PremiumHomeTabView extends StatelessWidget {
                         Text(
                           'Plant Lover! 🌱',
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
                         ),
-                        SizedBox(height: 25),
+                        SizedBox(height: 10),
                       ],
                     ),
                   ),
                 ),
                 actions: [
-                  IconButton(
-                    icon: Stack(
-                      children: [
-                        const Icon(Icons.notifications_outlined, color: Colors.black87),
-                        if (NotificationService.getUnreadCount() > 0)
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 16,
-                                minHeight: 16,
-                              ),
-                              child: Text(
-                                '${NotificationService.getUnreadCount()}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
+                  Container(
+                    margin: EdgeInsets.only(right: 8, top: 8),
+                    child: IconButton(
+                      icon: Stack(
+                        children: [
+                          const Icon(Icons.notifications_outlined, color: Colors.black87),
+                          if (NotificationService.getUnreadCount() > 0)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
                                 ),
-                                textAlign: TextAlign.center,
+                                constraints: const BoxConstraints(
+                                  minWidth: 16,
+                                  minHeight: 16,
+                                ),
+                                child: Text(
+                                  '${NotificationService.getUnreadCount()}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
+                      onPressed: () => Get.to(() => const NotificationsView()),
                     ),
-                    onPressed: () => Get.to(() => const NotificationsView()),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.person_outline, color: Colors.black87),
-                    onPressed: () => Get.find<HomeController>().changeTabIndex(4),
+                  Container(
+                    margin: EdgeInsets.only(right: 8, top: 8),
+                    child: IconButton(
+                      icon: Icon(Icons.search, color: Colors.black87),
+                      onPressed: () => _showPlantSearch(context),
+                    ),
                   ),
                 ],
               ),
               
-              // Main Content
               SliverToBoxAdapter(
                 child: AnimationLimiter(
                   child: Column(
@@ -194,16 +201,12 @@ class PremiumHomeTabView extends StatelessWidget {
                         child: FadeInAnimation(child: widget),
                       ),
                       children: [
-                        // Quick Actions
                         _buildQuickActions(context),
-                        
-                        // Featured Section
+                        _buildAnalyticsSection(),
+                        _buildCommunitySection(),
                         _buildFeaturedSection(),
-                        
-                        // Plant Care Tools
                         _buildPlantCareTools(),
-                        
-                        SizedBox(height: 100), // Bottom padding
+                        SizedBox(height: 100),
                       ],
                     ),
                   ),
@@ -218,30 +221,337 @@ class PremiumHomeTabView extends StatelessWidget {
 
   Widget _buildQuickActions(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(left: 20, right: 20, top: 40, bottom: 16),
-      child: Row(
+      margin: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 16),
+      child: Column(
         children: [
-          Expanded(
-            child: _buildActionCard(
-              icon: Icons.camera_alt,
-              title: 'Identify Plant',
-              subtitle: 'Take a photo',
-              color: Colors.green,
-              onTap: () => Get.find<HomeController>().changeTabIndex(1),
-            ),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: _buildActionCard(
-              icon: Icons.search,
-              title: 'Browse Plants',
-              subtitle: 'Explore plant database',
-              color: Colors.blue,
-              onTap: () => Get.to(() => PlantBrowseView()),
-            ),
+          _buildRemindersSection(),
+          SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildActionCard(
+                  icon: Icons.analytics,
+                  title: 'Plant Analytics',
+                  subtitle: 'Growth tracking',
+                  color: Colors.purple,
+                  onTap: () => Get.find<HomeController>().navigateToAnalytics(),
+                ),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildActionCard(
+                  icon: Icons.forum,
+                  title: 'Community',
+                  subtitle: 'Share & learn',
+                  color: Colors.orange,
+                  onTap: () => Get.find<HomeController>().navigateToCommunity(),
+                ),
+              ),
+            ],
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildRemindersSection() {
+    return Obx(() {
+      final controller = Get.find<HomeController>();
+      if (controller.careReminders.isEmpty) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+            color: Colors.green.withValues(alpha: 0.05),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 24),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'All caught up! No pending reminders.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.green[700],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => _showAddReminderDialog(),
+                child: Text('Add'),
+              ),
+            ],
+          ),
+        );
+      }
+      
+      return Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+          color: Colors.blue.withValues(alpha: 0.05),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Care Reminders',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue[700],
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => _showAddReminderDialog(),
+                  child: Text('Add'),
+                ),
+              ],
+            ),
+            SizedBox(height: 8),
+            ...controller.careReminders.take(2).map((reminder) => 
+              Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Icon(Icons.schedule, size: 16, color: Colors.blue[600]),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${reminder.plantName} - ${reminder.careType}',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ),
+                    Text(
+                      _formatDueTime(reminder.dueDate),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildAnalyticsSection() {
+    return Obx(() {
+      final controller = Get.find<HomeController>();
+      return Container(
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Plant Analytics',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 12),
+            Container(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: controller.plantAnalytics.length,
+                itemBuilder: (context, index) {
+                  final analytics = controller.plantAnalytics[index];
+                  return Container(
+                    width: 200,
+                    margin: EdgeInsets.only(right: 12),
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.purple.withValues(alpha: 0.1),
+                          Colors.purple.withValues(alpha: 0.05),
+                        ],
+                      ),
+                      border: Border.all(color: Colors.purple.withValues(alpha: 0.3)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          analytics.plantName,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildAnalyticsItem('Growth', '${analytics.growthRate}%'),
+                            _buildAnalyticsItem('Health', '${analytics.healthScore}%'),
+                          ],
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          '${analytics.daysOwned} days owned',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildCommunitySection() {
+    return Obx(() {
+      final controller = Get.find<HomeController>();
+      return Container(
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Community',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 12),
+            Container(
+              height: 140,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: controller.communityPosts.length,
+                itemBuilder: (context, index) {
+                  final post = controller.communityPosts[index];
+                  return Container(
+                    width: 250,
+                    margin: EdgeInsets.only(right: 12),
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.orange.withValues(alpha: 0.1),
+                          Colors.orange.withValues(alpha: 0.05),
+                        ],
+                      ),
+                      border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 16,
+                              backgroundColor: Colors.orange[200],
+                              child: Text(
+                                post.username[0].toUpperCase(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    post.username,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    post.timeAgo,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          post.content,
+                          style: TextStyle(fontSize: 13),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Spacer(),
+                        Row(
+                          children: [
+                            Icon(Icons.favorite_border, size: 16, color: Colors.grey[600]),
+                            SizedBox(width: 4),
+                            Text('${post.likes}', style: TextStyle(fontSize: 12)),
+                            SizedBox(width: 16),
+                            Icon(Icons.comment_outlined, size: 16, color: Colors.grey[600]),
+                            SizedBox(width: 4),
+                            Text('${post.comments}', style: TextStyle(fontSize: 12)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildAnalyticsItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.purple[700],
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
     );
   }
 
@@ -255,8 +565,8 @@ class PremiumHomeTabView extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 130,
-        padding: EdgeInsets.all(20),
+        height: 110,
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
@@ -272,12 +582,12 @@ class PremiumHomeTabView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 32),
-            SizedBox(height: 12),
+            Icon(icon, color: color, size: 28),
+            SizedBox(height: 8),
             Text(
               title,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
@@ -289,7 +599,7 @@ class PremiumHomeTabView extends StatelessWidget {
             Text(
               subtitle,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 color: Colors.black54,
               ),
               textAlign: TextAlign.center,
@@ -311,7 +621,7 @@ class PremiumHomeTabView extends StatelessWidget {
           child: Text(
             'Featured Plants',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
@@ -396,7 +706,7 @@ class PremiumHomeTabView extends StatelessWidget {
                   plant['name']!,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                   maxLines: 2,
@@ -419,7 +729,7 @@ class PremiumHomeTabView extends StatelessWidget {
           child: Text(
             'Plant Care Tools',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
@@ -436,28 +746,28 @@ class PremiumHomeTabView extends StatelessWidget {
             childAspectRatio: 1.0,
             children: [
               _buildFeatureCard(
-                icon: Icons.health_and_safety,
-                title: 'Disease Doctor',
-                subtitle: 'Diagnose issues',
-                color: Colors.red,
-              ),
-              _buildFeatureCard(
-                icon: Icons.water_drop,
-                title: 'Care Calendar',
-                subtitle: 'Watering reminders',
-                color: Colors.cyan,
+                icon: Icons.schedule,
+                title: 'Smart Reminders',
+                subtitle: 'Never miss care',
+                color: Colors.blue,
               ),
               _buildFeatureCard(
                 icon: Icons.wb_sunny,
-                title: 'Light Meter',
-                subtitle: 'Check sunlight',
+                title: 'Light Tracker',
+                subtitle: 'Optimal lighting',
                 color: Colors.orange,
               ),
               _buildFeatureCard(
-                icon: Icons.quiz,
-                title: 'Plant Quiz',
-                subtitle: 'Test knowledge',
-                color: Colors.purple,
+                icon: Icons.science,
+                title: 'Soil Analysis',
+                subtitle: 'Test soil health',
+                color: Colors.brown,
+              ),
+              _buildFeatureCard(
+                icon: Icons.trending_up,
+                title: 'Growth Stats',
+                subtitle: 'Track progress',
+                color: Colors.green,
               ),
             ],
           ),
@@ -494,7 +804,7 @@ class PremiumHomeTabView extends StatelessWidget {
           Text(
             title,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
@@ -506,7 +816,7 @@ class PremiumHomeTabView extends StatelessWidget {
           Text(
             subtitle,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               color: Colors.black54,
             ),
             textAlign: TextAlign.center,
@@ -518,228 +828,77 @@ class PremiumHomeTabView extends StatelessWidget {
     );
   }
 
-
-
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return 'Morning';
-    if (hour < 17) return 'Afternoon';
-    return 'Evening';
+  String _formatDueTime(DateTime dueDate) {
+    final now = DateTime.now();
+    final difference = dueDate.difference(now);
+    
+    if (difference.inDays > 0) {
+      return '${difference.inDays}d';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m';
+    } else {
+      return 'Now';
+    }
   }
 
-  void _showNotifications(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: 400,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
+  void _showAddReminderDialog() {
+    final controller = Get.find<HomeController>();
+    String plantName = '';
+    String careType = 'Watering';
+    DateTime selectedDate = DateTime.now().add(Duration(hours: 1));
+    
+    Get.dialog(
+      AlertDialog(
+        title: Text('Add Care Reminder'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Plant Name',
+                border: OutlineInputBorder(),
               ),
+              onChanged: (value) => plantName = value,
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                'Notifications',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+            SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: careType,
+              decoration: InputDecoration(
+                labelText: 'Care Type',
+                border: OutlineInputBorder(),
               ),
-            ),
-            Expanded(
-              child: Center(
-                child: Text(
-                  'No new notifications',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
+              items: ['Watering', 'Fertilizing', 'Pruning', 'Repotting']
+                  .map((type) => DropdownMenuItem(
+                        value: type,
+                        child: Text(type),
+                      ))
+                  .toList(),
+              onChanged: (value) => careType = value ?? 'Watering',
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class HomeTabView extends StatelessWidget {
-  const HomeTabView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final themeController = Get.find<ThemeController>();
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Plant Identifier'),
         actions: [
-          Obx(() => IconButton(
-            icon: Icon(
-              themeController.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-            ),
-            onPressed: themeController.toggleTheme,
-          )),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (plantName.isNotEmpty) {
+                controller.addReminder(plantName, careType, selectedDate);
+                Get.back();
+              }
+            },
+            child: Text('Add'),
+          ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Welcome Card
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome to Plant Identifier',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Discover and care for plants with AI-powered identification',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            
-            // Quick Actions
-            Text(
-              'Quick Actions',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            Row(
-              children: [
-                Expanded(
-                  child: _QuickActionCard(
-                    icon: Icons.camera_alt,
-                    title: 'Identify Plant',
-                    subtitle: 'Take a photo',
-                    onTap: () => Get.find<HomeController>().changeTabIndex(1),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _QuickActionCard(
-                    icon: Icons.local_florist,
-                    title: 'My Garden',
-                    subtitle: 'View collection',
-                    onTap: () => Get.find<HomeController>().changeTabIndex(2),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            
-            // Recent Activity
-            Text(
-              'Recent Activity',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.history,
-                      size: 48,
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'No recent activity',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
-}
 
-class _QuickActionCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  const _QuickActionCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Icon(
-                icon,
-                size: 32,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  void _showPlantSearch(BuildContext context) {
+    Get.to(() => PlantSearchView());
   }
 }

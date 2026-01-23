@@ -10,7 +10,7 @@ class CameraView extends GetView<IdentificationController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Identify Plant'),
+        title: const Text('Identify Plant', style: TextStyle(fontSize: 22)),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
       ),

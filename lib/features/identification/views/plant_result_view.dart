@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'dart:io';
 import '../../../core/data/models/plant.dart';
 import '../../../core/data/services/user_plant_service.dart';
+import '../../garden/controllers/garden_controller.dart';
 
 class PlantResultView extends StatelessWidget {
   const PlantResultView({super.key});
@@ -368,17 +369,21 @@ class PlantResultView extends StatelessWidget {
         imagePath: imagePath,
       );
 
+      // Refresh garden data
+      final gardenController = Get.find<GardenController>();
+      await gardenController.loadUserPlants();
+
       Get.back(); // Close dialog
       
       Get.snackbar(
         'Success!',
         'Plant saved to your garden successfully',
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.green,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
         borderRadius: 12,
         margin: EdgeInsets.all(16),
-        icon: Icon(Icons.check_circle, color: Colors.green),
+        icon: Icon(Icons.check_circle, color: Colors.white),
         duration: Duration(seconds: 3),
       );
     } catch (e) {

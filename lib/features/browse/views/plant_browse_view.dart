@@ -66,7 +66,7 @@ class _PlantBrowseViewState extends State<PlantBrowseView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Browse Plants'),
+        title: Text('Browse Plants', style: TextStyle(fontSize: 22)),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
       ),
@@ -81,6 +81,7 @@ class _PlantBrowseViewState extends State<PlantBrowseView> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'Search plants...',
+                    hintStyle: TextStyle(fontSize: 16),
                     prefixIcon: Icon(Icons.search),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -124,7 +125,7 @@ class _PlantBrowseViewState extends State<PlantBrowseView> {
     return Padding(
       padding: EdgeInsets.only(right: 8),
       child: FilterChip(
-        label: Text(label),
+        label: Text(label, style: TextStyle(fontSize: 16)),
         selected: isSelected,
         onSelected: (selected) {
           setState(() {
@@ -141,8 +142,8 @@ class _PlantBrowseViewState extends State<PlantBrowseView> {
       margin: EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: Icon(Icons.local_florist, color: Colors.green),
-        title: Text(plant.commonName),
-        subtitle: Text(plant.scientificName),
+        title: Text(plant.commonName, style: TextStyle(fontSize: 18)),
+        subtitle: Text(plant.scientificName, style: TextStyle(fontSize: 16)),
         trailing: IconButton(
           icon: Icon(Icons.add),
           onPressed: () => _addToGarden(plant),
@@ -166,11 +167,11 @@ class _PlantBrowseViewState extends State<PlantBrowseView> {
           children: [
             Text(
               plant.commonName,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            Text(plant.scientificName, style: TextStyle(fontStyle: FontStyle.italic)),
+            Text(plant.scientificName, style: TextStyle(fontStyle: FontStyle.italic, fontSize: 18)),
             SizedBox(height: 16),
-            Text(plant.description),
+            Text(plant.description, style: TextStyle(fontSize: 16)),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
