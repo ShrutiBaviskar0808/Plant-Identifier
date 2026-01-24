@@ -9,7 +9,7 @@ import '../../garden/views/garden_view.dart';
 import '../../care/views/care_view.dart';
 import '../../profile/views/profile_view.dart';
 import '../../notifications/views/notifications_view.dart';
-import '../../../core/data/services/notification_service.dart';
+
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -94,6 +94,48 @@ class PremiumHomeTabView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          Stack(
+            children: [
+              IconButton(
+                icon: Icon(Icons.notifications_outlined, color: Colors.green[800]),
+                onPressed: () => Get.to(() => const NotificationsView()),
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Container(
+                  padding: EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  constraints: BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    '3',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          IconButton(
+            icon: Icon(Icons.search, color: Colors.green[800]),
+            onPressed: () => _showPlantSearch(context),
+          ),
+        ],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -105,25 +147,22 @@ class PremiumHomeTabView extends StatelessWidget {
             ],
           ),
         ),
-        child: SafeArea(
-          child: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 100,
-                floating: false,
-                pinned: true,
-                snap: false,
-                backgroundColor: Colors.white.withValues(alpha: 0.9),
-                elevation: 0,
-                leading: Container(),
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+        child: SingleChildScrollView(
+          child: AnimationLimiter(
+            child: Column(
+              children: AnimationConfiguration.toStaggeredList(
+                duration: Duration(milliseconds: 375),
+                childAnimationBuilder: (widget) => SlideAnimation(
+                  horizontalOffset: 50.0,
+                  child: FadeInAnimation(child: widget),
+                ),
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 40),
                         Text(
                           'Good ${Get.find<HomeController>().getIndianTimeGreeting()},',
                           style: TextStyle(
@@ -134,85 +173,23 @@ class PremiumHomeTabView extends StatelessWidget {
                         Text(
                           'Plant Lover! 🌱',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Colors.green[800],
                           ),
                         ),
-                        SizedBox(height: 10),
                       ],
                     ),
                   ),
-                ),
-                actions: [
-                  Container(
-                    margin: EdgeInsets.only(right: 8, top: 8),
-                    child: IconButton(
-                      icon: Stack(
-                        children: [
-                          const Icon(Icons.notifications_outlined, color: Colors.black87),
-                          if (NotificationService.getUnreadCount() > 0)
-                            Positioned(
-                              right: 0,
-                              top: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(2),
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                ),
-                                constraints: const BoxConstraints(
-                                  minWidth: 16,
-                                  minHeight: 16,
-                                ),
-                                child: Text(
-                                  '${NotificationService.getUnreadCount()}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      onPressed: () => Get.to(() => const NotificationsView()),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(right: 8, top: 8),
-                    child: IconButton(
-                      icon: Icon(Icons.search, color: Colors.black87),
-                      onPressed: () => _showPlantSearch(context),
-                    ),
-                  ),
+                  _buildQuickActions(context),
+                  _buildAnalyticsSection(),
+                  _buildCommunitySection(),
+                  _buildFeaturedSection(),
+                  _buildPlantCareTools(),
+                  SizedBox(height: 100),
                 ],
               ),
-              
-              SliverToBoxAdapter(
-                child: AnimationLimiter(
-                  child: Column(
-                    children: AnimationConfiguration.toStaggeredList(
-                      duration: Duration(milliseconds: 375),
-                      childAnimationBuilder: (widget) => SlideAnimation(
-                        horizontalOffset: 50.0,
-                        child: FadeInAnimation(child: widget),
-                      ),
-                      children: [
-                        _buildQuickActions(context),
-                        _buildAnalyticsSection(),
-                        _buildCommunitySection(),
-                        _buildFeaturedSection(),
-                        _buildPlantCareTools(),
-                        SizedBox(height: 100),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
