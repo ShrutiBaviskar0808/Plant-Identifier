@@ -20,7 +20,7 @@ Future<void> _initializeServices() async {
   try {
     // Initialize plant database
     final plantService = PlantDatabaseService();
-    plantService.initializeSampleData();
+    await plantService.initializeSampleData();
     
     // Initialize user plant service
     final userPlantService = UserPlantService();

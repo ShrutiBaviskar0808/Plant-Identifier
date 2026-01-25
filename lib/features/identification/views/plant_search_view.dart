@@ -29,8 +29,8 @@ class _PlantSearchViewState extends State<PlantSearchView> {
   Future<void> _loadAllPlants() async {
     setState(() => _isLoading = true);
     try {
-      _plantService.initializeSampleData();
-      _allPlants = _plantService.getAllPlants();
+      await _plantService.initializeSampleData();
+      _allPlants = await _plantService.getAllPlants();
       _searchResults = _allPlants;
     } catch (e) {
       Get.snackbar('Error', 'Failed to load plants');
@@ -70,7 +70,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search Plants'),
+        title: Text('Search Plants', style: TextStyle(fontFamily: 'Poppins')),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
       ),
@@ -88,6 +88,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'Search plants by name, family...',
+                    hintStyle: TextStyle(fontFamily: 'Poppins'),
                     prefixIcon: Icon(Icons.search, color: Colors.green),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(

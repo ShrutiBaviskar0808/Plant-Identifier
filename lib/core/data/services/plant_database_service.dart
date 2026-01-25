@@ -1,19 +1,48 @@
 import '../models/plant.dart';
+import 'plant_api_service.dart';
 
 class PlantDatabaseService {
   static final PlantDatabaseService _instance = PlantDatabaseService._internal();
   factory PlantDatabaseService() => _instance;
   PlantDatabaseService._internal();
 
-  final List<Plant> _plants = [];
+  final PlantApiService _apiService = PlantApiService();
+  final List<Plant> _localPlants = [];
 
-  // Initialize with sample plant data
-  void initializeSampleData() {
-    if (_plants.isNotEmpty) return;
+  // Initialize with sample plant data and fetch from API
+  Future<void> initializeSampleData() async {
+    if (_localPlants.isNotEmpty) return;
 
-    _plants.addAll([
+    // Add some local sample plants for offline use
+    _localPlants.addAll([
       Plant(
-        id: '1',
+        id: 'hibiscus_1',
+        commonName: 'Hibiscus',
+        scientificName: 'Hibiscus rosa-sinensis',
+        category: 'flowering',
+        family: 'Malvaceae',
+        description: 'Beautiful tropical flowering plant with large, colorful blooms.',
+        careRequirements: PlantCareRequirements(
+          water: WaterRequirement(
+            frequency: 'daily',
+            amount: 'high',
+            notes: 'Keep soil consistently moist, especially during blooming',
+          ),
+          light: LightRequirement(
+            level: 'high',
+            hoursPerDay: 8,
+            placement: 'outdoor',
+          ),
+          soilType: 'Rich, well-draining soil',
+          growthSeason: 'Year-round in tropical climates',
+          temperature: TemperatureRange(minTemp: 18, maxTemp: 35),
+          fertilizer: 'Weekly during growing season',
+          pruning: 'Regular deadheading to encourage blooms',
+        ),
+        tags: ['flowering', 'tropical', 'outdoor', 'colorful'],
+      ),
+      Plant(
+        id: 'local_1',
         commonName: 'Monstera Deliciosa',
         scientificName: 'Monstera deliciosa',
         category: 'houseplant',
@@ -39,7 +68,7 @@ class PlantDatabaseService {
         tags: ['indoor', 'tropical', 'easy-care'],
       ),
       Plant(
-        id: '2',
+        id: 'local_2',
         commonName: 'Snake Plant',
         scientificName: 'Sansevieria trifasciata',
         category: 'succulent',
@@ -64,93 +93,33 @@ class PlantDatabaseService {
         ),
         tags: ['indoor', 'succulent', 'low-light', 'beginner'],
       ),
-      Plant(
-        id: '3',
-        commonName: 'Peace Lily',
-        scientificName: 'Spathiphyllum wallisii',
-        category: 'flowering',
-        family: 'Araceae',
-        description: 'Elegant flowering plant that thrives in low light.',
-        careRequirements: PlantCareRequirements(
-          water: WaterRequirement(
-            frequency: 'weekly',
-            amount: 'medium',
-            notes: 'Keep soil consistently moist but not soggy',
-          ),
-          light: LightRequirement(
-            level: 'low',
-            hoursPerDay: 4,
-            placement: 'indoor',
-          ),
-          soilType: 'Well-draining potting soil',
-          growthSeason: 'Year-round',
-          temperature: TemperatureRange(minTemp: 16, maxTemp: 25),
-          fertilizer: 'Monthly with diluted liquid fertilizer',
-          pruning: 'Remove spent flowers and yellow leaves',
-        ),
-        tags: ['indoor', 'flowering', 'low-light', 'air-purifying'],
-      ),
-      Plant(
-        id: '4',
-        commonName: 'Rubber Plant',
-        scientificName: 'Ficus elastica',
-        category: 'tree',
-        family: 'Moraceae',
-        description: 'Popular indoor tree with glossy, dark green leaves.',
-        careRequirements: PlantCareRequirements(
-          water: WaterRequirement(
-            frequency: 'weekly',
-            amount: 'medium',
-            notes: 'Water when top 2 inches of soil are dry',
-          ),
-          light: LightRequirement(
-            level: 'high',
-            hoursPerDay: 8,
-            placement: 'indoor',
-          ),
-          soilType: 'Well-draining potting mix',
-          growthSeason: 'Spring to Fall',
-          temperature: TemperatureRange(minTemp: 18, maxTemp: 24),
-          fertilizer: 'Monthly during growing season',
-          pruning: 'Prune to maintain shape',
-        ),
-        tags: ['indoor', 'tree', 'glossy-leaves'],
-      ),
-      Plant(
-        id: '5',
-        commonName: 'Fiddle Leaf Fig',
-        scientificName: 'Ficus lyrata',
-        category: 'tree',
-        family: 'Moraceae',
-        description: 'Trendy indoor tree with large, violin-shaped leaves.',
-        careRequirements: PlantCareRequirements(
-          water: WaterRequirement(
-            frequency: 'weekly',
-            amount: 'medium',
-            notes: 'Water thoroughly when top inch is dry',
-          ),
-          light: LightRequirement(
-            level: 'high',
-            hoursPerDay: 8,
-            placement: 'indoor',
-          ),
-          soilType: 'Well-draining, nutrient-rich soil',
-          growthSeason: 'Spring to Summer',
-          temperature: TemperatureRange(minTemp: 18, maxTemp: 26),
-          fertilizer: 'Monthly with balanced fertilizer',
-          pruning: 'Minimal pruning needed',
-        ),
-        tags: ['indoor', 'tree', 'statement-plant'],
-      ),
     ]);
+
+    // Try to fetch from API
+    try {
+      await _apiService.fetchPlantsFromApi();
+    } catch (e) {
+      print('Failed to fetch plants from API: $e');
+    }
   }
 
-  // Search plants by name
-  List<Plant> searchPlants(String query) {
-    if (query.isEmpty) return _plants;
+  // Search plants from both local and API sources
+  Future<List<Plant>> searchPlants(String query) async {
+    try {
+      // Try API first
+      final apiResults = await _apiService.searchPlants(query);
+      if (apiResults.isNotEmpty) {
+        return apiResults;
+      }
+    } catch (e) {
+      print('API search failed: $e');
+    }
+
+    // Fallback to local search
+    if (query.isEmpty) return _localPlants;
     
     query = query.toLowerCase();
-    return _plants.where((plant) {
+    return _localPlants.where((plant) {
       return plant.commonName.toLowerCase().contains(query) ||
              plant.scientificName.toLowerCase().contains(query) ||
              plant.tags.any((tag) => tag.toLowerCase().contains(query));
@@ -158,36 +127,63 @@ class PlantDatabaseService {
   }
 
   // Get plants by category
-  List<Plant> getPlantsByCategory(String category) {
-    return _plants.where((plant) => plant.category == category).toList();
+  Future<List<Plant>> getPlantsByCategory(String category) async {
+    try {
+      final allPlants = await _apiService.fetchPlantsFromApi();
+      return allPlants.where((plant) => plant.category == category).toList();
+    } catch (e) {
+      return _localPlants.where((plant) => plant.category == category).toList();
+    }
   }
 
   // Get all categories
-  List<String> getCategories() {
-    return _plants.map((plant) => plant.category).toSet().toList();
+  Future<List<String>> getCategories() async {
+    try {
+      final allPlants = await _apiService.fetchPlantsFromApi();
+      return allPlants.map((plant) => plant.category).toSet().toList();
+    } catch (e) {
+      return _localPlants.map((plant) => plant.category).toSet().toList();
+    }
   }
 
   // Get plant by ID
-  Plant? getPlantById(String id) {
+  Future<Plant?> getPlantById(String id) async {
     try {
-      return _plants.firstWhere((plant) => plant.id == id);
+      // Try API first
+      final apiPlant = await _apiService.getPlantById(id);
+      if (apiPlant != null) return apiPlant;
+    } catch (e) {
+      print('API getPlantById failed: $e');
+    }
+
+    // Fallback to local
+    try {
+      return _localPlants.firstWhere((plant) => plant.id == id);
     } catch (e) {
       return null;
     }
   }
 
   // Get all plants
-  List<Plant> getAllPlants() {
-    return List.from(_plants);
+  Future<List<Plant>> getAllPlants() async {
+    try {
+      final apiPlants = await _apiService.fetchPlantsFromApi();
+      return [...apiPlants, ..._localPlants];
+    } catch (e) {
+      return List.from(_localPlants);
+    }
   }
 
-  // Simulate plant identification from image
+  // Plant identification from image using API
   Future<List<Plant>> identifyPlantFromImage(String imagePath) async {
-    // Simulate API delay
-    await Future.delayed(Duration(seconds: 2));
-    
-    // Return random plants as identification results
-    final shuffled = List<Plant>.from(_plants)..shuffle();
-    return shuffled.take(3).toList();
+    try {
+      return await _apiService.identifyPlantFromImage(imagePath);
+    } catch (e) {
+      print('API identification failed: $e');
+      // Fallback to local simulation
+      await Future.delayed(Duration(seconds: 2));
+      final shuffled = List<Plant>.from(_localPlants)..shuffle();
+      return shuffled.take(3).toList();
+    }
   }
 }

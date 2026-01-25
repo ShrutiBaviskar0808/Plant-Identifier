@@ -11,7 +11,7 @@ class GardenView extends GetView<GardenController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Garden', style: TextStyle(fontSize: 22)),
+        title: const Text('My Garden', style: TextStyle(fontSize: 22, fontFamily: 'Poppins')),
       ),
       body: Obx(() {
         if (controller.isLoading) {

@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/data/services/plant_database_service.dart';
+import '../../../core/data/services/image_analysis_service.dart';
 import '../../../core/data/models/plant.dart';
 
 class IdentificationController extends GetxController {
@@ -14,6 +15,7 @@ class IdentificationController extends GetxController {
   final RxBool _isProcessing = false.obs;
   final ImagePicker _imagePicker = ImagePicker();
   final PlantDatabaseService _plantService = PlantDatabaseService();
+  final ImageAnalysisService _imageAnalysisService = ImageAnalysisService();
   final RxList<Plant> _identificationResults = <Plant>[].obs;
 
   CameraController? get cameraController => _cameraController;
@@ -25,8 +27,16 @@ class IdentificationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _plantService.initializeSampleData();
+    _initializeServices();
     initializeCamera();
+  }
+
+  Future<void> _initializeServices() async {
+    try {
+      await _plantService.initializeSampleData();
+    } catch (e) {
+      print('Failed to initialize plant service: $e');
+    }
   }
 
   @override
@@ -100,7 +110,7 @@ class IdentificationController extends GetxController {
               SizedBox(height: 16),
               Text(
                 'AI is analyzing your plant...',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16, fontFamily: 'Poppins'),
               ),
             ],
           ),
@@ -108,18 +118,24 @@ class IdentificationController extends GetxController {
         barrierDismissible: false,
       );
       
-      // Identify plant using database service
-      final results = await _plantService.identifyPlantFromImage(imageFile.path);
+      // Use image analysis service for better identification
+      final results = await _imageAnalysisService.analyzeImageForPlantIdentification(imageFile.path);
       _identificationResults.value = results;
       
       // Close loading dialog
       Get.back();
       
-      // Navigate to results with confidence scores
+      // Calculate confidence based on results
+      double confidence = 0.0;
+      if (results.isNotEmpty) {
+        confidence = _imageAnalysisService.calculateConfidence(results.first, imageFile.path);
+      }
+      
+      // Navigate to results
       Get.toNamed(AppRoutes.plantResult, arguments: {
         'imagePath': imageFile.path,
         'identificationResults': results,
-        'confidence': results.isNotEmpty ? 0.95 : 0.0,
+        'confidence': confidence,
       });
     } catch (e) {
       // Close loading dialog if open

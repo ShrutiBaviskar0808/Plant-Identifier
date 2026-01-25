@@ -27,16 +27,21 @@ class _PlantBrowseViewState extends State<PlantBrowseView> {
     _initializeData();
   }
 
-  void _initializeData() {
-    _plantService.initializeSampleData();
-    _plants = _plantService.getAllPlants();
-    _filteredPlants = _plants;
-    setState(() {
-      _isLoading = false;
-    });
+  Future<void> _initializeData() async {
+    try {
+      await _plantService.initializeSampleData();
+      _plants = await _plantService.getAllPlants();
+      _filteredPlants = _plants;
+    } catch (e) {
+      print('Failed to initialize data: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
-  void _filterPlants() {
+  Future<void> _filterPlants() async {
     List<Plant> filtered = _plants;
 
     if (_selectedCategory != 'all') {
@@ -44,7 +49,7 @@ class _PlantBrowseViewState extends State<PlantBrowseView> {
     }
 
     if (_searchController.text.isNotEmpty) {
-      filtered = _plantService.searchPlants(_searchController.text);
+      filtered = await _plantService.searchPlants(_searchController.text);
       if (_selectedCategory != 'all') {
         filtered = filtered.where((plant) => plant.category == _selectedCategory).toList();
       }
@@ -94,13 +99,19 @@ class _PlantBrowseViewState extends State<PlantBrowseView> {
                 SizedBox(height: 12),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildCategoryChip('all', 'All'),
-                      ..._plantService.getCategories().map(
-                        (category) => _buildCategoryChip(category, category),
-                      ),
-                    ],
+                  child: FutureBuilder<List<String>>(
+                    future: _plantService.getCategories(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) return SizedBox();
+                      return Row(
+                        children: [
+                          _buildCategoryChip('all', 'All'),
+                          ...snapshot.data!.map(
+                            (category) => _buildCategoryChip(category, category),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ],

@@ -7,27 +7,28 @@ class AppTheme {
 
   static TextTheme get _textTheme {
     return const TextTheme(
-      displayLarge: TextStyle(fontSize: 64, fontWeight: FontWeight.w300),
-      displayMedium: TextStyle(fontSize: 52, fontWeight: FontWeight.w400),
-      displaySmall: TextStyle(fontSize: 44, fontWeight: FontWeight.w400),
-      headlineLarge: TextStyle(fontSize: 40, fontWeight: FontWeight.w400),
-      headlineMedium: TextStyle(fontSize: 36, fontWeight: FontWeight.w400),
-      headlineSmall: TextStyle(fontSize: 32, fontWeight: FontWeight.w400),
-      titleLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
-      titleMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-      titleSmall: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-      bodyLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-      bodyMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
-      bodySmall: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-      labelLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-      labelMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-      labelSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      displayLarge: TextStyle(fontSize: 64, fontWeight: FontWeight.w300, fontFamily: 'Poppins'),
+      displayMedium: TextStyle(fontSize: 52, fontWeight: FontWeight.w400, fontFamily: 'Poppins'),
+      displaySmall: TextStyle(fontSize: 44, fontWeight: FontWeight.w400, fontFamily: 'Poppins'),
+      headlineLarge: TextStyle(fontSize: 40, fontWeight: FontWeight.w400, fontFamily: 'Poppins'),
+      headlineMedium: TextStyle(fontSize: 36, fontWeight: FontWeight.w400, fontFamily: 'Poppins'),
+      headlineSmall: TextStyle(fontSize: 32, fontWeight: FontWeight.w400, fontFamily: 'Poppins'),
+      titleLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.w500, fontFamily: 'Poppins'),
+      titleMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, fontFamily: 'Poppins'),
+      titleSmall: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, fontFamily: 'Poppins'),
+      bodyLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w400, fontFamily: 'Poppins'),
+      bodyMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, fontFamily: 'Poppins'),
+      bodySmall: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, fontFamily: 'Poppins'),
+      labelLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, fontFamily: 'Poppins'),
+      labelMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Poppins'),
+      labelSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, fontFamily: 'Poppins'),
     );
   }
 
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Poppins', // Set default font family
       textTheme: _textTheme,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
@@ -65,6 +66,7 @@ class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Poppins', // Set default font family
       textTheme: _textTheme.apply(bodyColor: Colors.white, displayColor: Colors.white),
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,

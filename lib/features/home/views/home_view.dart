@@ -53,8 +53,8 @@ class HomeView extends GetView<HomeController> {
           elevation: 0,
           selectedItemColor: Colors.green,
           unselectedItemColor: Colors.grey,
-          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          unselectedLabelStyle: TextStyle(fontSize: 14),
+          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, fontFamily: 'Poppins'),
+          unselectedLabelStyle: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home_outlined),
@@ -168,6 +168,7 @@ class PremiumHomeTabView extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.black54,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                         Text(
@@ -176,6 +177,7 @@ class PremiumHomeTabView extends StatelessWidget {
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.green[800],
+                            fontFamily: 'Poppins',
                           ),
                         ),
                       ],
