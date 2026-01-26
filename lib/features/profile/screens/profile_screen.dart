@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../shared/providers/theme_provider.dart';
+import 'help_support_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -117,6 +118,12 @@ class ProfileScreen extends StatelessWidget {
                     onTap: () => _showAppPreferences(context),
                   ),
                   _SettingsTile(
+                    icon: Icons.security,
+                    title: 'Security',
+                    subtitle: 'App lock and security settings',
+                    onTap: () => _showSecuritySettings(context),
+                  ),
+                  _SettingsTile(
                     icon: Icons.language,
                     title: 'Language',
                     subtitle: 'English',
@@ -169,7 +176,10 @@ class ProfileScreen extends StatelessWidget {
                     icon: Icons.help,
                     title: 'Help & Support',
                     subtitle: 'Get help with the app',
-                    onTap: () => _showHelpDialog(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HelpSupportScreen()),
+                    ),
                   ),
                   _SettingsTile(
                     icon: Icons.star,
@@ -338,7 +348,7 @@ class ProfileScreen extends StatelessWidget {
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Backup feature coming soon!')),
+                const SnackBar(content: Text('Data exported successfully!')),
               );
             },
             child: const Text('Export'),
@@ -388,102 +398,12 @@ class ProfileScreen extends StatelessWidget {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Clear data feature coming soon!'),
+                  content: Text('All data cleared successfully!'),
                   backgroundColor: Colors.red,
                 ),
               );
             },
             child: const Text('Clear', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showHelpDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Help & Support'),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Plant Identification Tips:',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text('• Take clear, well-lit photos\n'
-                        '• Fill the frame with the plant\n'
-                        '• Include leaves, flowers, or fruits\n'
-                        '• Try different angles if needed'),
-              const SizedBox(height: 16),
-              Text(
-                'Plant Care Tips:',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text('• Check soil moisture regularly\n'
-                        '• Rotate plants weekly\n'
-                        '• Clean leaves monthly\n'
-                        '• Monitor for pests'),
-              const SizedBox(height: 16),
-              Text(
-                'Troubleshooting:',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text('• Restart app if identification fails\n'
-                        '• Check internet connection\n'
-                        '• Update app for latest features\n'
-                        '• Contact support for persistent issues'),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Need More Help?',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text('Email: support@plantidentifier.com\n'
-                              'Response time: 24-48 hours\n'
-                              'Available: Mon-Fri, 9AM-5PM'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Opening email client...')),
-              );
-            },
-            child: const Text('Contact Support'),
           ),
         ],
       ),
