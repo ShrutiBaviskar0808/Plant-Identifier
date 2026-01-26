@@ -111,6 +111,12 @@ class ProfileScreen extends StatelessWidget {
                     onTap: () => _showNotificationSettings(context),
                   ),
                   _SettingsTile(
+                    icon: Icons.tune,
+                    title: 'App Preferences',
+                    subtitle: 'Customize app behavior',
+                    onTap: () => _showAppPreferences(context),
+                  ),
+                  _SettingsTile(
                     icon: Icons.language,
                     title: 'Language',
                     subtitle: 'English',
@@ -225,14 +231,95 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _showNotificationSettings(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Notification settings coming soon!')),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Notification Settings'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SwitchListTile(
+              title: const Text('Care Reminders'),
+              subtitle: const Text('Daily plant care notifications'),
+              value: true,
+              onChanged: (value) {},
+            ),
+            SwitchListTile(
+              title: const Text('Weekly Tips'),
+              subtitle: const Text('Plant care tips and advice'),
+              value: true,
+              onChanged: (value) {},
+            ),
+            SwitchListTile(
+              title: const Text('Weather Alerts'),
+              subtitle: const Text('Weather-based care suggestions'),
+              value: false,
+              onChanged: (value) {},
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Notification settings saved!')),
+              );
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
     );
   }
 
   void _showLanguageSettings(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Language settings coming soon!')),
+    final languages = ['English', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Hindi', 'Chinese'];
+    String selectedLanguage = 'English';
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Select Language'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: languages.length,
+              itemBuilder: (context, index) {
+                return RadioListTile<String>(
+                  title: Text(languages[index]),
+                  value: languages[index],
+                  groupValue: selectedLanguage,
+                  onChanged: (value) {
+                    setState(() => selectedLanguage = value!);
+                  },
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Language changed to $selectedLanguage')),
+                );
+              },
+              child: const Text('Apply'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -318,18 +405,85 @@ class ProfileScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Help & Support'),
-        content: const Text(
-          'Need help with Plant Identifier?\n\n'
-          '• Take clear, well-lit photos for best identification results\n'
-          '• Make sure the plant fills most of the frame\n'
-          '• Try different angles if identification fails\n'
-          '• Check care reminders regularly\n\n'
-          'For technical support, email: support@plantidentifier.com',
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Plant Identification Tips:',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text('• Take clear, well-lit photos\n'
+                        '• Fill the frame with the plant\n'
+                        '• Include leaves, flowers, or fruits\n'
+                        '• Try different angles if needed'),
+              const SizedBox(height: 16),
+              Text(
+                'Plant Care Tips:',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text('• Check soil moisture regularly\n'
+                        '• Rotate plants weekly\n'
+                        '• Clean leaves monthly\n'
+                        '• Monitor for pests'),
+              const SizedBox(height: 16),
+              Text(
+                'Troubleshooting:',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text('• Restart app if identification fails\n'
+                        '• Check internet connection\n'
+                        '• Update app for latest features\n'
+                        '• Contact support for persistent issues'),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Need More Help?',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text('Email: support@plantidentifier.com\n'
+                              'Response time: 24-48 hours\n'
+                              'Available: Mon-Fri, 9AM-5PM'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Opening email client...')),
+              );
+            },
+            child: const Text('Contact Support'),
           ),
         ],
       ),
@@ -355,6 +509,96 @@ class ProfileScreen extends StatelessWidget {
               );
             },
             child: const Text('Rate Now'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAppPreferences(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('App Preferences'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SwitchListTile(
+              title: const Text('Auto-save Photos'),
+              subtitle: const Text('Save identified plant photos'),
+              value: true,
+              onChanged: (value) {},
+            ),
+            SwitchListTile(
+              title: const Text('Offline Mode'),
+              subtitle: const Text('Use cached data when offline'),
+              value: false,
+              onChanged: (value) {},
+            ),
+            SwitchListTile(
+              title: const Text('Analytics'),
+              subtitle: const Text('Help improve the app'),
+              value: true,
+              onChanged: (value) {},
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Preferences saved!')),
+              );
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSecuritySettings(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Security Settings'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.fingerprint),
+              title: const Text('Biometric Lock'),
+              subtitle: const Text('Use fingerprint or face unlock'),
+              trailing: Switch(
+                value: false,
+                onChanged: (value) {},
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.lock),
+              title: const Text('App PIN'),
+              subtitle: const Text('Set a 4-digit PIN'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.timer),
+              title: const Text('Auto-lock Timer'),
+              subtitle: const Text('Lock app after inactivity'),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {},
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
           ),
         ],
       ),
