@@ -343,7 +343,7 @@ class PremiumHomeTabView extends StatelessWidget {
             ),
             SizedBox(height: 12),
             Container(
-              height: 120,
+              height: 110,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: controller.plantAnalytics.length,
@@ -352,7 +352,7 @@ class PremiumHomeTabView extends StatelessWidget {
                   return Container(
                     width: 200,
                     margin: EdgeInsets.only(right: 12),
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
                       gradient: LinearGradient(
@@ -365,29 +365,31 @@ class PremiumHomeTabView extends StatelessWidget {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           analytics.plantName,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 13,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _buildAnalyticsItem('Growth', '${analytics.growthRate}%'),
-                            _buildAnalyticsItem('Health', '${analytics.healthScore}%'),
-                          ],
-                        ),
                         SizedBox(height: 4),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildAnalyticsItem('Growth', '${analytics.growthRate}%'),
+                              _buildAnalyticsItem('Health', '${analytics.healthScore}%'),
+                            ],
+                          ),
+                        ),
                         Text(
                           '${analytics.daysOwned} days owned',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             color: Colors.grey[600],
                           ),
                         ),
@@ -514,19 +516,20 @@ class PremiumHomeTabView extends StatelessWidget {
 
   Widget _buildAnalyticsItem(String label, String value) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           value,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 16,
+            fontSize: 14,
             color: Colors.purple[700],
           ),
         ),
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 10,
             color: Colors.grey[600],
           ),
         ),
@@ -720,9 +723,9 @@ class PremiumHomeTabView extends StatelessWidget {
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1.0,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.1,
             children: [
               _buildFeatureCard(
                 icon: Icons.schedule,
@@ -762,7 +765,7 @@ class PremiumHomeTabView extends StatelessWidget {
     required Color color,
   }) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
@@ -777,13 +780,14 @@ class PremiumHomeTabView extends StatelessWidget {
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 32),
-          SizedBox(height: 10),
+          Icon(icon, color: color, size: 28),
+          SizedBox(height: 6),
           Text(
             title,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
@@ -795,7 +799,7 @@ class PremiumHomeTabView extends StatelessWidget {
           Text(
             subtitle,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               color: Colors.black54,
             ),
             textAlign: TextAlign.center,

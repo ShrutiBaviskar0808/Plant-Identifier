@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/data/local/database_service.dart';
+import '../screens/settings_screen.dart';
+import '../screens/help_support_screen.dart';
 
 class ProfileController extends GetxController {
   // Observable variables for profile statistics
@@ -143,33 +145,11 @@ class ProfileController extends GetxController {
   }
 
   void showSettings() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Settings'),
-        content: const Text('Settings functionality coming soon!'),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
+    Get.to(() => const SettingsScreen());
   }
 
   void showHelp() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Help & Support'),
-        content: const Text('Help content coming soon!'),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
+    Get.to(() => const HelpSupportScreen());
   }
 
   void showAbout() {
