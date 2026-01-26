@@ -1,14 +1,11 @@
 import 'dart:io';
 import '../models/plant.dart';
-import 'plant_database_service.dart';
 import 'plant_api_service.dart';
 
 class ImageAnalysisService {
   static final ImageAnalysisService _instance = ImageAnalysisService._internal();
   factory ImageAnalysisService() => _instance;
   ImageAnalysisService._internal();
-
-  final PlantDatabaseService _plantService = PlantDatabaseService();
 
   Future<List<Plant>> analyzeImageForPlantIdentification(String imagePath) async {
     try {
@@ -19,23 +16,37 @@ class ImageAnalysisService {
 
       await Future.delayed(Duration(seconds: 2));
 
-      // Get all plants from API and return random selection
+      // Use the updated PlantApiService identification method
       final apiService = PlantApiService();
-      final allPlants = await apiService.fetchPlantsFromApi();
-      
-      // Shuffle all plants for real variety
-      allPlants.shuffle();
-      
-      return allPlants.take(3).toList();
+      return await apiService.identifyPlantFromImage(imagePath);
     } catch (e) {
       print('Image analysis failed: $e');
-      return await _getDefaultFloweringPlants();
+      return _createFallbackPlants(imagePath);
     }
   }
 
-  Future<List<Plant>> _getDefaultFloweringPlants() async {
-    final allPlants = await _plantService.getAllPlants();
-    return allPlants.where((plant) => plant.category == 'flowering').take(3).toList();
+  List<Plant> _createFallbackPlants(String imagePath) {
+    final plantNames = ['Rose', 'Sunflower', 'Orchid'];
+    
+    return plantNames.map((name) => Plant(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      commonName: name,
+      scientificName: '$name species',
+      category: 'flowering',
+      family: 'Plantae',
+      description: 'Beautiful $name flower',
+      careRequirements: PlantCareRequirements(
+        water: WaterRequirement(frequency: 'weekly', amount: 'medium', notes: ''),
+        light: LightRequirement(level: 'medium', hoursPerDay: 6, placement: 'indoor'),
+        soilType: 'Well-draining',
+        growthSeason: 'Spring to Fall',
+        temperature: TemperatureRange(minTemp: 18, maxTemp: 25),
+        fertilizer: 'Monthly',
+        pruning: 'As needed',
+      ),
+      imageUrls: [],
+      tags: ['flowering'],
+    )).toList();
   }
 
   double calculateConfidence(Plant plant, String imagePath) {

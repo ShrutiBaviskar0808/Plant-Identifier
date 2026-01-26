@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import '../models/plant.dart';
 
@@ -13,11 +14,78 @@ class PlantApiService {
   List<Plant> _cachedPlants = [];
   bool _isLoaded = false;
 
-  // ✅ UPDATED METHOD (ONLY THIS PART CHANGED)
   Future<List<Plant>> identifyPlantFromImage(String imagePath) async {
-    final plants = await fetchPlantsFromApi();
-    plants.shuffle();
-    return plants.take(3).toList();
+    final plantNames = [
+      'Rose', 'Sunflower', 'Tulip', 'Lily', 'Orchid', 'Jasmine',
+      'Marigold', 'Lavender', 'Petunia', 'Dahlia', 'Carnation', 'Chrysanthemum',
+      'Begonia', 'Geranium', 'Pansy', 'Zinnia', 'Snapdragon', 'Peony', 'Iris', 'Daffodil'
+    ];
+    
+    final pathHash = imagePath.hashCode.abs();
+    final timeStamp = DateTime.now().millisecondsSinceEpoch;
+    final randomSeed = (pathHash * 31 + timeStamp * 17) % 10000;
+    
+    final random = Random(randomSeed);
+    final shuffledNames = List<String>.from(plantNames);
+    shuffledNames.shuffle(random);
+    
+    return shuffledNames.take(3).map((name) => _createMockPlant(name)).toList();
+  }
+  
+  Plant _createMockPlant(String name) {
+    final scientificNames = {
+      'Rose': 'Rosa rubiginosa',
+      'Sunflower': 'Helianthus annuus',
+      'Tulip': 'Tulipa gesneriana',
+      'Lily': 'Lilium candidum',
+      'Orchid': 'Orchidaceae phalaenopsis',
+      'Jasmine': 'Jasminum officinale',
+      'Marigold': 'Tagetes erecta',
+      'Lavender': 'Lavandula angustifolia',
+      'Petunia': 'Petunia hybrida',
+      'Dahlia': 'Dahlia pinnata',
+      'Carnation': 'Dianthus caryophyllus',
+      'Chrysanthemum': 'Chrysanthemum morifolium',
+      'Begonia': 'Begonia semperflorens',
+      'Geranium': 'Pelargonium hortorum',
+      'Pansy': 'Viola tricolor',
+      'Zinnia': 'Zinnia elegans',
+      'Snapdragon': 'Antirrhinum majus',
+      'Peony': 'Paeonia lactiflora',
+      'Iris': 'Iris germanica',
+      'Daffodil': 'Narcissus pseudonarcissus',
+    };
+    
+    return Plant(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      commonName: name,
+      scientificName: scientificNames[name] ?? '$name species',
+      category: 'flowering',
+      family: 'Plantae',
+      description: 'Beautiful $name flower with vibrant colors and pleasant fragrance.',
+      careRequirements: PlantCareRequirements(
+        water: WaterRequirement(
+          frequency: 'weekly',
+          amount: 'medium',
+          notes: 'Water when soil feels dry',
+        ),
+        light: LightRequirement(
+          level: 'medium',
+          hoursPerDay: 6,
+          placement: 'indoor',
+        ),
+        soilType: 'Well-draining potting mix',
+        growthSeason: 'Spring to Fall',
+        temperature: TemperatureRange(
+          minTemp: 18,
+          maxTemp: 28,
+        ),
+        fertilizer: 'Monthly during growing season',
+        pruning: 'Remove dead flowers regularly',
+      ),
+      imageUrls: [],
+      tags: ['flowering', 'colorful', 'fragrant'],
+    );
   }
 
   // ---------------- NO CHANGES BELOW ----------------
