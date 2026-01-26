@@ -297,46 +297,52 @@ class PlantResultView extends StatelessWidget {
   void _showSaveDialog(Plant plant, String imagePath) {
     final nameController = TextEditingController(text: plant.commonName);
     final notesController = TextEditingController();
-    String selectedGroup = 'indoor';
+    String selectedGroup = 'decorative';
 
     Get.dialog(
       AlertDialog(
         title: Text('Save to My Garden'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'Plant Name',
-                border: OutlineInputBorder(),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Plant Name',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
               ),
-            ),
-            SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: selectedGroup,
-              decoration: InputDecoration(
-                labelText: 'Group',
-                border: OutlineInputBorder(),
+              SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: selectedGroup,
+                decoration: InputDecoration(
+                  labelText: 'Group',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+                items: ['indoor', 'outdoor', 'edible', 'decorative']
+                    .map((group) => DropdownMenuItem(
+                          value: group,
+                          child: Text(group.capitalize!),
+                        ))
+                    .toList(),
+                onChanged: (value) => selectedGroup = value!,
               ),
-              items: ['indoor', 'outdoor', 'edible', 'decorative']
-                  .map((group) => DropdownMenuItem(
-                        value: group,
-                        child: Text(group.capitalize!),
-                      ))
-                  .toList(),
-              onChanged: (value) => selectedGroup = value!,
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: notesController,
-              decoration: InputDecoration(
-                labelText: 'Notes (optional)',
-                border: OutlineInputBorder(),
+              SizedBox(height: 12),
+              TextField(
+                controller: notesController,
+                decoration: InputDecoration(
+                  labelText: 'Notes (optional)',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                ),
+                maxLines: 2,
               ),
-              maxLines: 2,
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -379,12 +385,19 @@ class PlantResultView extends StatelessWidget {
         'Success!',
         'Plant saved to your garden successfully',
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+        backgroundColor: Colors.white,
+        colorText: Colors.green[700],
         borderRadius: 12,
         margin: EdgeInsets.all(16),
-        icon: Icon(Icons.check_circle, color: Colors.white),
+        icon: Icon(Icons.check_circle, color: Colors.green[600]),
         duration: Duration(seconds: 3),
+        boxShadows: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       );
     } catch (e) {
       Get.snackbar(
