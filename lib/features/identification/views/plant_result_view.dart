@@ -6,15 +6,19 @@ import '../../../core/data/services/user_plant_service.dart';
 import '../../garden/controllers/garden_controller.dart';
 
 class PlantResultView extends StatelessWidget {
-  const PlantResultView({super.key});
+  final String imagePath;
+  final List<Plant> identificationResults;
+  final double confidence;
+
+  const PlantResultView({
+    super.key,
+    required this.imagePath,
+    required this.identificationResults,
+    required this.confidence,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final args = Get.arguments as Map<String, dynamic>;
-    final imagePath = args['imagePath'] as String;
-    final results = args['identificationResults'] as List<Plant>;
-    final confidence = args['confidence'] as double;
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Plant Identification'),
@@ -40,7 +44,7 @@ class PlantResultView extends StatelessWidget {
             SizedBox(height: 20),
             
             // Identification Results
-            if (results.isNotEmpty) ...[
+            if (identificationResults.isNotEmpty) ...{
               Text(
                 'Identification Results',
                 style: TextStyle(
@@ -52,10 +56,10 @@ class PlantResultView extends StatelessWidget {
               SizedBox(height: 16),
               
               // Top match
-              _buildPlantCard(results.first, confidence, true),
+              _buildPlantCard(identificationResults.first, confidence, true),
               
               // Other matches
-              if (results.length > 1) ...[
+              if (identificationResults.length > 1) ...{
                 SizedBox(height: 16),
                 Text(
                   'Other Possible Matches',
@@ -65,16 +69,16 @@ class PlantResultView extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 8),
-                ...results.skip(1).map((plant) => 
+                ...identificationResults.skip(1).map((plant) => 
                   Padding(
                     padding: EdgeInsets.only(bottom: 8),
                     child: _buildPlantCard(plant, confidence - 0.1, false),
                   )
                 ),
-              ],
-            ] else ...[
+              },
+            } else ...{
               _buildNoResultsCard(),
-            ],
+            },
             
             SizedBox(height: 30),
             
@@ -83,7 +87,7 @@ class PlantResultView extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => Get.back(),
+                    onPressed: () => Navigator.of(context).pop(),
                     icon: Icon(Icons.camera_alt),
                     label: Text('Scan Another'),
                     style: ElevatedButton.styleFrom(
@@ -93,11 +97,11 @@ class PlantResultView extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (results.isNotEmpty) ...[
+                if (identificationResults.isNotEmpty) ...{
                   SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () => _showSaveDialog(results.first, imagePath),
+                      onPressed: () => _showSaveDialog(context, identificationResults.first),
                       icon: Icon(Icons.add),
                       label: Text('Save to Garden'),
                       style: ElevatedButton.styleFrom(
@@ -107,7 +111,7 @@ class PlantResultView extends StatelessWidget {
                       ),
                     ),
                   ),
-                ],
+                },
               ],
             ),
           ],
@@ -171,7 +175,7 @@ class PlantResultView extends StatelessWidget {
             SizedBox(height: 8),
             _buildInfoRow('Category', plant.category),
             _buildInfoRow('Family', plant.family),
-            if (isTopMatch) ...[
+            if (isTopMatch) ...{
               SizedBox(height: 12),
               Text(
                 'Care Requirements',
@@ -182,7 +186,7 @@ class PlantResultView extends StatelessWidget {
               ),
               SizedBox(height: 8),
               _buildCareInfo(plant.careRequirements),
-            ],
+            },
           ],
         ),
       ),
@@ -294,13 +298,14 @@ class PlantResultView extends StatelessWidget {
     );
   }
 
-  void _showSaveDialog(Plant plant, String imagePath) {
+  void _showSaveDialog(BuildContext context, Plant plant) {
     final nameController = TextEditingController(text: plant.commonName);
     final notesController = TextEditingController();
     String selectedGroup = 'decorative';
 
-    Get.dialog(
-      AlertDialog(
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
         title: Text('Save to My Garden'),
         content: SizedBox(
           width: double.maxFinite,
@@ -346,16 +351,16 @@ class PlantResultView extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Navigator.of(context).pop(),
             child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () => _savePlant(
+              context,
               plant,
               nameController.text,
               notesController.text,
               selectedGroup,
-              imagePath,
             ),
             child: Text('Save'),
           ),
@@ -364,7 +369,7 @@ class PlantResultView extends StatelessWidget {
     );
   }
 
-  Future<void> _savePlant(Plant plant, String customName, String notes, String group, String imagePath) async {
+  Future<void> _savePlant(BuildContext context, Plant plant, String customName, String notes, String group) async {
     try {
       final userPlantService = UserPlantService();
       await userPlantService.addPlant(
@@ -379,32 +384,23 @@ class PlantResultView extends StatelessWidget {
       final gardenController = Get.find<GardenController>();
       await gardenController.loadUserPlants();
 
-      Get.back(); // Close dialog
+      Navigator.of(context).pop(); // Close dialog
       
-      Get.snackbar(
-        'Success!',
-        'Plant saved to your garden successfully',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.white,
-        colorText: Colors.green[700],
-        borderRadius: 12,
-        margin: EdgeInsets.all(16),
-        icon: Icon(Icons.check_circle, color: Colors.green[600]),
-        duration: Duration(seconds: 3),
-        boxShadows: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: Offset(0, 2),
-          ),
-        ],
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Plant saved to your garden successfully'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to save plant: $e',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to save plant: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }

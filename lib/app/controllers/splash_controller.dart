@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
-import '../routes/app_routes.dart';
+import 'package:flutter/material.dart';
+import '../../features/home/views/home_view.dart';
 
 class SplashController extends GetxController {
   final _isLoading = true.obs;
@@ -31,7 +32,9 @@ class SplashController extends GetxController {
       
       _isLoading.value = false;
       
-      Get.offAllNamed(AppRoutes.home);
+      Navigator.of(Get.context!).pushReplacement(
+        MaterialPageRoute(builder: (context) => const HomeView()),
+      );
       
     } catch (e) {
       Get.snackbar(

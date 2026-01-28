@@ -1,5 +1,8 @@
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import '../../../core/data/services/notification_service.dart';
+import '../../identification/views/camera_view.dart';
+import '../../garden/views/garden_view.dart';
 
 class HomeController extends GetxController {
   final RxInt _currentIndex = 0.obs;
@@ -55,11 +58,15 @@ class HomeController extends GetxController {
   }
 
   void navigateToCamera() {
-    Get.toNamed('/camera');
+    Navigator.of(Get.context!).push(
+      MaterialPageRoute(builder: (context) => const CameraView()),
+    );
   }
 
   void navigateToGarden() {
-    Get.toNamed('/garden');
+    Navigator.of(Get.context!).push(
+      MaterialPageRoute(builder: (context) => const GardenView()),
+    );
   }
 
   Future<void> _loadHomeData() async {

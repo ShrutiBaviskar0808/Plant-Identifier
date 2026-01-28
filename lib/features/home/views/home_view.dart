@@ -102,7 +102,9 @@ class PremiumHomeTabView extends StatelessWidget {
             children: [
               IconButton(
                 icon: Icon(Icons.notifications_outlined, color: Colors.green[800]),
-                onPressed: () => Get.to(() => const NotificationsView()),
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const NotificationsView()),
+                ),
               ),
               Positioned(
                 right: 8,
@@ -166,7 +168,7 @@ class PremiumHomeTabView extends StatelessWidget {
                         Text(
                           'Good ${Get.find<HomeController>().getIndianTimeGreeting()},',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 18,
                             color: Colors.black54,
                             fontFamily: 'Poppins',
                           ),
@@ -174,7 +176,7 @@ class PremiumHomeTabView extends StatelessWidget {
                         Text(
                           'Plant Lover! 🌱',
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: 32,
                             fontWeight: FontWeight.bold,
                             color: Colors.green[800],
                             fontFamily: 'Poppins',
@@ -203,7 +205,7 @@ class PremiumHomeTabView extends StatelessWidget {
       margin: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 16),
       child: Column(
         children: [
-          _buildRemindersSection(),
+          _buildRemindersSection(context),
           SizedBox(height: 16),
           Row(
             children: [
@@ -233,7 +235,7 @@ class PremiumHomeTabView extends StatelessWidget {
     );
   }
 
-  Widget _buildRemindersSection() {
+  Widget _buildRemindersSection(BuildContext context) {
     return Obx(() {
       final controller = Get.find<HomeController>();
       if (controller.careReminders.isEmpty) {
@@ -259,7 +261,7 @@ class PremiumHomeTabView extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () => _showAddReminderDialog(),
+                onPressed: () => _showAddReminderDialog(context),
                 child: Text('Add'),
               ),
             ],
@@ -289,7 +291,7 @@ class PremiumHomeTabView extends StatelessWidget {
                   ),
                 ),
                 TextButton(
-                  onPressed: () => _showAddReminderDialog(),
+                  onPressed: () => _showAddReminderDialog(context),
                   child: Text('Add'),
                 ),
               ],
@@ -564,7 +566,7 @@ class PremiumHomeTabView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 28),
+            Icon(icon, color: color, size: 36),
             SizedBox(height: 8),
             Text(
               title,
@@ -782,7 +784,7 @@ class PremiumHomeTabView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 28),
+          Icon(icon, color: color, size: 36),
           SizedBox(height: 6),
           Text(
             title,
@@ -826,14 +828,15 @@ class PremiumHomeTabView extends StatelessWidget {
     }
   }
 
-  void _showAddReminderDialog() {
+  void _showAddReminderDialog(BuildContext context) {
     final controller = Get.find<HomeController>();
     String plantName = '';
     String careType = 'Watering';
     DateTime selectedDate = DateTime.now().add(Duration(hours: 1));
     
-    Get.dialog(
-      AlertDialog(
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
         title: Text('Add Care Reminder'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -864,14 +867,14 @@ class PremiumHomeTabView extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Navigator.of(context).pop(),
             child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
               if (plantName.isNotEmpty) {
                 controller.addReminder(plantName, careType, selectedDate);
-                Get.back();
+                Navigator.of(context).pop();
               }
             },
             child: Text('Add'),
@@ -882,6 +885,8 @@ class PremiumHomeTabView extends StatelessWidget {
   }
 
   void _showPlantSearch(BuildContext context) {
-    Get.to(() => PlantSearchView());
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => PlantSearchView()),
+    );
   }
 }

@@ -12,7 +12,6 @@ import '../../features/care/views/care_view.dart';
 import '../../features/care/bindings/care_binding.dart';
 import '../../features/profile/views/profile_view.dart';
 import '../../features/profile/bindings/profile_binding.dart';
-import '../../features/identification/views/plant_result_view.dart';
 
 class AppPages {
   static final routes = [
@@ -47,11 +46,6 @@ class AppPages {
       name: AppRoutes.profile,
       page: () => const ProfileView(),
       binding: ProfileBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.plantResult,
-      page: () => const PlantResultView(),
-      binding: IdentificationBinding(),
     ),
   ];
 }

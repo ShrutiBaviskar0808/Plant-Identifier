@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../../../app/routes/app_routes.dart';
+import '../views/plant_result_view.dart';
 import '../../../core/data/services/plant_database_service.dart';
 import '../../../core/data/services/image_analysis_service.dart';
 import '../../../core/data/models/plant.dart';
@@ -131,12 +131,16 @@ class IdentificationController extends GetxController {
         confidence = _imageAnalysisService.calculateConfidence(results.first, imageFile.path);
       }
       
-      // Navigate to results
-      Get.toNamed(AppRoutes.plantResult, arguments: {
-        'imagePath': imageFile.path,
-        'identificationResults': results,
-        'confidence': confidence,
-      });
+      // Navigate to results using Navigator.push
+      Navigator.of(Get.context!).push(
+        MaterialPageRoute(
+          builder: (context) => PlantResultView(
+            imagePath: imageFile.path,
+            identificationResults: results,
+            confidence: confidence,
+          ),
+        ),
+      );
     } catch (e) {
       // Close loading dialog if open
       if (Get.isDialogOpen ?? false) Get.back();
