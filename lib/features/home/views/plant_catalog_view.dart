@@ -42,6 +42,7 @@ class PlantCatalogView extends StatelessWidget {
             childAspectRatio: 0.8,
           ),
           itemCount: plants.length,
+          cacheExtent: 200,
           itemBuilder: (context, index) {
             final plant = plants[index];
             return _buildPlantCard(plant, context);
@@ -83,7 +84,10 @@ class PlantCatalogView extends StatelessWidget {
                 child: Image.asset(
                   plant.imageUrl,
                   width: double.infinity,
+                  height: double.infinity,
                   fit: BoxFit.cover,
+                  cacheWidth: 200,
+                  cacheHeight: 200,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: Colors.grey[300],
