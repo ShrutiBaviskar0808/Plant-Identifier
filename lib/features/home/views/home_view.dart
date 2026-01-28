@@ -204,7 +204,7 @@ class PremiumHomeTabView extends StatelessWidget {
                   _buildQuickTipsSection(),
                   _buildWeatherSection(),
                   _buildPlantOfTheWeekSection(),
-                  SizedBox(height: 120),
+                  SizedBox(height: 20),
                 ],
               ),
             ),
