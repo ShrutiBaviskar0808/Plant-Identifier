@@ -14,8 +14,6 @@ import '../../care/views/care_view.dart';
 import '../../profile/views/profile_view.dart';
 import '../../notifications/views/notifications_view.dart';
 import 'plant_catalog_view.dart';
-import 'plant_detail_view.dart';
-import '../../../core/data/models/plant_catalog.dart';
 
 
 class HomeView extends GetView<HomeController> {
@@ -200,7 +198,6 @@ class PremiumHomeTabView extends StatelessWidget {
                     ),
                   ),
                   _buildQuickActions(context),
-                  _buildPlantCatalogSection(context),
                   _buildFeaturedSection(),
                   _buildPlantCareTools(),
                   _buildQuickTipsSection(),
@@ -329,181 +326,6 @@ class PremiumHomeTabView extends StatelessWidget {
         ),
       );
     });
-  }
-
-  Widget _buildPlantCatalogSection(BuildContext context) {
-    final featuredPlants = PlantCatalogData.getAllPlants().take(6).toList();
-    
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Popular Plants',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              TextButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PlantCatalogView()),
-                ),
-                child: Text(
-                  'View All',
-                  style: TextStyle(
-                    color: Colors.green[700],
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12),
-          Container(
-            height: 200,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: featuredPlants.length,
-              itemBuilder: (context, index) {
-                final plant = featuredPlants[index];
-                return Container(
-                  width: 140,
-                  margin: EdgeInsets.only(right: 12),
-                  child: _buildPlantCatalogCard(plant, context),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPlantCatalogCard(PlantCatalogItem plant, BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PlantDetailView(plant: plant),
-        ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 8,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 3,
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                child: Image.network(
-                  plant.imageUrl,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[300],
-                      child: Icon(
-                        Icons.local_florist,
-                        size: 30,
-                        color: Colors.grey[600],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      plant.name,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Icon(Icons.water_drop, size: 12, color: Colors.blue),
-                        SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            plant.waterRequirement.frequency,
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.grey[600],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 4),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: _getDifficultyColor(plant.difficulty),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        plant.difficulty,
-                        style: TextStyle(
-                          fontSize: 9,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Color _getDifficultyColor(String difficulty) {
-    switch (difficulty.toLowerCase()) {
-      case 'very easy':
-        return Colors.green;
-      case 'easy':
-        return Colors.lightGreen;
-      case 'moderate':
-        return Colors.orange;
-      case 'hard':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
   }
 
   Widget _buildActionCard({
