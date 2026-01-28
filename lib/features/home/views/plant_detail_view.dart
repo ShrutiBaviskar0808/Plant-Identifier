@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/data/models/plant_catalog.dart';
 import '../../garden/controllers/garden_controller.dart';
-import '../../../core/data/models/plant.dart';
+import '../../../core/data/models/plant.dart' as PlantModel;
 import 'package:get/get.dart';
 
 class PlantDetailView extends StatelessWidget {
@@ -107,22 +107,40 @@ class PlantDetailView extends StatelessWidget {
     final gardenController = Get.find<GardenController>();
     
     // Convert PlantCatalogItem to Plant
-    final plant = Plant(
+    final newPlant = PlantModel.Plant(
       id: catalogItem.id,
       commonName: catalogItem.name,
       scientificName: catalogItem.scientificName,
       description: catalogItem.description,
       category: 'Houseplant',
-      wateringFrequency: catalogItem.waterRequirement.frequency,
-      lightRequirement: catalogItem.lightRequirement,
-      temperatureRange: catalogItem.temperature,
-      soilType: catalogItem.soilType,
-      toxicity: catalogItem.toxicity,
-      imageUrl: catalogItem.imageUrl,
+      family: 'Unknown',
+      careRequirements: PlantModel.PlantCareRequirements(
+        water: PlantModel.WaterRequirement(
+          frequency: catalogItem.waterRequirement.frequency,
+          amount: catalogItem.waterRequirement.amount,
+          notes: catalogItem.waterRequirement.description,
+        ),
+        light: PlantModel.LightRequirement(
+          level: 'medium',
+          hoursPerDay: 6,
+          placement: 'indoor',
+        ),
+        soilType: catalogItem.soilType,
+        growthSeason: catalogItem.growingSeason,
+        temperature: PlantModel.TemperatureRange(
+          minTemp: 18,
+          maxTemp: 24,
+          unit: 'celsius',
+        ),
+        fertilizer: catalogItem.fertilizer,
+      ),
+      imageUrls: [catalogItem.imageUrl],
     );
     
-    gardenController.addPlantToGarden(plant);
+    gardenController.addPlantToGarden(newPlant);
   }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8),
       child: Row(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../../../core/data/models/plant.dart';
 
 class GardenPlantDetailView extends StatelessWidget {
@@ -79,11 +78,11 @@ class GardenPlantDetailView extends StatelessWidget {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 12),
-        _buildInfoRow(Icons.water_drop, 'Watering', userPlant.plant.wateringFrequency),
-        _buildInfoRow(Icons.wb_sunny, 'Light', userPlant.plant.lightRequirement),
-        _buildInfoRow(Icons.thermostat, 'Temperature', userPlant.plant.temperatureRange),
-        _buildInfoRow(Icons.grass, 'Soil', userPlant.plant.soilType),
-        _buildInfoRow(Icons.warning, 'Toxicity', userPlant.plant.toxicity),
+        _buildInfoRow(Icons.water_drop, 'Watering', userPlant.plant.description),
+        _buildInfoRow(Icons.wb_sunny, 'Light', 'Bright, indirect light'),
+        _buildInfoRow(Icons.thermostat, 'Temperature', '65-75°F'),
+        _buildInfoRow(Icons.grass, 'Soil', 'Well-draining potting mix'),
+        _buildInfoRow(Icons.warning, 'Toxicity', 'Check plant details'),
       ],
     );
   }

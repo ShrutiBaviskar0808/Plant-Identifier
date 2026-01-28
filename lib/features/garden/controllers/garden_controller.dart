@@ -53,12 +53,14 @@ class GardenController extends GetxController {
         notes: notes,
         group: group,
       );
-      await loadUserPlants(); // Refresh the list
+      await loadUserPlants();
       Get.snackbar('Success', 'Plant added to your garden!');
     } catch (e) {
       Get.snackbar('Error', 'Failed to add plant: $e');
     }
   }
+
+  Future<void> removePlant(String userPlantId) async {
     try {
       await _userPlantService.removePlant(userPlantId);
       _userPlants.removeWhere((plant) => plant.id == userPlantId);
@@ -79,7 +81,7 @@ class GardenController extends GetxController {
         notes: notes,
         group: group,
       );
-      await loadUserPlants(); // Refresh the list
+      await loadUserPlants();
     } catch (e) {
       Get.snackbar('Error', 'Failed to update plant: $e');
     }
@@ -96,12 +98,10 @@ class GardenController extends GetxController {
   List<UserPlant> _getFilteredPlants() {
     List<UserPlant> filtered = _userPlants;
 
-    // Apply group filter
     if (_selectedGroup.value != 'all') {
       filtered = filtered.where((plant) => plant.group == _selectedGroup.value).toList();
     }
 
-    // Apply search filter
     if (_searchQuery.value.isNotEmpty) {
       filtered = _userPlantService.searchUserPlants(_searchQuery.value);
       if (_selectedGroup.value != 'all') {
