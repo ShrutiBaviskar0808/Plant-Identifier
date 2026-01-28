@@ -13,6 +13,9 @@ import '../../garden/views/garden_view.dart';
 import '../../care/views/care_view.dart';
 import '../../profile/views/profile_view.dart';
 import '../../notifications/views/notifications_view.dart';
+import 'plant_catalog_view.dart';
+import 'plant_detail_view.dart';
+import '../../../core/data/models/plant_catalog.dart';
 
 
 class HomeView extends GetView<HomeController> {
@@ -197,8 +200,7 @@ class PremiumHomeTabView extends StatelessWidget {
                     ),
                   ),
                   _buildQuickActions(context),
-                  _buildAnalyticsSection(),
-                  _buildCommunitySection(),
+                  _buildPlantCatalogSection(context),
                   _buildFeaturedSection(),
                   _buildPlantCareTools(),
                   _buildQuickTipsSection(),
@@ -221,28 +223,16 @@ class PremiumHomeTabView extends StatelessWidget {
         children: [
           _buildRemindersSection(context),
           SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildActionCard(
-                  icon: Icons.analytics,
-                  title: 'Plant Analytics',
-                  subtitle: 'Growth tracking',
-                  color: Colors.purple,
-                  onTap: () => Get.find<HomeController>().navigateToAnalytics(),
-                ),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: _buildActionCard(
-                  icon: Icons.forum,
-                  title: 'Community',
-                  subtitle: 'Share & learn',
-                  color: Colors.orange,
-                  onTap: () => Get.find<HomeController>().navigateToCommunity(),
-                ),
-              ),
-            ],
+          _buildActionCard(
+            icon: Icons.menu_book,
+            title: 'Plant Catalog',
+            subtitle: 'Explore 50+ plants with detailed care guides',
+            color: Colors.green,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PlantCatalogView()),
+            ),
+            isFullWidth: true,
           ),
         ],
       ),
@@ -341,216 +331,179 @@ class PremiumHomeTabView extends StatelessWidget {
     });
   }
 
-  Widget _buildAnalyticsSection() {
-    return Obx(() {
-      final controller = Get.find<HomeController>();
-      return Container(
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Plant Analytics',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+  Widget _buildPlantCatalogSection(BuildContext context) {
+    final featuredPlants = PlantCatalogData.getAllPlants().take(6).toList();
+    
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Popular Plants',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
-            ),
-            SizedBox(height: 12),
-            Container(
-              height: 110,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: controller.plantAnalytics.length,
-                itemBuilder: (context, index) {
-                  final analytics = controller.plantAnalytics[index];
-                  return Container(
-                    width: 200,
-                    margin: EdgeInsets.only(right: 12),
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.purple.withValues(alpha: 0.1),
-                          Colors.purple.withValues(alpha: 0.05),
-                        ],
-                      ),
-                      border: Border.all(color: Colors.purple.withValues(alpha: 0.3)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          analytics.plantName,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: 4),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _buildAnalyticsItem('Growth', '${analytics.growthRate}%'),
-                              _buildAnalyticsItem('Health', '${analytics.healthScore}%'),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          '${analytics.daysOwned} days owned',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+              TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PlantCatalogView()),
+                ),
+                child: Text(
+                  'View All',
+                  style: TextStyle(
+                    color: Colors.green[700],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-
-  Widget _buildCommunitySection() {
-    return Obx(() {
-      final controller = Get.find<HomeController>();
-      return Container(
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Community',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            SizedBox(height: 12),
-            Container(
-              height: 140,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: controller.communityPosts.length,
-                itemBuilder: (context, index) {
-                  final post = controller.communityPosts[index];
-                  return Container(
-                    width: 250,
-                    margin: EdgeInsets.only(right: 12),
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.orange.withValues(alpha: 0.1),
-                          Colors.orange.withValues(alpha: 0.05),
-                        ],
-                      ),
-                      border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 16,
-                              backgroundColor: Colors.orange[200],
-                              child: Text(
-                                post.username[0].toUpperCase(),
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    post.username,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  Text(
-                                    post.timeAgo,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          post.content,
-                          style: TextStyle(fontSize: 13),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Spacer(),
-                        Row(
-                          children: [
-                            Icon(Icons.favorite_border, size: 16, color: Colors.grey[600]),
-                            SizedBox(width: 4),
-                            Text('${post.likes}', style: TextStyle(fontSize: 12)),
-                            SizedBox(width: 16),
-                            Icon(Icons.comment_outlined, size: 16, color: Colors.grey[600]),
-                            SizedBox(width: 4),
-                            Text('${post.comments}', style: TextStyle(fontSize: 12)),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-
-  Widget _buildAnalyticsItem(String label, String value) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-            color: Colors.purple[700],
+            ],
           ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.grey[600],
+          SizedBox(height: 12),
+          Container(
+            height: 200,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: featuredPlants.length,
+              itemBuilder: (context, index) {
+                final plant = featuredPlants[index];
+                return Container(
+                  width: 140,
+                  margin: EdgeInsets.only(right: 12),
+                  child: _buildPlantCatalogCard(plant, context),
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
+  }
+
+  Widget _buildPlantCatalogCard(PlantCatalogItem plant, BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PlantDetailView(plant: plant),
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                child: Image.network(
+                  plant.imageUrl,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300],
+                      child: Icon(
+                        Icons.local_florist,
+                        size: 30,
+                        color: Colors.grey[600],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      plant.name,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Icon(Icons.water_drop, size: 12, color: Colors.blue),
+                        SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            plant.waterRequirement.frequency,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey[600],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: _getDifficultyColor(plant.difficulty),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        plant.difficulty,
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getDifficultyColor(String difficulty) {
+    switch (difficulty.toLowerCase()) {
+      case 'very easy':
+        return Colors.green;
+      case 'easy':
+        return Colors.lightGreen;
+      case 'moderate':
+        return Colors.orange;
+      case 'hard':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 
   Widget _buildActionCard({
@@ -559,11 +512,13 @@ class PremiumHomeTabView extends StatelessWidget {
     required String subtitle,
     required Color color,
     required VoidCallback onTap,
+    bool isFullWidth = false,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 120,
+        height: isFullWidth ? 100 : 120,
+        width: isFullWidth ? double.infinity : null,
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -577,35 +532,67 @@ class PremiumHomeTabView extends StatelessWidget {
             ],
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color, size: 36),
-            SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+        child: isFullWidth
+            ? Row(
+                children: [
+                  Icon(icon, color: color, size: 36),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward_ios, color: color, size: 20),
+                ],
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, color: color, size: 36),
+                  SizedBox(height: 8),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.black54,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(height: 2),
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 11,
-                color: Colors.black54,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
       ),
     );
   }
