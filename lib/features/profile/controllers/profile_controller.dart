@@ -145,11 +145,15 @@ class ProfileController extends GetxController {
   }
 
   void showSettings() {
-    Get.to(() => const SettingsScreen());
+    Navigator.of(Get.context!).push(
+      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+    );
   }
 
   void showHelp() {
-    Get.to(() => const HelpSupportScreen());
+    Navigator.of(Get.context!).push(
+      MaterialPageRoute(builder: (context) => const HelpSupportScreen()),
+    );
   }
 
   void showAbout() {

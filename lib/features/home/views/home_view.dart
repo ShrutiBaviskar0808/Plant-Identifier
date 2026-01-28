@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../controllers/home_controller.dart';
+import '../../garden/controllers/garden_controller.dart';
+import '../../identification/controllers/identification_controller.dart';
+import '../../care/controllers/care_controller.dart';
+import '../../profile/controllers/profile_controller.dart';
 
 import '../../identification/views/camera_view.dart';
 import '../../identification/views/plant_search_view.dart';
@@ -16,6 +20,13 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize all required controllers
+    Get.put(HomeController());
+    Get.put(GardenController());
+    Get.put(IdentificationController());
+    Get.put(CareController());
+    Get.put(ProfileController());
+    
     return Scaffold(
       body: Obx(() => IndexedStack(
         index: controller.currentIndex,
