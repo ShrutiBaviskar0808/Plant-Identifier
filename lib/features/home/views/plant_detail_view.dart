@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/data/models/plant_catalog.dart';
-import '../../garden/controllers/garden_controller.dart';
-import '../../../core/data/models/plant.dart' as PlantModel;
-import 'package:get/get.dart';
 
 class PlantDetailView extends StatelessWidget {
   final PlantCatalogItem plant;
@@ -40,33 +37,13 @@ class PlantDetailView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              plant.name,
-                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              plant.scientificName,
-                              style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[600]),
-                            ),
-                          ],
-                        ),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: () => _saveToGarden(plant),
-                        icon: Icon(Icons.add),
-                        label: Text('Save to Garden'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    plant.name,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    plant.scientificName,
+                    style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[600]),
                   ),
                   SizedBox(height: 16),
                   Text(
@@ -101,43 +78,6 @@ class PlantDetailView extends StatelessWidget {
         _buildInfoRow(Icons.warning, 'Toxicity', plant.toxicity),
       ],
     );
-  }
-
-  void _saveToGarden(PlantCatalogItem catalogItem) {
-    final gardenController = Get.find<GardenController>();
-    
-    // Convert PlantCatalogItem to Plant
-    final newPlant = PlantModel.Plant(
-      id: catalogItem.id,
-      commonName: catalogItem.name,
-      scientificName: catalogItem.scientificName,
-      description: catalogItem.description,
-      category: 'Houseplant',
-      family: 'Unknown',
-      careRequirements: PlantModel.PlantCareRequirements(
-        water: PlantModel.WaterRequirement(
-          frequency: catalogItem.waterRequirement.frequency,
-          amount: catalogItem.waterRequirement.amount,
-          notes: catalogItem.waterRequirement.description,
-        ),
-        light: PlantModel.LightRequirement(
-          level: 'medium',
-          hoursPerDay: 6,
-          placement: 'indoor',
-        ),
-        soilType: catalogItem.soilType,
-        growthSeason: catalogItem.growingSeason,
-        temperature: PlantModel.TemperatureRange(
-          minTemp: 18,
-          maxTemp: 24,
-          unit: 'celsius',
-        ),
-        fertilizer: catalogItem.fertilizer,
-      ),
-      imageUrls: [catalogItem.imageUrl],
-    );
-    
-    gardenController.addPlantToGarden(newPlant);
   }
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
