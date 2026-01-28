@@ -560,7 +560,7 @@ class PremiumHomeTabView extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 110,
+        height: 120,
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -582,7 +582,7 @@ class PremiumHomeTabView extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
@@ -594,7 +594,7 @@ class PremiumHomeTabView extends StatelessWidget {
             Text(
               subtitle,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: Colors.black54,
               ),
               textAlign: TextAlign.center,
