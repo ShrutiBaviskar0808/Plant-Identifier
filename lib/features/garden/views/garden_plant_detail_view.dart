@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/data/models/plant.dart';
+import 'dart:io';
 
 class GardenPlantDetailView extends StatelessWidget {
   final UserPlant userPlant;
@@ -21,8 +22,32 @@ class GardenPlantDetailView extends StatelessWidget {
             Container(
               height: 250,
               width: double.infinity,
-              color: Colors.grey[300],
-              child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
+              child: userPlant.imagePath != null
+                  ? Image.file(
+                      File(userPlant.imagePath!),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
+                        );
+                      },
+                    )
+                  : userPlant.plant.imageUrls.isNotEmpty
+                      ? Image.asset(
+                          userPlant.plant.imageUrls.first,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey[300],
+                              child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
+                            );
+                          },
+                        )
+                      : Container(
+                          color: Colors.grey[300],
+                          child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
+                        ),
             ),
             Padding(
               padding: EdgeInsets.all(16),

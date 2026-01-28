@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/garden_controller.dart';
 import '../../../core/data/models/plant.dart';
 import 'garden_plant_detail_view.dart';
+import 'dart:io';
 
 
 class GardenView extends GetView<GardenController> {
@@ -208,7 +209,29 @@ class _PlantCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 ),
-                child: const Icon(Icons.local_florist, size: 48),
+                child: plant.imagePath != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        child: Image.file(
+                          File(plant.imagePath!),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.local_florist, size: 48);
+                          },
+                        ),
+                      )
+                    : plant.plant.imageUrls.isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                            child: Image.asset(
+                              plant.plant.imageUrls.first,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(Icons.local_florist, size: 48);
+                              },
+                            ),
+                          )
+                        : Icon(Icons.local_florist, size: 48),
               ),
             ),
             
