@@ -1141,7 +1141,7 @@ class PlantCatalogData {
         id: '50',
         name: 'Zinnia',
         scientificName: 'Zinnia elegans',
-        description: 'Zinnia elegans is a cheerful annual flower native to Mexico, beloved for its bright, long-lasting blooms and easy care. Available in nearly every color except blue, zinnias produce flowers from summer until frost. They are excellent for cutting gardens and attract butterflies and beneficial insects. These heat-loving plants are perfect for beginners and children gardens, as they grow quickly from seed and are very forgiving.',,
+        description: 'Zinnia elegans is a cheerful annual flower native to Mexico, beloved for its bright, long-lasting blooms and easy care. Available in nearly every color except blue, zinnias produce flowers from summer until frost. They are excellent for cutting gardens and attract butterflies and beneficial insects. These heat-loving plants are perfect for beginners and children gardens, as they grow quickly from seed and are very forgiving.',
         imageUrl: 'assets/images/Zinnia.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',

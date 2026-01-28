@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/garden_controller.dart';
 import '../../../core/data/models/plant.dart';
+import 'garden_plant_detail_view.dart';
 
 
 class GardenView extends GetView<GardenController> {
@@ -112,7 +113,12 @@ class GardenView extends GetView<GardenController> {
   }
 
   void _showPlantDetails(UserPlant plant) {
-    Get.snackbar('Plant Details', 'Details for ${plant.plant.commonName}');
+    Navigator.push(
+      Get.context!,
+      MaterialPageRoute(
+        builder: (context) => GardenPlantDetailView(userPlant: plant),
+      ),
+    );
   }
 
   void _deletePlant(UserPlant plant) {

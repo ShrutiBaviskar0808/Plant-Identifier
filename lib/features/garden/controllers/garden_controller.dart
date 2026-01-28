@@ -41,7 +41,24 @@ class GardenController extends GetxController {
     }
   }
 
-  Future<void> removePlant(String userPlantId) async {
+  Future<void> addPlantToGarden(Plant plant, {
+    String? customName,
+    String? notes,
+    String? group,
+  }) async {
+    try {
+      await _userPlantService.addPlant(
+        plant,
+        customName: customName,
+        notes: notes,
+        group: group,
+      );
+      await loadUserPlants(); // Refresh the list
+      Get.snackbar('Success', 'Plant added to your garden!');
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to add plant: $e');
+    }
+  }
     try {
       await _userPlantService.removePlant(userPlantId);
       _userPlants.removeWhere((plant) => plant.id == userPlantId);
