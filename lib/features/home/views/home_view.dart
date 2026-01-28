@@ -201,6 +201,8 @@ class PremiumHomeTabView extends StatelessWidget {
                   _buildCommunitySection(),
                   _buildFeaturedSection(),
                   _buildPlantCareTools(),
+                  _buildQuickTipsSection(),
+                  _buildWeatherSection(),
                   SizedBox(height: 100),
                 ],
               ),
@@ -732,13 +734,14 @@ class PremiumHomeTabView extends StatelessWidget {
         ),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
+          margin: EdgeInsets.only(bottom: 20),
           child: GridView.count(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
             crossAxisCount: 2,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 1.1,
+            childAspectRatio: 1.2,
             children: [
               _buildFeatureCard(
                 icon: Icons.schedule,
@@ -898,6 +901,143 @@ class PremiumHomeTabView extends StatelessWidget {
   void _showPlantSearch(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => PlantSearchView()),
+    );
+  }
+
+  Widget _buildQuickTipsSection() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Quick Plant Tips',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 12),
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.teal.withValues(alpha: 0.1),
+                  Colors.teal.withValues(alpha: 0.05),
+                ],
+              ),
+              border: Border.all(color: Colors.teal.withValues(alpha: 0.3)),
+            ),
+            child: Column(
+              children: [
+                _buildTipItem(Icons.water_drop, 'Water plants early morning for best absorption'),
+                SizedBox(height: 12),
+                _buildTipItem(Icons.wb_sunny, 'Rotate plants weekly for even growth'),
+                SizedBox(height: 12),
+                _buildTipItem(Icons.eco, 'Check soil moisture before watering'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTipItem(IconData icon, String tip) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.teal, size: 20),
+        SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            tip,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWeatherSection() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Today\'s Plant Weather',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 12),
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.blue.withValues(alpha: 0.1),
+                  Colors.lightBlue.withValues(alpha: 0.05),
+                ],
+              ),
+              border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.wb_sunny, color: Colors.orange, size: 40),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Perfect Day for Plant Care',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Sunny, 24°C - Great for watering and repotting',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'Ideal',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
