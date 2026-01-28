@@ -55,8 +55,7 @@ class PlantCatalogData {
         id: '1',
         name: 'Monstera Deliciosa',
         scientificName: 'Monstera deliciosa',
-        description:
-            'A stunning tropical plant known for its large, split leaves.',
+        description: 'The Monstera Deliciosa, also known as the Swiss Cheese Plant, is a stunning tropical houseplant native to Central America. Its large, glossy leaves develop characteristic splits and holes (fenestrations) as the plant matures, creating a dramatic architectural presence. This climbing plant can reach impressive heights indoors and is beloved for its air-purifying qualities and Instagram-worthy appearance.',
         imageUrl: 'assets/images/Monstera Deliciosa.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -78,8 +77,7 @@ class PlantCatalogData {
         id: '2',
         name: 'Snake Plant',
         scientificName: 'Sansevieria trifasciata',
-        description:
-            'An extremely hardy plant with upright, sword-like leaves.',
+        description: 'Sansevieria trifasciata, commonly called Snake Plant or Mother-in-Law\'s Tongue, is virtually indestructible and perfect for beginners. Native to West Africa, this architectural succulent features thick, upright leaves with striking yellow margins and dark green patterns. NASA studies confirm its exceptional air-purifying abilities, removing toxins like formaldehyde and benzene while producing oxygen at night.',
         imageUrl: 'assets/images/Snake Plant.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Bi-weekly',
@@ -101,7 +99,7 @@ class PlantCatalogData {
         id: '3',
         name: 'Fiddle Leaf Fig',
         scientificName: 'Ficus lyrata',
-        description: 'A popular houseplant with large, violin-shaped leaves.',
+        description: 'The Fiddle Leaf Fig (Ficus lyrata) is a statement plant native to western Africa, prized for its large, violin-shaped leaves and tree-like growth habit. This Instagram-famous plant can grow up to 10 feet indoors, making it perfect for filling empty corners. While it requires consistent care and bright, indirect light, its dramatic presence makes it worth the effort for plant enthusiasts.',
         imageUrl: 'assets/images/Fiddle Leaf Fig.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -123,7 +121,7 @@ class PlantCatalogData {
         id: '4',
         name: 'Peace Lily',
         scientificName: 'Spathiphyllum wallisii',
-        description: 'Elegant plant with dark green leaves and white flowers.',
+        description: 'Spathiphyllum wallisii, the Peace Lily, is an elegant flowering houseplant from tropical Americas. Known for its glossy dark green leaves and pristine white spathes that bloom throughout the year, this plant is also an excellent air purifier. It\'s particularly valued for its ability to indicate watering needs by drooping slightly when thirsty, making it perfect for attentive plant parents.',
         imageUrl: 'assets/images/Peace Lily.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -145,7 +143,7 @@ class PlantCatalogData {
         id: '5',
         name: 'Rubber Plant',
         scientificName: 'Ficus elastica',
-        description: 'A classic houseplant with glossy, dark green leaves.',
+        description: 'Ficus elastica, the Rubber Plant, is a robust and forgiving houseplant native to India and Southeast Asia. Its thick, glossy leaves emerge in a beautiful burgundy color before maturing to deep green. This fast-growing plant was historically used to make rubber and can grow into an impressive indoor tree. It\'s excellent for beginners and effectively removes indoor air pollutants.',
         imageUrl: 'assets/images/Rubber Plant.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -167,7 +165,7 @@ class PlantCatalogData {
         id: '6',
         name: 'Pothos',
         scientificName: 'Epipremnum aureum',
-        description: 'A trailing vine with heart-shaped leaves.',
+        description: 'Epipremnum aureum, commonly known as Golden Pothos or Devil\'s Ivy, is one of the most popular and easiest houseplants to grow. Native to the Solomon Islands, this trailing vine features heart-shaped leaves with stunning golden variegation. It\'s incredibly adaptable, thriving in various light conditions and forgiving of occasional neglect, making it perfect for beginners and busy plant parents.',
         imageUrl: 'assets/images/Pothos.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -189,7 +187,7 @@ class PlantCatalogData {
         id: '7',
         name: 'ZZ Plant',
         scientificName: 'Zamioculcas zamiifolia',
-        description: 'An extremely low-maintenance plant with glossy leaves.',
+        description: 'Zamioculcas zamiifolia, the ZZ Plant, is the ultimate low-maintenance houseplant, native to eastern Africa. Its thick, waxy leaflets store water, making it extremely drought-tolerant and perfect for frequent travelers or forgetful waterers. The plant\'s glossy, dark green foliage adds modern elegance to any space, and it thrives in low light conditions where other plants struggle.',
         imageUrl: 'assets/images/ZZ Plant.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Monthly',
@@ -211,8 +209,7 @@ class PlantCatalogData {
         id: '8',
         name: 'Spider Plant',
         scientificName: 'Chlorophytum comosum',
-        description:
-            'A popular houseplant with long, thin leaves and baby plantlets.',
+        description: 'Chlorophytum comosum, the Spider Plant, is a classic houseplant known for its arching green and white striped leaves and prolific production of plantlets or "spiderettes." Native to South Africa, this resilient plant is perfect for hanging baskets and is completely safe for pets. It\'s also an excellent air purifier and one of the easiest plants to propagate, making it a favorite for sharing with friends.',
         imageUrl: 'assets/images/Spider Plant.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -234,7 +231,7 @@ class PlantCatalogData {
         id: '9',
         name: 'Aloe Vera',
         scientificName: 'Aloe barbadensis',
-        description: 'A succulent plant with medicinal properties.',
+        description: 'Aloe barbadensis, commonly known as Aloe Vera, is a medicinal succulent native to the Arabian Peninsula, renowned for its healing properties and easy care. The thick, fleshy leaves contain a clear gel that has been used for centuries to treat burns, cuts, and skin irritations. This drought-tolerant plant produces offsets readily, making it easy to propagate and share. It\'s also completely safe for pets and requires minimal care.',
         imageUrl: 'assets/images/Aloe vera.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Bi-weekly',
@@ -256,7 +253,7 @@ class PlantCatalogData {
         id: '10',
         name: 'Boston Fern',
         scientificName: 'Nephrolepis exaltata',
-        description: 'A lush, feathery fern that adds tropical vibes.',
+        description: 'Nephrolepis exaltata, the Boston Fern, is a classic Victorian-era houseplant that remains popular today. Native to tropical regions worldwide, this lush fern features delicate, arching fronds that create a soft, romantic appearance. It\'s an excellent natural humidifier and air purifier, thriving in bathrooms and other humid environments. While it requires consistent moisture, its timeless beauty makes it worth the extra attention.',,
         imageUrl: 'assets/images/Boston Fern.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Twice weekly',
@@ -278,7 +275,7 @@ class PlantCatalogData {
         id: '11',
         name: 'Philodendron',
         scientificName: 'Philodendron hederaceum',
-        description: 'A trailing plant with heart-shaped leaves.',
+        description: 'Philodendron hederaceum, commonly known as Heartleaf Philodendron, is a beloved tropical houseplant native to Central America and the Caribbean. These climbing or trailing plants adapt well to various indoor conditions and are excellent for beginners. Many varieties offer stunning variegation or unique leaf shapes, and they\'re known for their air-purifying abilities and rapid growth when happy.',
         imageUrl: 'assets/images/philodendron.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -300,7 +297,7 @@ class PlantCatalogData {
         id: '12',
         name: 'Dracaena',
         scientificName: 'Dracaena marginata',
-        description: 'A striking plant with spiky leaves and colorful edges.',
+        description: 'Dracaena marginata, the Dragon Tree, is an architectural houseplant native to Madagascar, perfect for adding height and structure to indoor spaces. These slow-growing plants feature sword-like leaves with colorful red margins. They\'re excellent air purifiers, removing harmful chemicals like formaldehyde and xylene, and are relatively low-maintenance once established in the right conditions.',
         imageUrl: 'assets/images/Dracaena.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -322,7 +319,7 @@ class PlantCatalogData {
         id: '13',
         name: 'Jade Plant',
         scientificName: 'Crassula ovata',
-        description: 'A succulent with thick, glossy leaves.',
+        description: 'Crassula ovata, the Jade Plant or Money Tree, is a beloved succulent native to South Africa. According to feng shui principles, this plant brings good luck and prosperity to its owners. Its thick, oval leaves store water, making it extremely drought-tolerant. With proper care and age, jade plants can develop thick, tree-like trunks and may even produce small white or pink flowers.',
         imageUrl: 'assets/images/Jade Plant.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Bi-weekly',
@@ -344,7 +341,7 @@ class PlantCatalogData {
         id: '14',
         name: 'English Ivy',
         scientificName: 'Hedera helix',
-        description: 'A climbing vine with distinctive lobed leaves.',
+        description: 'Hedera helix, English Ivy, is a classic trailing plant native to Europe and western Asia. Known for its distinctive lobed leaves and vigorous climbing or trailing habit, this versatile plant is excellent for hanging baskets or as a climbing specimen. It\'s also recognized by NASA as an effective air purifier, particularly good at removing airborne mold particles.',
         imageUrl: 'assets/images/English Ivy.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -366,7 +363,7 @@ class PlantCatalogData {
         id: '15',
         name: 'Calathea',
         scientificName: 'Calathea orbifolia',
-        description: 'A prayer plant with stunning patterned leaves.',
+        description: 'Calathea orbifolia, known as Prayer Plants, are stunning foliage plants native to tropical Americas. Famous for their intricate leaf patterns featuring stripes, spots, and vibrant colors, these plants literally move their leaves throughout the day in response to light changes. This nyctinastic movement, along with their air-purifying qualities and pet-safe nature, makes them fascinating additions to any plant collection.',
         imageUrl: 'assets/images/Calathea.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -388,8 +385,7 @@ class PlantCatalogData {
         id: '16',
         name: 'Bird of Paradise',
         scientificName: 'Strelitzia reginae',
-        description:
-            'A dramatic tropical plant with large paddle-shaped leaves.',
+        description: 'Strelitzia reginae, the Bird of Paradise, is an exotic flowering plant native to South Africa. Known for its large, paddle-shaped leaves and spectacular orange and blue bird-like flowers, this plant brings tropical paradise indoors. While it requires bright light and patience to bloom indoors, its architectural foliage and potential for stunning flowers make it a prized addition to any plant collection.',
         imageUrl: 'assets/images/Bird of Paradise.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -411,7 +407,7 @@ class PlantCatalogData {
         id: '17',
         name: 'Anthurium',
         scientificName: 'Anthurium andraeanum',
-        description: 'A flowering plant with glossy heart-shaped leaves.',
+        description: 'Anthurium andraeanum, the Flamingo Flower, is a stunning tropical plant native to Colombia and Ecuador. Known for its glossy, heart-shaped red, pink, or white spathes and long-lasting blooms, this plant brings continuous color to indoor spaces. It\'s also an excellent air purifier and, with proper care including high humidity and bright indirect light, can bloom year-round.',
         imageUrl: 'assets/images/Anthurium.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -433,7 +429,7 @@ class PlantCatalogData {
         id: '18',
         name: 'Schefflera',
         scientificName: 'Schefflera actinophylla',
-        description: 'An umbrella tree with distinctive palmate leaves.',
+        description: 'Schefflera actinophylla, the Umbrella Tree, is a fast-growing houseplant native to Australia and New Guinea. Named for its distinctive palmate leaves that resemble umbrella spokes, this plant can quickly fill empty corners and add lush greenery to any room. It\'s relatively low-maintenance and can tolerate various light conditions, making it popular for offices and homes alike.',
         imageUrl: 'assets/images/schefflera.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -455,7 +451,7 @@ class PlantCatalogData {
         id: '19',
         name: 'Bromeliad',
         scientificName: 'Guzmania lingulata',
-        description: 'A tropical plant with colorful bracts.',
+        description: 'Guzmania lingulata, a type of Bromeliad, is an exotic tropical plant native to Central and South America, known for its colorful central cups and unique rosette growth pattern. These epiphytic plants naturally grow on trees in rainforests, collecting water in their central tanks. Popular varieties produce stunning colorful bracts in shades of red, pink, yellow, and orange, lasting for months.',
         imageUrl: 'assets/images/Bromeliad.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -477,7 +473,7 @@ class PlantCatalogData {
         id: '20',
         name: 'Yucca',
         scientificName: 'Yucca elephantipes',
-        description: 'A drought-tolerant plant with sword-like leaves.',
+        description: 'Yucca elephantipes, the Spineless Yucca, is a striking architectural plant native to Mexico and Central America. Despite its name, it\'s not completely spineless but has softer leaf tips than other yucca species. This drought-tolerant plant features sword-like leaves atop thick, cane-like stems, creating a bold, modern appearance that works well in contemporary interiors.',
         imageUrl: 'assets/images/Yucca.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Bi-weekly',
@@ -499,7 +495,7 @@ class PlantCatalogData {
         id: '21',
         name: 'Dieffenbachia',
         scientificName: 'Dieffenbachia seguine',
-        description: 'A tropical plant with large variegated leaves.',
+        description: 'Dieffenbachia seguine, commonly known as Dumb Cane, is a popular houseplant native to tropical America. Known for its large, variegated leaves with striking patterns of green and cream or yellow, this plant adds bold tropical flair to any room. The name "dumb cane" refers to the temporary speech loss that can occur if the plant is ingested, so it should be kept away from children and pets.',
         imageUrl: 'assets/images/Dieffenbachia.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -521,7 +517,7 @@ class PlantCatalogData {
         id: '22',
         name: 'Croton',
         scientificName: 'Codiaeum variegatum',
-        description: 'A colorful plant with vibrant, multicolored leaves.',
+        description: 'Codiaeum variegatum, commonly known as Croton, is a vibrant tropical shrub native to Indonesia and Malaysia. Famous for its incredibly colorful leaves that display combinations of yellow, orange, red, green, and purple, this plant is like having a living piece of art. While it requires bright light to maintain its stunning coloration, the dramatic foliage makes it a showstopper in any collection.',
         imageUrl: 'assets/images/croton.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -543,7 +539,7 @@ class PlantCatalogData {
         id: '23',
         name: 'Parlor Palm',
         scientificName: 'Chamaedorea elegans',
-        description: 'A small, elegant palm perfect for indoor spaces.',
+        description: 'Chamaedorea elegans, the Parlor Palm, is a compact, elegant palm native to Mexico and Guatemala. This Victorian-era favorite features delicate, feathery fronds and stays relatively small, making it perfect for tabletops and smaller spaces. It\'s one of the most adaptable palms for indoor growing, tolerating low light and dry air while maintaining its graceful appearance.',
         imageUrl: 'assets/images/Parlor Palm.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -565,7 +561,7 @@ class PlantCatalogData {
         id: '24',
         name: 'Areca Palm',
         scientificName: 'Dypsis lutescens',
-        description: 'A graceful palm with feathery fronds.',
+        description: 'Dypsis lutescens, the Areca Palm or Butterfly Palm, brings tropical elegance to any indoor space. Native to Madagascar, this graceful palm features feathery, arching fronds that create a lush, resort-like atmosphere. It\'s an excellent natural humidifier and air purifier, making it both beautiful and functional. This palm is also pet-safe and relatively easy to care for with proper humidity.',
         imageUrl: 'assets/images/Areca Palm.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -587,7 +583,7 @@ class PlantCatalogData {
         id: '25',
         name: 'Majesty Palm',
         scientificName: 'Ravenea rivularis',
-        description: 'A stately palm with long, arching fronds.',
+        description: 'Ravenea rivularis, the Majesty Palm, is considered one of the most elegant indoor palms. Native to Madagascar, this slow-growing palm features graceful, arching fronds that create a sophisticated tropical atmosphere. While it requires high humidity and bright light to thrive indoors, its majestic appearance makes it a stunning focal point for large rooms with adequate space and light.',
         imageUrl: 'assets/images/Majesty Palm.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -609,7 +605,7 @@ class PlantCatalogData {
         id: '26',
         name: 'Kentia Palm',
         scientificName: 'Howea forsteriana',
-        description: 'An elegant palm with graceful, drooping fronds.',
+        description: 'Howea forsteriana, the Kentia Palm, is considered one of the most elegant and resilient indoor palms. Native to Lord Howe Island off Australia, this slow-growing palm features graceful, arching fronds that create a sophisticated tropical atmosphere. It\'s more tolerant of low light and dry air than most palms, making it perfect for indoor cultivation and a favorite among interior designers.',
         imageUrl: 'assets/images/Kentia Palm.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -631,7 +627,7 @@ class PlantCatalogData {
         id: '27',
         name: 'Bamboo Palm',
         scientificName: 'Chamaedorea seifrizii',
-        description: 'A clustering palm with bamboo-like stems.',
+        description: 'Chamaedorea seifrizii, the Bamboo Palm, is a clustering palm native to Mexico and Central America. Its multiple slender trunks and feathery fronds create a bamboo-like appearance, hence the name. This palm is excellent for creating natural room dividers and is particularly valued for its air-purifying abilities, effectively removing formaldehyde and other indoor pollutants.',
         imageUrl: 'assets/images/Bamboo Palm.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -653,7 +649,7 @@ class PlantCatalogData {
         id: '28',
         name: 'Ponytail Palm',
         scientificName: 'Beaucarnea recurvata',
-        description: 'A unique succulent tree with a bulbous base.',
+        description: 'Beaucarnea recurvata, the Ponytail Palm, is a unique succulent tree native to Mexico. Despite its name, it\'s not a true palm but gets its nickname from the cascading, curly leaves that resemble a ponytail. The swollen trunk base stores water, making it extremely drought-tolerant. This slow-growing, pet-safe plant adds whimsical character to any space and can live for decades with minimal care.',
         imageUrl: 'assets/images/ponytail palm.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Bi-weekly',
@@ -675,7 +671,7 @@ class PlantCatalogData {
         id: '29',
         name: 'Norfolk Pine',
         scientificName: 'Araucaria heterophylla',
-        description: 'A coniferous tree with symmetrical branches.',
+        description: 'Araucaria heterophylla, the Norfolk Island Pine, is a unique coniferous houseplant native to Norfolk Island in the Pacific. Often called a "living Christmas tree," this plant features soft, needle-like foliage arranged in symmetrical tiers. It\'s one of the few conifers that can successfully grow indoors, bringing a touch of the outdoors inside and serving as a natural holiday decoration.',
         imageUrl: 'assets/images/Norfolk Pine.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -697,7 +693,7 @@ class PlantCatalogData {
         id: '30',
         name: 'Weeping Fig',
         scientificName: 'Ficus benjamina',
-        description: 'A popular tree with small, glossy leaves.',
+        description: 'Ficus benjamina, the Weeping Fig, is an elegant indoor tree native to Asia and Australia. Known for its graceful, drooping branches and small, glossy leaves, this plant can be trained into various shapes including braided trunks. It\'s an excellent air purifier and can adapt to various light conditions, though it may drop leaves when stressed or moved to new locations.',
         imageUrl: 'assets/images/Weeping Fig.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -719,7 +715,7 @@ class PlantCatalogData {
         id: '31',
         name: 'Aglaonema',
         scientificName: 'Aglaonema commutatum',
-        description: 'A Chinese evergreen with colorful, patterned leaves.',
+        description: 'Aglaonema commutatum, commonly called Chinese Evergreen, is among the most colorful and low-maintenance houseplants available. Native to tropical Asia, these plants feature stunning variegated leaves in combinations of green, silver, pink, and red. They\'re incredibly tolerant of low light conditions and irregular watering, making them perfect for offices and darker rooms while still providing vibrant color.',
         imageUrl: 'assets/images/Aglaonema.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -741,7 +737,7 @@ class PlantCatalogData {
         id: '32',
         name: 'Peperomia',
         scientificName: 'Peperomia obtusifolia',
-        description: 'A compact plant with thick, succulent-like leaves.',
+        description: 'Peperomia obtusifolia, commonly known as Baby Rubber Plant, is a charming, compact houseplant native to tropical and subtropical regions. These "radiator plants" come in an amazing variety of leaf shapes, sizes, and colors. They\'re perfect for small spaces and are generally easy to care for with minimal watering needs, making them ideal for beginners.',
         imageUrl: 'assets/images/Peperomia.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -763,8 +759,7 @@ class PlantCatalogData {
         id: '33',
         name: 'Hoya',
         scientificName: 'Hoya carnosa',
-        description:
-            'A wax plant with thick, waxy leaves and fragrant flowers.',
+        description: 'Hoya carnosa, the Wax Plant, is a fascinating succulent vine native to Asia and Australia. Known for its thick, waxy leaves and clusters of fragrant, star-shaped flowers, this plant is a favorite among collectors. The flowers appear in perfect geometric clusters and produce sweet nectar, often attracting beneficial insects. This low-maintenance plant can live for decades and becomes more beautiful with age.',
         imageUrl: 'assets/images/Hoya.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -786,7 +781,7 @@ class PlantCatalogData {
         id: '34',
         name: 'String of Hearts',
         scientificName: 'Ceropegia woodii',
-        description: 'A trailing succulent with heart-shaped leaves.',
+        description: 'Ceropegia woodii, the String of Hearts, is an enchanting trailing succulent native to South Africa. Its delicate heart-shaped leaves are silver-green with darker veining, creating a romantic cascading effect. This plant produces small tubers along its stems that can be used for propagation, and mature plants may produce small, unusual purple flowers. It\'s perfect for hanging baskets and is completely pet-safe.',
         imageUrl: 'assets/images/String of Hearts.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Bi-weekly',
@@ -808,7 +803,7 @@ class PlantCatalogData {
         id: '35',
         name: 'String of Pearls',
         scientificName: 'Senecio rowleyanus',
-        description: 'A unique succulent with bead-like leaves.',
+        description: 'Senecio rowleyanus, the String of Pearls, is one of the most unique and Instagram-worthy succulents available. Native to southwest Africa, this trailing plant features perfectly round, bead-like leaves that store water. When happy, it produces small white flowers with a cinnamon-like fragrance. This conversation starter is perfect for hanging baskets but requires careful watering to prevent root rot.',
         imageUrl: 'assets/images/String of Pearls.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Bi-weekly',
@@ -830,7 +825,7 @@ class PlantCatalogData {
         id: '36',
         name: 'Echeveria',
         scientificName: 'Echeveria elegans',
-        description: 'A rosette-forming succulent with blue-green leaves.',
+        description: 'Echeveria elegans, commonly called Mexican Snowball, is a stunning rosette-forming succulent native to Mexico. Its blue-green leaves form perfect geometric rosettes that can produce pink or yellow bell-shaped flowers on tall stalks. This drought-tolerant beauty is perfect for beginners and readily produces offsets, making it easy to create a collection or share with friends.',
         imageUrl: 'assets/images/Echeveria.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Bi-weekly',
@@ -852,8 +847,7 @@ class PlantCatalogData {
         id: '37',
         name: 'Haworthia',
         scientificName: 'Haworthia fasciata',
-        description:
-            'A small succulent with white stripes on dark green leaves.',
+        description: 'Haworthia fasciata, the Zebra Plant, is a small, striking succulent native to South Africa. Its thick, triangular leaves feature distinctive white horizontal stripes that create a zebra-like pattern. This slow-growing plant is perfect for small spaces and is extremely low-maintenance. It occasionally produces tall flower spikes with small white blooms and is completely safe for pets.',
         imageUrl: 'assets/images/Haworthia.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Bi-weekly',
@@ -875,7 +869,7 @@ class PlantCatalogData {
         id: '38',
         name: 'Christmas Cactus',
         scientificName: 'Schlumbergera bridgessii',
-        description: 'A holiday cactus that blooms with colorful flowers.',
+        description: 'Schlumbergera bridgessii, the Christmas Cactus, is a beloved holiday plant native to Brazilian rainforests. Unlike desert cacti, this epiphytic plant prefers humid conditions and indirect light. It produces stunning tubular flowers in shades of pink, red, white, or purple during the winter months. With proper care, including a cool period to initiate blooming, this long-lived plant can become a cherished family heirloom.',
         imageUrl: 'assets/images/Christmas Cactus.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -897,7 +891,7 @@ class PlantCatalogData {
         id: '39',
         name: 'Easter Cactus',
         scientificName: 'Rhipsalidopsis gaertneri',
-        description: 'A spring-blooming cactus with colorful flowers.',
+        description: 'Rhipsalidopsis gaertneri, the Easter Cactus, is a spring-blooming epiphytic cactus native to Brazil. Similar to its Christmas cousin but blooming in spring, this plant produces vibrant star-shaped flowers in shades of pink, red, or white. The segmented, flattened stems create an attractive cascading effect, making it perfect for hanging baskets. It requires a cool winter rest period to bloom properly.',
         imageUrl: 'assets/images/Easter Cactus.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -919,7 +913,7 @@ class PlantCatalogData {
         id: '40',
         name: 'Prickly Pear Cactus',
         scientificName: 'Opuntia microdasys',
-        description: 'A paddle-shaped cactus with small spines.',
+        description: 'Opuntia microdasys, the Bunny Ears Cactus, is a charming desert cactus native to Mexico. Named for its flat, oval pads that resemble rabbit ears, this cactus is covered in small, fuzzy-looking areoles called glochids instead of large spines. While it appears soft and touchable, these tiny barbed bristles can be irritating to skin. This slow-growing cactus is perfect for sunny windowsills and requires minimal water.',
         imageUrl: 'assets/images/Prickly Pear Cactus.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Monthly',
@@ -945,7 +939,7 @@ class PlantCatalogData {
         id: '41',
         name: 'Barrel Cactus',
         scientificName: 'Echinocactus grusonii',
-        description: 'A round, barrel-shaped cactus with golden spines.',
+        description: 'Echinocactus grusonii, the Golden Barrel Cactus, is an iconic desert plant native to Mexico. This slow-growing spherical cactus can live for over 100 years, eventually reaching impressive sizes. Its golden spines create a stunning geometric pattern, and mature specimens may produce a crown of yellow flowers. This architectural plant is perfect for modern, minimalist interiors and requires very little care once established.',
         imageUrl: 'assets/images/Barrel Cactus.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Monthly',
@@ -971,7 +965,7 @@ class PlantCatalogData {
         id: '42',
         name: 'African Violet',
         scientificName: 'Saintpaulia ionantha',
-        description: 'A compact flowering plant with velvety leaves.',
+        description: 'Saintpaulia ionantha, the African Violet, is a beloved flowering houseplant native to Tanzania and Kenya. These compact plants produce velvety leaves and delicate flowers in shades of purple, pink, blue, or white throughout the year with proper care. They prefer bottom watering to avoid getting their fuzzy leaves wet and thrive in bright, indirect light. Many varieties offer double flowers or variegated foliage.',
         imageUrl: 'assets/images/African Violet.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -993,8 +987,7 @@ class PlantCatalogData {
         id: '43',
         name: 'Cyclamen',
         scientificName: 'Cyclamen persicum',
-        description:
-            'A flowering plant with heart-shaped leaves and colorful blooms.',
+        description: 'Cyclamen persicum is an elegant flowering plant native to the Mediterranean region. Known for its heart-shaped leaves with silver markings and delicate upswept flowers in shades of pink, red, white, or purple, this plant brings winter color to indoor spaces. As a cool-weather plant, it prefers temperatures between 60-68°F and may go dormant in summer, returning to bloom again in fall.',
         imageUrl: 'assets/images/Cyclamen.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -1016,7 +1009,7 @@ class PlantCatalogData {
         id: '44',
         name: 'Begonia',
         scientificName: 'Begonia rex',
-        description: 'A colorful foliage plant with striking leaf patterns.',
+        description: 'Begonia rex, the Rex Begonia, is prized for its spectacular foliage rather than flowers. Native to India, these plants feature large, asymmetrical leaves with incredible patterns and colors including silver, purple, pink, green, and burgundy. The leaves often have a metallic sheen and intricate patterns that make each plant unique. They prefer high humidity and bright, indirect light to maintain their vibrant coloration.',
         imageUrl: 'assets/images/Begonia.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -1038,7 +1031,7 @@ class PlantCatalogData {
         id: '45',
         name: 'Coleus',
         scientificName: 'Plectranthus scutellarioides',
-        description: 'A vibrant foliage plant with multicolored leaves.',
+        description: 'Plectranthus scutellarioides, commonly known as Coleus, is a vibrant annual plant native to Southeast Asia. Famous for its incredible leaf colors and patterns, Coleus can display combinations of red, purple, yellow, green, and pink in the same leaf. While traditionally grown as an outdoor annual, many varieties make excellent houseplants when given bright light. Regular pinching encourages bushy growth and prevents flowering.',
         imageUrl: 'assets/images/coleus.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -1060,7 +1053,7 @@ class PlantCatalogData {
         id: '46',
         name: 'Caladium',
         scientificName: 'Caladium bicolor',
-        description: 'A colorful foliage plant with heart-shaped leaves.',
+        description: 'Caladium bicolor, the Angel Wings, is a stunning tropical plant native to South America. Known for its large, heart-shaped leaves in combinations of pink, red, white, and green, this plant brings dramatic color to shaded areas. As a tuberous plant, Caladiums naturally go dormant in winter and return in spring. They prefer warm, humid conditions and are perfect for adding tropical flair to indoor spaces.',
         imageUrl: 'assets/images/Caladium.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -1082,7 +1075,7 @@ class PlantCatalogData {
         id: '47',
         name: 'Impatiens',
         scientificName: 'Impatiens walleriana',
-        description: 'A flowering plant with continuous colorful blooms.',
+        description: 'Impatiens walleriana, commonly called Busy Lizzie, is a cheerful flowering plant native to East Africa. Known for its continuous production of colorful flowers in shades of pink, red, white, purple, and orange, this plant blooms non-stop in the right conditions. It prefers partial shade and consistent moisture, making it perfect for brightening up darker corners of homes or shaded outdoor areas.',
         imageUrl: 'assets/images/Impatiens.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Daily',
@@ -1104,7 +1097,7 @@ class PlantCatalogData {
         id: '48',
         name: 'Geranium',
         scientificName: 'Pelargonium hortorum',
-        description: 'A classic flowering plant with rounded leaves.',
+        description: 'Pelargonium hortorum, the common Geranium, is a classic flowering plant native to South Africa. Known for its rounded, often scented leaves and clusters of bright flowers in shades of red, pink, white, or purple, geraniums have been garden favorites for centuries. Many varieties have fragrant foliage with scents ranging from rose to lemon to mint, making them as appealing to touch as they are to see.',
         imageUrl: 'assets/images/Geranium.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -1126,7 +1119,7 @@ class PlantCatalogData {
         id: '49',
         name: 'Marigold',
         scientificName: 'Tagetes erecta',
-        description: 'A bright flowering plant with orange and yellow blooms.',
+        description: 'Tagetes erecta, the African Marigold, is a vibrant annual flower native to Mexico. Despite its common name, this cheerful plant produces large, ruffled flowers in bright shades of yellow and orange throughout the growing season. Marigolds are known for their pest-deterrent properties, naturally repelling many garden insects. They\'re also edible, with petals that add color and a slightly spicy flavor to salads.',
         imageUrl: 'assets/images/Marigold.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -1148,8 +1141,7 @@ class PlantCatalogData {
         id: '50',
         name: 'Zinnia',
         scientificName: 'Zinnia elegans',
-        description:
-            'A colorful annual flower with vibrant, long-lasting blooms.',
+        description: 'Zinnia elegans is a cheerful annual flower native to Mexico, beloved for its bright, long-lasting blooms and easy care. Available in nearly every color except blue, zinnias produce flowers from summer until frost. They\'re excellent for cutting gardens and attract butterflies and beneficial insects. These heat-loving plants are perfect for beginners and children\'s gardens, as they grow quickly from seed and are very forgiving.',,
         imageUrl: 'assets/images/Zinnia.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
