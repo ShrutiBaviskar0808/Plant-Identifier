@@ -1039,7 +1039,7 @@ class PlantCatalogData {
         name: 'Coleus',
         scientificName: 'Plectranthus scutellarioides',
         description: 'A vibrant foliage plant with multicolored leaves.',
-        imageUrl: 'assets/images/Coleus.jpg',
+        imageUrl: 'assets/images/coleus.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
           amount: 'Moderate',
@@ -1127,7 +1127,7 @@ class PlantCatalogData {
         name: 'Marigold',
         scientificName: 'Tagetes erecta',
         description: 'A bright flowering plant with orange and yellow blooms.',
-        imageUrl: 'assets/images/marigold.jpg',
+        imageUrl: 'assets/images/Marigold.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
           amount: 'Moderate',
