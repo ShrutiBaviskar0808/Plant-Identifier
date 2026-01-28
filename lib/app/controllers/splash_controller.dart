@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import '../../features/home/views/home_view.dart';
+import '../../features/home/controllers/home_controller.dart';
 
 class SplashController extends GetxController {
   final _isLoading = true.obs;
@@ -33,7 +34,10 @@ class SplashController extends GetxController {
       _isLoading.value = false;
       
       Navigator.of(Get.context!).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeView()),
+        MaterialPageRoute(builder: (context) {
+          Get.put(HomeController());
+          return const HomeView();
+        }),
       );
       
     } catch (e) {

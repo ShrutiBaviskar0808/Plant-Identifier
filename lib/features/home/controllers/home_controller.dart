@@ -2,7 +2,9 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../../../core/data/services/notification_service.dart';
 import '../../identification/views/camera_view.dart';
+import '../../identification/controllers/identification_controller.dart';
 import '../../garden/views/garden_view.dart';
+import '../../garden/controllers/garden_controller.dart';
 
 class HomeController extends GetxController {
   final RxInt _currentIndex = 0.obs;
@@ -59,13 +61,19 @@ class HomeController extends GetxController {
 
   void navigateToCamera() {
     Navigator.of(Get.context!).push(
-      MaterialPageRoute(builder: (context) => const CameraView()),
+      MaterialPageRoute(builder: (context) {
+        Get.put(IdentificationController());
+        return const CameraView();
+      }),
     );
   }
 
   void navigateToGarden() {
     Navigator.of(Get.context!).push(
-      MaterialPageRoute(builder: (context) => const GardenView()),
+      MaterialPageRoute(builder: (context) {
+        Get.put(GardenController());
+        return const GardenView();
+      }),
     );
   }
 
