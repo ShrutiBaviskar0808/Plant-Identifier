@@ -98,7 +98,7 @@ class PlantCatalogView extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(6),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -106,49 +106,49 @@ class PlantCatalogView extends StatelessWidget {
                   Text(
                     plant.name,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 2),
+                  SizedBox(height: 1),
                   Text(
                     plant.scientificName,
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 10,
                       color: Colors.grey[600],
                       fontStyle: FontStyle.italic,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4),
+                  SizedBox(height: 3),
                   Row(
                     children: [
-                      Icon(Icons.water_drop, size: 12, color: Colors.blue),
+                      Icon(Icons.water_drop, size: 10, color: Colors.blue),
                       SizedBox(width: 2),
                       Expanded(
                         child: Text(
                           plant.waterRequirement.frequency,
-                          style: TextStyle(fontSize: 10, color: Colors.grey[700]),
+                          style: TextStyle(fontSize: 9, color: Colors.grey[700]),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 4),
+                  SizedBox(height: 3),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                     decoration: BoxDecoration(
                       color: _getDifficultyColor(plant.difficulty),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       plant.difficulty,
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: 8,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
