@@ -253,7 +253,7 @@ class PlantCatalogData {
         id: '10',
         name: 'Boston Fern',
         scientificName: 'Nephrolepis exaltata',
-        description: 'Nephrolepis exaltata, the Boston Fern, is a classic Victorian-era houseplant that remains popular today. Native to tropical regions worldwide, this lush fern features delicate, arching fronds that create a soft, romantic appearance. It\'s an excellent natural humidifier and air purifier, thriving in bathrooms and other humid environments. While it requires consistent moisture, its timeless beauty makes it worth the extra attention.',,
+        description: 'Nephrolepis exaltata, the Boston Fern, is a classic Victorian-era houseplant that remains popular today. Native to tropical regions worldwide, this lush fern features delicate, arching fronds that create a soft, romantic appearance. It is an excellent natural humidifier and air purifier, thriving in bathrooms and other humid environments. While it requires consistent moisture, its timeless beauty makes it worth the extra attention.',
         imageUrl: 'assets/images/Boston Fern.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Twice weekly',
@@ -1119,7 +1119,7 @@ class PlantCatalogData {
         id: '49',
         name: 'Marigold',
         scientificName: 'Tagetes erecta',
-        description: 'Tagetes erecta, the African Marigold, is a vibrant annual flower native to Mexico. Despite its common name, this cheerful plant produces large, ruffled flowers in bright shades of yellow and orange throughout the growing season. Marigolds are known for their pest-deterrent properties, naturally repelling many garden insects. They\'re also edible, with petals that add color and a slightly spicy flavor to salads.',
+        description: 'Tagetes erecta, the African Marigold, is a vibrant annual flower native to Mexico. Despite its common name, this cheerful plant produces large, ruffled flowers in bright shades of yellow and orange throughout the growing season. Marigolds are known for their pest-deterrent properties, naturally repelling many garden insects. They are also edible, with petals that add color and a slightly spicy flavor to salads.',
         imageUrl: 'assets/images/Marigold.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
@@ -1141,7 +1141,7 @@ class PlantCatalogData {
         id: '50',
         name: 'Zinnia',
         scientificName: 'Zinnia elegans',
-        description: 'Zinnia elegans is a cheerful annual flower native to Mexico, beloved for its bright, long-lasting blooms and easy care. Available in nearly every color except blue, zinnias produce flowers from summer until frost. They\'re excellent for cutting gardens and attract butterflies and beneficial insects. These heat-loving plants are perfect for beginners and children\'s gardens, as they grow quickly from seed and are very forgiving.',,
+        description: 'Zinnia elegans is a cheerful annual flower native to Mexico, beloved for its bright, long-lasting blooms and easy care. Available in nearly every color except blue, zinnias produce flowers from summer until frost. They are excellent for cutting gardens and attract butterflies and beneficial insects. These heat-loving plants are perfect for beginners and children gardens, as they grow quickly from seed and are very forgiving.',,
         imageUrl: 'assets/images/Zinnia.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
