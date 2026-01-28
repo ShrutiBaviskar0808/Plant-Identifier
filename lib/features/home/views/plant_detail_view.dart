@@ -21,7 +21,7 @@ class PlantDetailView extends StatelessWidget {
             Container(
               height: 250,
               width: double.infinity,
-              child: Image.network(
+              child: Image.asset(
                 plant.imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {

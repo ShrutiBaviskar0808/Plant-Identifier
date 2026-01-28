@@ -235,7 +235,7 @@ class PlantCatalogData {
         name: 'Aloe Vera',
         scientificName: 'Aloe barbadensis',
         description: 'A succulent plant with medicinal properties.',
-        imageUrl: 'assets/images/Aloe Vera.jpg',
+        imageUrl: 'assets/images/Aloe vera.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Bi-weekly',
           amount: 'Low',
@@ -279,7 +279,7 @@ class PlantCatalogData {
         name: 'Philodendron',
         scientificName: 'Philodendron hederaceum',
         description: 'A trailing plant with heart-shaped leaves.',
-        imageUrl: 'assets/images/Philodendron.jpg',
+        imageUrl: 'assets/images/philodendron.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
           amount: 'Moderate',
@@ -367,7 +367,7 @@ class PlantCatalogData {
         name: 'Calathea',
         scientificName: 'Calathea orbifolia',
         description: 'A prayer plant with stunning patterned leaves.',
-        imageUrl: 'assets/images/calathea.jpg',
+        imageUrl: 'assets/images/Calathea.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
           amount: 'Moderate',
@@ -876,7 +876,7 @@ class PlantCatalogData {
         name: 'Christmas Cactus',
         scientificName: 'Schlumbergera bridgessii',
         description: 'A holiday cactus that blooms with colorful flowers.',
-        imageUrl: 'assets/images/christmas_cactus.jpg',
+        imageUrl: 'assets/images/Christmas Cactus.jpg',
         waterRequirement: WaterRequirement(
           frequency: 'Weekly',
           amount: 'Moderate',
