@@ -53,6 +53,12 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
               print('Processing letter $key with ${value.length} plants');
               for (var plant in value) {
                 if (plant is Map<String, dynamic>) {
+                  // Debug: Print the first plant's structure
+                  if (plantList.isEmpty) {
+                    print('First plant structure: ${plant.keys.toList()}');
+                    print('Sample plant data: $plant');
+                  }
+                  
                   final imageUrl = plant['image_url'] ?? '';
                   if (imageUrl.isNotEmpty) {
                     print('Plant: ${plant['name']}, Image URL: $imageUrl');
@@ -212,41 +218,7 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
         contentPadding: EdgeInsets.all(12),
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: plant['image_url'] != null && plant['image_url'].isNotEmpty
-              ? Image.network(
-                  plant['image_url'],
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      width: 60,
-                      height: 60,
-                      color: Colors.grey[300],
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.green,
-                        ),
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: 60,
-                      height: 60,
-                      color: Colors.grey[300],
-                      child: Icon(Icons.local_florist, color: Colors.grey),
-                    );
-                  },
-                )
-              : Container(
-                  width: 60,
-                  height: 60,
-                  color: Colors.grey[300],
-                  child: Icon(Icons.local_florist, color: Colors.grey),
-                ),
+          child: _buildPlantImage(plant),
         ),
         title: Text(
           plant['name'] ?? 'Unknown Plant',
@@ -463,6 +435,45 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPlantImage(Map<String, dynamic> plant) {
+    final plantName = plant['name']?.toString() ?? 'plant';
+    // Use Unsplash API for real plant images
+    final imageUrl = 'https://source.unsplash.com/200x200/?${plantName.replaceAll(' ', '+')},plant';
+    
+    return Image.network(
+      imageUrl,
+      width: 60,
+      height: 60,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return _buildPlaceholderImage();
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return _buildPlaceholderImage();
+      },
+    );
+  }
+
+  Widget _buildPlaceholderImage() {
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.green[300]!, Colors.green[600]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Icon(
+        Icons.local_florist,
+        color: Colors.white,
+        size: 30,
       ),
     );
   }
