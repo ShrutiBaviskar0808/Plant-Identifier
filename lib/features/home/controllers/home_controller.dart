@@ -13,6 +13,7 @@ class HomeController extends GetxController {
   final RxBool _isLoading = false.obs;
   final RxList<PlantAnalytics> _plantAnalytics = <PlantAnalytics>[].obs;
   final RxList<CommunityPost> _communityPosts = <CommunityPost>[].obs;
+  final RxInt _notificationCount = 0.obs;
 
   int get currentIndex => _currentIndex.value;
   List<CareReminder> get careReminders => _careReminders;
@@ -20,30 +21,22 @@ class HomeController extends GetxController {
   bool get isLoading => _isLoading.value;
   List<PlantAnalytics> get plantAnalytics => _plantAnalytics;
   List<CommunityPost> get communityPosts => _communityPosts;
+  int get notificationCount => _notificationCount.value;
+
+  int getUnreadNotificationCount() {
+    _notificationCount.value = NotificationService.getUnreadCount();
+    return _notificationCount.value;
+  }
 
   @override
   void onInit() {
     super.onInit();
     _loadHomeData();
-    _initializeNotifications();
+    // Initialize notification count to 0 (no default notifications)
+    _notificationCount.value = 0;
   }
 
-  void _initializeNotifications() {
-    // Add some sample notifications
-    NotificationService.addNotification(PlantNotification(
-      id: '1',
-      title: 'Welcome to Plant Care!',
-      message: 'Start adding your plants and set care reminders',
-      type: NotificationType.general,
-    ));
-    
-    NotificationService.sendWeatherAlert(
-      'Weather Update',
-      'Perfect weather for watering your outdoor plants today!'
-    );
-    
-    NotificationService.sendHealthAlert('Monstera Deliciosa', 35);
-  }
+
 
   String getIndianTimeGreeting() {
     final now = DateTime.now().toUtc().add(Duration(hours: 5, minutes: 30));
@@ -95,23 +88,8 @@ class HomeController extends GetxController {
   }
 
   Future<void> _loadCareReminders() async {
-    // Mock data - replace with actual service calls
-    _careReminders.value = [
-      CareReminder(
-        id: '1',
-        plantName: 'Monstera Deliciosa',
-        careType: 'Watering',
-        description: 'Time to water your plant',
-        dueDate: DateTime.now().add(Duration(hours: 2)),
-      ),
-      CareReminder(
-        id: '2',
-        plantName: 'Snake Plant',
-        careType: 'Fertilizing',
-        description: 'Monthly fertilizer application',
-        dueDate: DateTime.now().add(Duration(days: 1)),
-      ),
-    ];
+    // Start with empty reminders - only add when user creates them
+    _careReminders.clear();
   }
 
   Future<void> _loadPlantTips() async {
@@ -277,6 +255,9 @@ class HomeController extends GetxController {
       type: NotificationType.general,
     ));
     
+    // Update notification count
+    _notificationCount.value = NotificationService.getUnreadCount();
+    
     update();
     
     Get.snackbar(
@@ -284,6 +265,17 @@ class HomeController extends GetxController {
       'Reminder set for $plantName',
       snackPosition: SnackPosition.BOTTOM,
     );
+  }
+
+  // Clear all app data (for app reset/uninstall)
+  void clearAllData() {
+    _careReminders.clear();
+    _plantTips.clear();
+    _plantAnalytics.clear();
+    _communityPosts.clear();
+    _notificationCount.value = 0;
+    NotificationService.clearAllAppData();
+    update();
   }
 }
 

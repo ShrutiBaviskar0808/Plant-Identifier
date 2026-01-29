@@ -1,6 +1,7 @@
 import 'dart:io';
 import '../models/plant.dart';
-import 'plant_api_service.dart';
+import '../services/plant_api_service.dart';
+import '../converters/plant_model_converter.dart';
 
 class ImageAnalysisService {
   static final ImageAnalysisService _instance = ImageAnalysisService._internal();
@@ -17,8 +18,11 @@ class ImageAnalysisService {
       await Future.delayed(Duration(seconds: 2));
 
       // Use the updated PlantApiService identification method
-      final apiService = PlantApiService();
-      return await apiService.identifyPlantFromImage(imagePath);
+      final apiResult = await PlantApiService.identifyPlantFromImage(imagePath);
+      if (apiResult != null) {
+        return [PlantModelConverter.fromApiModel(apiResult)];
+      }
+      return [];
     } catch (e) {
       print('Image analysis failed: $e');
       return _createFallbackPlants(imagePath);

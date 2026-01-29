@@ -1,12 +1,12 @@
 import '../models/plant.dart';
-import 'plant_api_service.dart';
+import '../services/plant_api_service.dart';
+import '../converters/plant_model_converter.dart';
 
 class PlantDatabaseService {
   static final PlantDatabaseService _instance = PlantDatabaseService._internal();
   factory PlantDatabaseService() => _instance;
   PlantDatabaseService._internal();
 
-  final PlantApiService _apiService = PlantApiService();
   final List<Plant> _localPlants = [];
 
   // Initialize with sample plant data and fetch from API
@@ -97,7 +97,7 @@ class PlantDatabaseService {
 
     // Try to fetch from API
     try {
-      await _apiService.fetchPlantsFromApi();
+      await PlantApiService.fetchPlantsFromApi();
     } catch (e) {
       print('Failed to fetch plants from API: $e');
     }
@@ -107,9 +107,9 @@ class PlantDatabaseService {
   Future<List<Plant>> searchPlants(String query) async {
     try {
       // Try API first
-      final apiResults = await _apiService.searchPlants(query);
+      final apiResults = await PlantApiService.searchPlants(query);
       if (apiResults.isNotEmpty) {
-        return apiResults;
+        return PlantModelConverter.fromApiModelList(apiResults);
       }
     } catch (e) {
       print('API search failed: $e');
@@ -129,8 +129,9 @@ class PlantDatabaseService {
   // Get plants by category
   Future<List<Plant>> getPlantsByCategory(String category) async {
     try {
-      final allPlants = await _apiService.fetchPlantsFromApi();
-      return allPlants.where((plant) => plant.category == category).toList();
+      final allPlants = await PlantApiService.fetchPlantsFromApi();
+      final converted = PlantModelConverter.fromApiModelList(allPlants);
+      return converted.where((plant) => plant.category == category).toList();
     } catch (e) {
       return _localPlants.where((plant) => plant.category == category).toList();
     }
@@ -139,8 +140,9 @@ class PlantDatabaseService {
   // Get all categories
   Future<List<String>> getCategories() async {
     try {
-      final allPlants = await _apiService.fetchPlantsFromApi();
-      return allPlants.map((plant) => plant.category).toSet().toList();
+      final allPlants = await PlantApiService.fetchPlantsFromApi();
+      final converted = PlantModelConverter.fromApiModelList(allPlants);
+      return converted.map((plant) => plant.category).toSet().toList();
     } catch (e) {
       return _localPlants.map((plant) => plant.category).toSet().toList();
     }
@@ -150,8 +152,10 @@ class PlantDatabaseService {
   Future<Plant?> getPlantById(String id) async {
     try {
       // Try API first
-      final apiPlant = await _apiService.getPlantById(id);
-      if (apiPlant != null) return apiPlant;
+      final apiPlant = await PlantApiService.getPlantById(int.tryParse(id) ?? 0);
+      if (apiPlant != null) {
+        return PlantModelConverter.fromApiModel(apiPlant);
+      }
     } catch (e) {
       print('API getPlantById failed: $e');
     }
@@ -167,8 +171,9 @@ class PlantDatabaseService {
   // Get all plants
   Future<List<Plant>> getAllPlants() async {
     try {
-      final apiPlants = await _apiService.fetchPlantsFromApi();
-      return [...apiPlants, ..._localPlants];
+      final apiPlants = await PlantApiService.fetchPlantsFromApi();
+      final converted = PlantModelConverter.fromApiModelList(apiPlants);
+      return [...converted, ..._localPlants];
     } catch (e) {
       return List.from(_localPlants);
     }
@@ -177,7 +182,11 @@ class PlantDatabaseService {
   // Plant identification from image using API
   Future<List<Plant>> identifyPlantFromImage(String imagePath) async {
     try {
-      return await _apiService.identifyPlantFromImage(imagePath);
+      final apiResult = await PlantApiService.identifyPlantFromImage(imagePath);
+      if (apiResult != null) {
+        return [PlantModelConverter.fromApiModel(apiResult)];
+      }
+      return [];
     } catch (e) {
       print('API identification failed: $e');
       // Fallback to local simulation

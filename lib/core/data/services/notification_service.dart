@@ -28,6 +28,11 @@ class NotificationService {
     return _notifications.where((n) => !n.isRead).length;
   }
   
+  // Clear all app data (called when app is uninstalled or reset)
+  static void clearAllAppData() {
+    _notifications.clear();
+  }
+  
   static void scheduleReminderNotification(String plantName, String reminderType, DateTime scheduledTime) {
     final notification = PlantNotification(
       id: DateTime.now().millisecondsSinceEpoch.toString(),

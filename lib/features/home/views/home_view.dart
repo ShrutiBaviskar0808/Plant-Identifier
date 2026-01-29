@@ -123,40 +123,48 @@ class PremiumHomeTabView extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: Icon(Icons.notifications_outlined, color: Colors.green[800]),
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const NotificationsView()),
+          Obx(() {
+            final controller = Get.find<HomeController>();
+            final unreadCount = controller.notificationCount;
+            return Stack(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.notifications_outlined, color: Colors.green[800]),
+                  onPressed: () {
+                    controller.getUnreadNotificationCount(); // Update count
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const NotificationsView()),
+                    );
+                  },
                 ),
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  constraints: BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: Text(
-                    '3',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                if (unreadCount > 0)
+                  Positioned(
+                    right: 8,
+                    top: 8,
+                    child: Container(
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      constraints: BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        unreadCount.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                ),
-              ),
-            ],
-          ),
+              ],
+            );
+          }),
           IconButton(
             icon: Icon(Icons.search, color: Colors.green[800]),
             onPressed: () => _showPlantSearch(context),

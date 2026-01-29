@@ -1,260 +1,84 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:http/http.dart' as http;
-import '../models/plant.dart';
+import '../models/plant_api_model.dart';
 
 class PlantApiService {
-  static const String _baseUrl =
-      'https://publicassetsdata.sfo3.cdn.digitaloceanspaces.com/smit/MockAPI/plants_database.json';
+  static const String _baseUrl = 'https://publicassetsdata.sfo3.cdn.digitaloceanspaces.com/smit/MockAPI/plants_database.json';
 
-  static final PlantApiService _instance = PlantApiService._internal();
-  factory PlantApiService() => _instance;
-  PlantApiService._internal();
-
-  List<Plant> _cachedPlants = [];
-  bool _isLoaded = false;
-
-  Future<List<Plant>> identifyPlantFromImage(String imagePath) async {
-    final plantNames = [
-      'Rose', 'Sunflower', 'Tulip', 'Lily', 'Orchid', 'Jasmine',
-      'Marigold', 'Lavender', 'Petunia', 'Dahlia', 'Carnation', 'Chrysanthemum',
-      'Begonia', 'Geranium', 'Pansy', 'Zinnia', 'Snapdragon', 'Peony', 'Iris', 'Daffodil'
-    ];
-    
-    final pathHash = imagePath.hashCode.abs();
-    final timeStamp = DateTime.now().millisecondsSinceEpoch;
-    final randomSeed = (pathHash * 31 + timeStamp * 17) % 10000;
-    
-    final random = Random(randomSeed);
-    final shuffledNames = List<String>.from(plantNames);
-    shuffledNames.shuffle(random);
-    
-    return shuffledNames.take(3).map((name) => _createMockPlant(name)).toList();
-  }
-  
-  Plant _createMockPlant(String name) {
-    final scientificNames = {
-      'Rose': 'Rosa rubiginosa',
-      'Sunflower': 'Helianthus annuus',
-      'Tulip': 'Tulipa gesneriana',
-      'Lily': 'Lilium candidum',
-      'Orchid': 'Orchidaceae phalaenopsis',
-      'Jasmine': 'Jasminum officinale',
-      'Marigold': 'Tagetes erecta',
-      'Lavender': 'Lavandula angustifolia',
-      'Petunia': 'Petunia hybrida',
-      'Dahlia': 'Dahlia pinnata',
-      'Carnation': 'Dianthus caryophyllus',
-      'Chrysanthemum': 'Chrysanthemum morifolium',
-      'Begonia': 'Begonia semperflorens',
-      'Geranium': 'Pelargonium hortorum',
-      'Pansy': 'Viola tricolor',
-      'Zinnia': 'Zinnia elegans',
-      'Snapdragon': 'Antirrhinum majus',
-      'Peony': 'Paeonia lactiflora',
-      'Iris': 'Iris germanica',
-      'Daffodil': 'Narcissus pseudonarcissus',
-    };
-    
-    return Plant(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      commonName: name,
-      scientificName: scientificNames[name] ?? '$name species',
-      category: 'flowering',
-      family: 'Plantae',
-      description: 'Beautiful $name flower with vibrant colors and pleasant fragrance.',
-      careRequirements: PlantCareRequirements(
-        water: WaterRequirement(
-          frequency: 'weekly',
-          amount: 'medium',
-          notes: 'Water when soil feels dry',
-        ),
-        light: LightRequirement(
-          level: 'medium',
-          hoursPerDay: 6,
-          placement: 'indoor',
-        ),
-        soilType: 'Well-draining potting mix',
-        growthSeason: 'Spring to Fall',
-        temperature: TemperatureRange(
-          minTemp: 18,
-          maxTemp: 28,
-        ),
-        fertilizer: 'Monthly during growing season',
-        pruning: 'Remove dead flowers regularly',
-      ),
-      imageUrls: [],
-      tags: ['flowering', 'colorful', 'fragrant'],
-    );
-  }
-
-  // ---------------- NO CHANGES BELOW ----------------
-
-  Future<List<Plant>> fetchPlantsFromApi() async {
-    if (_isLoaded && _cachedPlants.isNotEmpty) {
-      return _cachedPlants;
-    }
-
+  static Future<List<PlantApiModel>> fetchPlants() async {
     try {
       final response = await http.get(Uri.parse(_baseUrl));
-
+      
       if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
-        _cachedPlants =
-            jsonData.map((json) => _mapApiPlantToModel(json)).toList();
-        _isLoaded = true;
-        return _cachedPlants;
+        final dynamic jsonData = json.decode(response.body);
+        
+        // Debug: Print the structure of the response
+        print('API Response type: ${jsonData.runtimeType}');
+        if (jsonData is Map) {
+          print('Map keys: ${jsonData.keys.toList()}');
+        }
+        
+        // Handle both Map and List responses
+        if (jsonData is Map<String, dynamic>) {
+          // If it's a map, look for a 'plants' key or similar
+          if (jsonData.containsKey('plants')) {
+            final List<dynamic> plantsList = jsonData['plants'];
+            return plantsList.map((json) => PlantApiModel.fromJson(json)).toList();
+          } else if (jsonData.containsKey('data')) {
+            final List<dynamic> plantsList = jsonData['data'];
+            return plantsList.map((json) => PlantApiModel.fromJson(json)).toList();
+          } else {
+            // If it's a map with plant data directly, convert the values
+            final List<dynamic> plantsList = jsonData.values.toList();
+            return plantsList.map((json) => PlantApiModel.fromJson(json)).toList();
+          }
+        } else if (jsonData is List<dynamic>) {
+          // If it's already a list
+          return jsonData.map((json) => PlantApiModel.fromJson(json)).toList();
+        } else {
+          throw Exception('Unexpected API response format: ${jsonData.runtimeType}');
+        }
       } else {
         throw Exception('Failed to load plants: ${response.statusCode}');
       }
     } catch (e) {
+      print('Detailed error: $e');
       throw Exception('Error fetching plants: $e');
     }
   }
 
-  Plant _mapApiPlantToModel(Map<String, dynamic> json) {
-    return Plant(
-      id: json['id']?.toString() ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
-      commonName: json['name'] ?? json['common_name'] ?? 'Unknown Plant',
-      scientificName: json['scientific_name'] ?? json['botanicalName'] ?? '',
-      category: _mapCategory(json['category'] ?? json['type'] ?? 'houseplant'),
-      family: json['family'] ?? '',
-      description: json['description'] ??
-          json['care_tips'] ??
-          'No description available',
-      careRequirements: _mapCareRequirements(json),
-      imageUrls: _extractImageUrls(json),
-      tags: _extractTags(json),
-    );
+  // Alias method for backward compatibility
+  static Future<List<PlantApiModel>> fetchPlantsFromApi() async {
+    return await fetchPlants();
   }
 
-  String _mapCategory(String apiCategory) {
-    final category = apiCategory.toLowerCase();
-    if (category.contains('succulent') || category.contains('cactus'))
-      return 'succulent';
-    if (category.contains('tree') || category.contains('woody')) return 'tree';
-    if (category.contains('flower') || category.contains('bloom'))
-      return 'flowering';
-    if (category.contains('shrub') || category.contains('bush')) return 'shrub';
-    return 'houseplant';
+  // Search plants by name
+  static Future<List<PlantApiModel>> searchPlants(String query) async {
+    final plants = await fetchPlants();
+    return plants.where((plant) => 
+      plant.name.toLowerCase().contains(query.toLowerCase()) ||
+      plant.scientificName.toLowerCase().contains(query.toLowerCase())
+    ).toList();
   }
 
-  PlantCareRequirements _mapCareRequirements(Map<String, dynamic> json) {
-    return PlantCareRequirements(
-      water: WaterRequirement(
-        frequency:
-            _mapWaterFrequency(json['watering'] ?? json['water_frequency']),
-        amount: _mapWaterAmount(json['water_amount'] ?? 'medium'),
-        notes: json['watering_notes'] ?? json['water_tips'] ?? '',
-      ),
-      light: LightRequirement(
-        level: _mapLightLevel(
-            json['light'] ?? json['light_requirement'] ?? 'medium'),
-        hoursPerDay:
-            _parseLightHours(json['light_hours'] ?? json['daily_light'] ?? 6),
-        placement: json['placement'] ?? 'indoor',
-      ),
-      soilType:
-          json['soil'] ?? json['soil_type'] ?? 'Well-draining potting mix',
-      growthSeason:
-          json['growth_season'] ?? json['growing_season'] ?? 'Spring to Fall',
-      temperature: TemperatureRange(
-        minTemp: _parseTemp(json['min_temp'] ?? json['temperature_min'] ?? 15),
-        maxTemp: _parseTemp(json['max_temp'] ?? json['temperature_max'] ?? 25),
-      ),
-      fertilizer: json['fertilizer'] ??
-          json['feeding'] ??
-          'Monthly during growing season',
-      pruning: json['pruning'] ??
-          json['maintenance'] ??
-          'Remove dead leaves as needed',
-    );
-  }
-
-  String _mapWaterFrequency(dynamic frequency) {
-    final freq = frequency.toString().toLowerCase();
-    if (freq.contains('daily')) return 'daily';
-    if (freq.contains('weekly')) return 'weekly';
-    if (freq.contains('bi-weekly')) return 'bi-weekly';
-    if (freq.contains('monthly')) return 'monthly';
-    return 'weekly';
-  }
-
-  String _mapWaterAmount(dynamic amount) {
-    final amt = amount.toString().toLowerCase();
-    if (amt.contains('low')) return 'low';
-    if (amt.contains('high')) return 'high';
-    return 'medium';
-  }
-
-  String _mapLightLevel(dynamic light) {
-    final lightLevel = light.toString().toLowerCase();
-    if (lightLevel.contains('low')) return 'low';
-    if (lightLevel.contains('high') ||
-        lightLevel.contains('bright') ||
-        lightLevel.contains('full')) return 'high';
-    return 'medium';
-  }
-
-  int _parseLightHours(dynamic hours) {
-    if (hours is int) return hours;
-    if (hours is String) {
-      final parsed = int.tryParse(hours);
-      if (parsed != null) return parsed;
-    }
-    return 6;
-  }
-
-  int _parseTemp(dynamic temp) {
-    if (temp is int) return temp;
-    if (temp is String) {
-      final parsed = int.tryParse(temp);
-      if (parsed != null) return parsed;
-    }
-    return 20;
-  }
-
-  List<String> _extractImageUrls(Map<String, dynamic> json) {
-    final images = <String>[];
-    if (json['image'] != null) images.add(json['image'].toString());
-    if (json['image_url'] != null) images.add(json['image_url'].toString());
-    if (json['images'] is List) {
-      images.addAll((json['images'] as List).map((e) => e.toString()));
-    }
-    return images;
-  }
-
-  List<String> _extractTags(Map<String, dynamic> json) {
-    final tags = <String>[];
-    if (json['tags'] is List) {
-      tags.addAll((json['tags'] as List).map((e) => e.toString()));
-    }
-    if (json['characteristics'] is List) {
-      tags.addAll((json['characteristics'] as List).map((e) => e.toString()));
-    }
-    return tags;
-  }
-
-  Future<List<Plant>> searchPlants(String query) async {
-    final plants = await fetchPlantsFromApi();
-    if (query.isEmpty) return plants;
-
-    query = query.toLowerCase();
-    return plants.where((plant) {
-      return plant.commonName.toLowerCase().contains(query) ||
-          plant.scientificName.toLowerCase().contains(query) ||
-          plant.tags.any((tag) => tag.toLowerCase().contains(query)) ||
-          plant.category.toLowerCase().contains(query);
-    }).toList();
-  }
-
-  Future<Plant?> getPlantById(String id) async {
-    final plants = await fetchPlantsFromApi();
+  // Get plant by ID
+  static Future<PlantApiModel?> getPlantById(int id) async {
+    final plants = await fetchPlants();
     try {
       return plants.firstWhere((plant) => plant.id == id);
     } catch (e) {
       return null;
     }
+  }
+
+  // Mock plant identification from image (placeholder)
+  static Future<PlantApiModel?> identifyPlantFromImage(String imagePath) async {
+    // This is a mock implementation - in a real app, you'd send the image to an AI service
+    final plants = await fetchPlants();
+    if (plants.isNotEmpty) {
+      // Return a random plant for demo purposes
+      return plants[DateTime.now().millisecond % plants.length];
+    }
+    return null;
   }
 }
