@@ -10,34 +10,41 @@ class PlantApiService {
       final response = await http.get(Uri.parse(_baseUrl));
       
       if (response.statusCode == 200) {
-        final dynamic jsonData = json.decode(response.body);
+        final String responseBody = response.body;
+        final dynamic jsonData = json.decode(responseBody);
         
-        // The API returns an object with plant IDs as keys
+        print('Response type: ${jsonData.runtimeType}');
+        print('First few chars: ${responseBody.substring(0, 100)}');
+        
         if (jsonData is Map<String, dynamic>) {
           final List<PlantApiModel> plants = [];
           
           jsonData.forEach((key, value) {
             if (value is Map<String, dynamic>) {
-              // Add the ID from the key if not present in the data
-              if (!value.containsKey('id')) {
-                value['id'] = int.tryParse(key) ?? plants.length + 1;
+              // Add ID and parse plant
+              final plantData = Map<String, dynamic>.from(value);
+              plantData['id'] = int.tryParse(key) ?? plants.length + 1;
+              
+              try {
+                final plant = PlantApiModel.fromJson(plantData);
+                plants.add(plant);
+              } catch (e) {
+                print('Error parsing plant $key: $e');
               }
-              plants.add(PlantApiModel.fromJson(value));
             }
           });
           
+          print('Successfully parsed ${plants.length} plants');
           return plants;
-        } else if (jsonData is List<dynamic>) {
-          return jsonData.map((json) => PlantApiModel.fromJson(json)).toList();
-        } else {
-          throw Exception('Unexpected API response format: ${jsonData.runtimeType}');
         }
+        
+        throw Exception('Expected Map but got ${jsonData.runtimeType}');
       } else {
-        throw Exception('Failed to load plants: ${response.statusCode}');
+        throw Exception('HTTP Error: ${response.statusCode}');
       }
     } catch (e) {
-      print('API Error: $e');
-      throw Exception('Error fetching plants: $e');
+      print('Fetch error: $e');
+      rethrow;
     }
   }
 

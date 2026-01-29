@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/data/services/plant_api_service.dart';
-import '../../../core/data/models/plant_api_model.dart';
-import 'plant_detail_view.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class PlantCatalogListView extends StatefulWidget {
   const PlantCatalogListView({super.key});
@@ -11,7 +10,7 @@ class PlantCatalogListView extends StatefulWidget {
 }
 
 class _PlantCatalogListViewState extends State<PlantCatalogListView> {
-  List<PlantApiModel> plants = [];
+  List<Map<String, dynamic>> plants = [];
   bool isLoading = true;
   String? errorMessage;
 
@@ -22,15 +21,61 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
   }
 
   Future<void> _loadPlants() async {
+    print('Starting to load plants...');
+    
     try {
-      final fetchedPlants = await PlantApiService.fetchPlants();
       setState(() {
-        plants = fetchedPlants;
-        isLoading = false;
+        isLoading = true;
+        errorMessage = null;
       });
+
+      print('Making HTTP request...');
+      final response = await http.get(
+        Uri.parse('https://publicassetsdata.sfo3.cdn.digitaloceanspaces.com/smit/MockAPI/plants_database.json'),
+        headers: {'Accept': 'application/json'},
+      ).timeout(Duration(seconds: 30));
+
+      print('Response status: ${response.statusCode}');
+      print('Response body length: ${response.body.length}');
+
+      if (response.statusCode == 200) {
+        final dynamic jsonData = json.decode(response.body);
+        print('JSON data type: ${jsonData.runtimeType}');
+        
+        if (jsonData is Map<String, dynamic>) {
+          final List<Map<String, dynamic>> plantList = [];
+          
+          jsonData.forEach((key, value) {
+            if (value is Map<String, dynamic>) {
+              plantList.add({
+                'id': key,
+                'name': value['name'] ?? 'Plant $key',
+                'scientific_name': value['scientific_name'] ?? '',
+                'description': value['description'] ?? 'No description available',
+                'image_url': value['image_url'] ?? '',
+                'water_requirement': value['water_requirement'] ?? 'Weekly',
+                'light_requirement': value['light_requirement'] ?? 'Bright light',
+                'difficulty': value['difficulty'] ?? 'Easy',
+              });
+            }
+          });
+
+          print('Parsed ${plantList.length} plants');
+          
+          setState(() {
+            plants = plantList;
+            isLoading = false;
+          });
+        } else {
+          throw Exception('API returned unexpected data format');
+        }
+      } else {
+        throw Exception('Server error: ${response.statusCode}');
+      }
     } catch (e) {
+      print('Error loading plants: $e');
       setState(() {
-        errorMessage = e.toString();
+        errorMessage = 'Failed to load plants: $e';
         isLoading = false;
       });
     }
@@ -130,15 +175,14 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
     return ListView.builder(
       padding: EdgeInsets.all(16),
       itemCount: plants.length,
-      cacheExtent: 500,
       itemBuilder: (context, index) {
         final plant = plants[index];
-        return _buildPlantListItem(plant, context);
+        return _buildPlantCard(plant);
       },
     );
   }
 
-  Widget _buildPlantListItem(PlantApiModel plant, BuildContext context) {
+  Widget _buildPlantCard(Map<String, dynamic> plant) {
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -156,36 +200,30 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
         contentPadding: EdgeInsets.all(12),
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: Image.network(
-            plant.imageUrl,
-            width: 60,
-            height: 60,
-            fit: BoxFit.cover,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Container(
-                width: 60,
-                height: 60,
-                color: Colors.grey[300],
-                child: const Center(
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.green,
-                    ),
-                  ),
+          child: plant['image_url'] != null && plant['image_url'].isNotEmpty
+              ? Image.network(
+                  plant['image_url'],
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 60,
+                      height: 60,
+                      color: Colors.grey[300],
+                      child: Icon(Icons.local_florist, color: Colors.grey),
+                    );
+                  },
+                )
+              : Container(
+                  width: 60,
+                  height: 60,
+                  color: Colors.grey[300],
+                  child: Icon(Icons.local_florist, color: Colors.grey),
                 ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return _buildErrorIcon();
-            },
-          ),
         ),
         title: Text(
-          plant.name,
+          plant['name'] ?? 'Unknown Plant',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -195,14 +233,15 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              plant.scientificName,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontStyle: FontStyle.italic,
+            if (plant['scientific_name'] != null && plant['scientific_name'].isNotEmpty)
+              Text(
+                plant['scientific_name'],
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontStyle: FontStyle.italic,
+                ),
               ),
-            ),
             SizedBox(height: 4),
             Row(
               children: [
@@ -210,7 +249,7 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
                 SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    plant.waterRequirement,
+                    plant['water_requirement'] ?? 'Weekly',
                     style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -218,11 +257,11 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: _getDifficultyColor(plant.difficulty),
+                    color: _getDifficultyColor(plant['difficulty'] ?? 'Easy'),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    plant.difficulty,
+                    plant['difficulty'] ?? 'Easy',
                     style: TextStyle(
                       fontSize: 10,
                       color: Colors.white,
@@ -235,26 +274,8 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
           ],
         ),
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PlantDetailView(plantApi: plant),
-            ),
-          );
+          _showPlantDetails(plant);
         },
-      ),
-    );
-  }
-
-  Widget _buildErrorIcon() {
-    return Container(
-      width: 60,
-      height: 60,
-      color: Colors.grey[300],
-      child: const Icon(
-        Icons.local_florist,
-        size: 30,
-        color: Colors.grey,
       ),
     );
   }
@@ -272,5 +293,114 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
       default:
         return Colors.grey;
     }
+  }
+
+  void _showPlantDetails(Map<String, dynamic> plant) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.8,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              height: 4,
+              width: 40,
+              margin: EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (plant['image_url'] != null && plant['image_url'].isNotEmpty)
+                      Container(
+                        height: 200,
+                        width: double.infinity,
+                        margin: EdgeInsets.only(bottom: 16),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            plant['image_url'],
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey[300],
+                                child: Icon(Icons.local_florist, size: 60, color: Colors.grey),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    Text(
+                      plant['name'] ?? 'Unknown Plant',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    if (plant['scientific_name'] != null && plant['scientific_name'].isNotEmpty)
+                      Text(
+                        plant['scientific_name'],
+                        style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[600]),
+                      ),
+                    SizedBox(height: 16),
+                    if (plant['description'] != null && plant['description'].isNotEmpty)
+                      Text(
+                        plant['description'],
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Care Information',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 12),
+                    _buildInfoRow(Icons.water_drop, 'Watering', plant['water_requirement'] ?? 'Weekly'),
+                    _buildInfoRow(Icons.wb_sunny, 'Light', plant['light_requirement'] ?? 'Bright light'),
+                    _buildInfoRow(Icons.star, 'Difficulty', plant['difficulty'] ?? 'Easy'),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: Colors.green, size: 20),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
