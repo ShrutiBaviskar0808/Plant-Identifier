@@ -442,39 +442,24 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
   Widget _buildPlantImage(Map<String, dynamic> plant) {
     final plantName = plant['name']?.toString().toLowerCase() ?? '';
     
-    // Map each plant name to its specific real image
-    String imageUrl;
+    // Use plant-specific search terms for better images
+    String searchTerm = 'plant';
     
     if (plantName.contains('velvetleaf')) {
-      imageUrl = 'https://images.unsplash.com/photo-1574263867128-a3d5c1b1deaa?w=200&h=200&fit=crop'; // Velvetleaf plant
-    } else if (plantName.contains('three-seeded mercury') || plantName.contains('mercury')) {
-      imageUrl = 'https://images.unsplash.com/photo-1518335935020-cfd9c7d28e8a?w=200&h=200&fit=crop'; // Mercury plant
-    } else if (plantName.contains('box elder') || plantName.contains('elder')) {
-      imageUrl = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'; // Box elder tree
-    } else if (plantName.contains('japanese maple')) {
-      imageUrl = 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=200&h=200&fit=crop'; // Japanese maple
-    } else if (plantName.contains('norway maple')) {
-      imageUrl = 'https://images.unsplash.com/photo-1574263867128-a3d5c1b1deaa?w=200&h=200&fit=crop'; // Norway maple
+      searchTerm = 'velvetleaf+plant+leaf';
+    } else if (plantName.contains('mercury')) {
+      searchTerm = 'mercury+plant+green+leaf';
+    } else if (plantName.contains('box+elder')) {
+      searchTerm = 'box+elder+tree+leaves';
+    } else if (plantName.contains('japanese+maple')) {
+      searchTerm = 'japanese+maple+tree+red+leaves';
+    } else if (plantName.contains('norway+maple')) {
+      searchTerm = 'norway+maple+tree+leaves';
     } else if (plantName.contains('sycamore')) {
-      imageUrl = 'https://images.unsplash.com/photo-1518335935020-cfd9c7d28e8a?w=200&h=200&fit=crop'; // Sycamore tree
-    } else if (plantName.contains('oak')) {
-      imageUrl = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'; // Oak tree
-    } else if (plantName.contains('pine')) {
-      imageUrl = 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=200&h=200&fit=crop'; // Pine tree
-    } else if (plantName.contains('rose')) {
-      imageUrl = 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=200&h=200&fit=crop'; // Rose
-    } else if (plantName.contains('sunflower')) {
-      imageUrl = 'https://images.unsplash.com/photo-1597848212624-e6eb1b3b9764?w=200&h=200&fit=crop'; // Sunflower
-    } else if (plantName.contains('daisy')) {
-      imageUrl = 'https://images.unsplash.com/photo-1574263867128-a3d5c1b1deaa?w=200&h=200&fit=crop'; // Daisy
-    } else if (plantName.contains('lily')) {
-      imageUrl = 'https://images.unsplash.com/photo-1518335935020-cfd9c7d28e8a?w=200&h=200&fit=crop'; // Lily
-    } else if (plantName.contains('tulip')) {
-      imageUrl = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'; // Tulip
-    } else {
-      // Default plant image
-      imageUrl = 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=200&h=200&fit=crop';
+      searchTerm = 'sycamore+tree+leaves';
     }
+    
+    final imageUrl = 'https://source.unsplash.com/200x200/?$searchTerm';
     
     return Image.network(
       imageUrl,
