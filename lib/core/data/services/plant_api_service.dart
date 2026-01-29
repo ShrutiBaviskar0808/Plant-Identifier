@@ -12,28 +12,22 @@ class PlantApiService {
       if (response.statusCode == 200) {
         final dynamic jsonData = json.decode(response.body);
         
-        // Debug: Print the structure of the response
-        print('API Response type: ${jsonData.runtimeType}');
-        if (jsonData is Map) {
-          print('Map keys: ${jsonData.keys.toList()}');
-        }
-        
-        // Handle both Map and List responses
+        // The API returns an object with plant IDs as keys
         if (jsonData is Map<String, dynamic>) {
-          // If it's a map, look for a 'plants' key or similar
-          if (jsonData.containsKey('plants')) {
-            final List<dynamic> plantsList = jsonData['plants'];
-            return plantsList.map((json) => PlantApiModel.fromJson(json)).toList();
-          } else if (jsonData.containsKey('data')) {
-            final List<dynamic> plantsList = jsonData['data'];
-            return plantsList.map((json) => PlantApiModel.fromJson(json)).toList();
-          } else {
-            // If it's a map with plant data directly, convert the values
-            final List<dynamic> plantsList = jsonData.values.toList();
-            return plantsList.map((json) => PlantApiModel.fromJson(json)).toList();
-          }
+          final List<PlantApiModel> plants = [];
+          
+          jsonData.forEach((key, value) {
+            if (value is Map<String, dynamic>) {
+              // Add the ID from the key if not present in the data
+              if (!value.containsKey('id')) {
+                value['id'] = int.tryParse(key) ?? plants.length + 1;
+              }
+              plants.add(PlantApiModel.fromJson(value));
+            }
+          });
+          
+          return plants;
         } else if (jsonData is List<dynamic>) {
-          // If it's already a list
           return jsonData.map((json) => PlantApiModel.fromJson(json)).toList();
         } else {
           throw Exception('Unexpected API response format: ${jsonData.runtimeType}');
@@ -42,7 +36,7 @@ class PlantApiService {
         throw Exception('Failed to load plants: ${response.statusCode}');
       }
     } catch (e) {
-      print('Detailed error: $e');
+      print('API Error: $e');
       throw Exception('Error fetching plants: $e');
     }
   }

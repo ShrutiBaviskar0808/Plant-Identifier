@@ -29,73 +29,11 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
         isLoading = false;
       });
     } catch (e) {
-      print('API Error: $e');
-      // Fallback to sample data if API fails
       setState(() {
-        plants = _createSamplePlants();
+        errorMessage = e.toString();
         isLoading = false;
-        errorMessage = null; // Don't show error if we have fallback data
       });
     }
-  }
-
-  List<PlantApiModel> _createSamplePlants() {
-    return [
-      PlantApiModel(
-        id: 1,
-        name: 'Monstera Deliciosa',
-        scientificName: 'Monstera deliciosa',
-        description: 'Popular houseplant with split leaves',
-        imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300',
-        waterRequirement: 'Weekly',
-        lightRequirement: 'Bright indirect light',
-        soilType: 'Well-draining potting mix',
-        temperature: '65-80°F (18-27°C)',
-        humidity: '60-70%',
-        fertilizer: 'Monthly during growing season',
-        toxicity: 'Toxic to pets',
-        difficulty: 'Easy',
-        matureSize: '6-10 feet',
-        growingSeason: 'Spring to Fall',
-        benefits: ['Air purifying', 'Low maintenance'],
-      ),
-      PlantApiModel(
-        id: 2,
-        name: 'Snake Plant',
-        scientificName: 'Sansevieria trifasciata',
-        description: 'Low-maintenance succulent perfect for beginners',
-        imageUrl: 'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=300',
-        waterRequirement: 'Bi-weekly',
-        lightRequirement: 'Low to bright indirect light',
-        soilType: 'Cactus or succulent mix',
-        temperature: '60-80°F (15-27°C)',
-        humidity: '30-50%',
-        fertilizer: 'Every 2-3 months',
-        toxicity: 'Mildly toxic to pets',
-        difficulty: 'Very Easy',
-        matureSize: '2-4 feet',
-        growingSeason: 'Year-round',
-        benefits: ['Air purifying', 'Drought tolerant', 'Low light tolerant'],
-      ),
-      PlantApiModel(
-        id: 3,
-        name: 'Pothos',
-        scientificName: 'Epipremnum aureum',
-        description: 'Trailing vine with heart-shaped leaves',
-        imageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300',
-        waterRequirement: 'Weekly',
-        lightRequirement: 'Low to bright indirect light',
-        soilType: 'Well-draining potting mix',
-        temperature: '65-85°F (18-29°C)',
-        humidity: '50-70%',
-        fertilizer: 'Monthly during growing season',
-        toxicity: 'Toxic to pets',
-        difficulty: 'Very Easy',
-        matureSize: '6-10 feet long',
-        growingSeason: 'Year-round',
-        benefits: ['Air purifying', 'Fast growing', 'Versatile placement'],
-      ),
-    ];
   }
 
   @override
