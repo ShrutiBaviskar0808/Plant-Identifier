@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
 import 'dart:convert';
+import '../../garden/controllers/garden_controller.dart';
+import '../../../core/data/models/plant.dart';
 
 class PlantCatalogListView extends StatefulWidget {
   const PlantCatalogListView({super.key});
@@ -50,12 +53,16 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
               print('Processing letter $key with ${value.length} plants');
               for (var plant in value) {
                 if (plant is Map<String, dynamic>) {
+                  final imageUrl = plant['image_url'] ?? '';
+                  if (imageUrl.isNotEmpty) {
+                    print('Plant: ${plant['name']}, Image URL: $imageUrl');
+                  }
                   plantList.add({
                     'id': plant['id']?.toString() ?? plantList.length.toString(),
                     'name': plant['name'] ?? 'Unknown Plant',
                     'scientific_name': plant['scientific_name'] ?? '',
                     'description': plant['description'] ?? 'No description available',
-                    'image_url': plant['image_url'] ?? '',
+                    'image_url': imageUrl,
                     'water_requirement': plant['water_requirement'] ?? 'Weekly',
                     'light_requirement': plant['light_requirement'] ?? 'Bright light',
                     'difficulty': plant['difficulty'] ?? 'Easy',
@@ -211,6 +218,20 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
                   width: 60,
                   height: 60,
                   fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      width: 60,
+                      height: 60,
+                      color: Colors.grey[300],
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.green,
+                        ),
+                      ),
+                    );
+                  },
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       width: 60,
@@ -259,17 +280,18 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: _getDifficultyColor(plant['difficulty'] ?? 'Easy'),
-                    borderRadius: BorderRadius.circular(10),
+                ElevatedButton(
+                  onPressed: () => _addToGarden(plant),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    minimumSize: Size(0, 28),
                   ),
                   child: Text(
-                    plant['difficulty'] ?? 'Easy',
+                    'Add to Garden',
                     style: TextStyle(
                       fontSize: 10,
-                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -285,18 +307,54 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
     );
   }
 
-  Color _getDifficultyColor(String difficulty) {
-    switch (difficulty.toLowerCase()) {
-      case 'very easy':
-      case 'easy':
-        return Colors.green;
-      case 'moderate':
-        return Colors.orange;
-      case 'hard':
-      case 'difficult':
-        return Colors.red;
-      default:
-        return Colors.grey;
+  void _addToGarden(Map<String, dynamic> plant) {
+    try {
+      // Get the garden controller
+      final gardenController = Get.find<GardenController>();
+      
+      // Create a Plant object from the API data
+      final plantObj = Plant(
+        id: plant['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        commonName: plant['name'] ?? 'Unknown Plant',
+        scientificName: plant['scientific_name'] ?? '',
+        category: 'houseplant',
+        family: 'Unknown',
+        description: plant['description'] ?? '',
+        careRequirements: PlantCareRequirements(
+          water: WaterRequirement(
+            frequency: plant['water_requirement'] ?? 'Weekly',
+            amount: 'medium',
+            notes: plant['water_requirement'] ?? '',
+          ),
+          light: LightRequirement(
+            level: plant['light_requirement'] ?? 'medium',
+            hoursPerDay: 6,
+            placement: 'indoor',
+          ),
+          soilType: 'Well-draining potting mix',
+          growthSeason: 'Spring to Fall',
+          temperature: TemperatureRange(minTemp: 18, maxTemp: 25),
+          fertilizer: 'Monthly',
+          pruning: 'As needed',
+        ),
+        imageUrls: plant['image_url'] != null && plant['image_url'].isNotEmpty 
+            ? [plant['image_url']] 
+            : [],
+        tags: [plant['difficulty'] ?? 'Easy'],
+      );
+      
+      // Add to garden
+      gardenController.addPlantToGarden(plantObj);
+      
+    } catch (e) {
+      print('Error adding to garden: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${plant['name']} added to your garden!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
