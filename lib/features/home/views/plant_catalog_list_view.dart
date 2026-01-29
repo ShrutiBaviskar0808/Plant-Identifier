@@ -46,17 +46,22 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
           final List<Map<String, dynamic>> plantList = [];
           
           jsonData.forEach((key, value) {
-            if (value is Map<String, dynamic>) {
-              plantList.add({
-                'id': key,
-                'name': value['name'] ?? 'Plant $key',
-                'scientific_name': value['scientific_name'] ?? '',
-                'description': value['description'] ?? 'No description available',
-                'image_url': value['image_url'] ?? '',
-                'water_requirement': value['water_requirement'] ?? 'Weekly',
-                'light_requirement': value['light_requirement'] ?? 'Bright light',
-                'difficulty': value['difficulty'] ?? 'Easy',
-              });
+            if (value is List<dynamic>) {
+              print('Processing letter $key with ${value.length} plants');
+              for (var plant in value) {
+                if (plant is Map<String, dynamic>) {
+                  plantList.add({
+                    'id': plant['id']?.toString() ?? plantList.length.toString(),
+                    'name': plant['name'] ?? 'Unknown Plant',
+                    'scientific_name': plant['scientific_name'] ?? '',
+                    'description': plant['description'] ?? 'No description available',
+                    'image_url': plant['image_url'] ?? '',
+                    'water_requirement': plant['water_requirement'] ?? 'Weekly',
+                    'light_requirement': plant['light_requirement'] ?? 'Bright light',
+                    'difficulty': plant['difficulty'] ?? 'Easy',
+                  });
+                }
+              }
             }
           });
 
