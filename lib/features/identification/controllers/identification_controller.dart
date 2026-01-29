@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import '../views/plant_result_view.dart';
 import '../../../core/data/services/plant_database_service.dart';
@@ -47,6 +48,18 @@ class IdentificationController extends GetxController {
 
   Future<void> initializeCamera() async {
     try {
+      // Request camera permission first
+      final status = await Permission.camera.request();
+      
+      if (status != PermissionStatus.granted) {
+        Get.snackbar(
+          'Permission Denied',
+          'Camera permission is required to identify plants',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+      
       final cameras = await availableCameras();
       _cameras.assignAll(cameras);
       

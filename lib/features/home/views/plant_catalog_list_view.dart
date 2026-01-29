@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../../../core/data/models/plant_catalog.dart';
 import 'plant_detail_view.dart';
 
@@ -64,24 +65,42 @@ class PlantCatalogListView extends StatelessWidget {
         contentPadding: EdgeInsets.all(12),
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: Image.asset(
-            plant.imageUrl,
-            width: 60,
-            height: 60,
-            fit: BoxFit.cover,
-            cacheWidth: 120,
-            cacheHeight: 120,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                width: 60,
-                height: 60,
-                color: Colors.grey[300],
-                child: Icon(
-                  Icons.local_florist,
-                  size: 30,
-                  color: Colors.grey[600],
-                ),
-              );
+          child: FutureBuilder<bool>(
+            future: _checkAssetExists(plant.imageUrl, context),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Container(
+                  width: 60,
+                  height: 60,
+                  color: Colors.grey[300],
+                  child: const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                );
+              }
+              
+              if (snapshot.hasData && snapshot.data == true) {
+                return Image.asset(
+                  plant.imageUrl,
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  cacheWidth: kIsWeb ? null : 120,
+                  cacheHeight: kIsWeb ? null : 120,
+                  errorBuilder: (context, error, stackTrace) {
+                    return _buildErrorIcon();
+                  },
+                );
+              }
+              
+              return _buildErrorIcon();
             },
           ),
         ),
@@ -143,6 +162,28 @@ class PlantCatalogListView extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Widget _buildErrorIcon() {
+    return Container(
+      width: 60,
+      height: 60,
+      color: Colors.grey[300],
+      child: const Icon(
+        Icons.local_florist,
+        size: 30,
+        color: Colors.grey,
+      ),
+    );
+  }
+
+  Future<bool> _checkAssetExists(String assetPath, BuildContext context) async {
+    try {
+      await DefaultAssetBundle.of(context).load(assetPath);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   Color _getDifficultyColor(String difficulty) {

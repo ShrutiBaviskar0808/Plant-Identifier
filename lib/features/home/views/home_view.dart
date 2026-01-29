@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../controllers/home_controller.dart';
 import '../../garden/controllers/garden_controller.dart';
-import '../../identification/controllers/identification_controller.dart';
 import '../../care/controllers/care_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
 
@@ -21,24 +20,36 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize all required controllers
+    // Initialize only essential controllers
     Get.put(HomeController());
     Get.put(GardenController());
-    Get.put(IdentificationController());
     Get.put(CareController());
     Get.put(ProfileController());
     
     return Scaffold(
-      body: Obx(() => IndexedStack(
-        index: controller.currentIndex,
-        children: const [
-          PremiumHomeTabView(),
-          CameraView(),
-          GardenView(),
-          CareView(),
-          ProfileView(),
-        ],
-      )),
+      body: Obx(() {
+        Widget currentView;
+        switch (controller.currentIndex) {
+          case 0:
+            currentView = const PremiumHomeTabView();
+            break;
+          case 1:
+            currentView = const CameraView();
+            break;
+          case 2:
+            currentView = const GardenView();
+            break;
+          case 3:
+            currentView = const CareView();
+            break;
+          case 4:
+            currentView = const ProfileView();
+            break;
+          default:
+            currentView = const PremiumHomeTabView();
+        }
+        return currentView;
+      }),
       bottomNavigationBar: Obx(() => Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -98,6 +109,8 @@ class HomeView extends GetView<HomeController> {
       )),
     );
   }
+
+
 }
 
 class PremiumHomeTabView extends StatelessWidget {
@@ -363,21 +376,30 @@ class PremiumHomeTabView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                        Flexible(
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         SizedBox(height: 4),
-                        Text(
-                          subtitle,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.black54,
+                        Flexible(
+                          child: Text(
+                            subtitle,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black54,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],

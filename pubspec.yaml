@@ -20,6 +20,7 @@ dependencies:
   # Camera & Media
   camera: ^0.10.5
   image_picker: ^1.0.4
+  permission_handler: ^11.0.1
 
   # Storage
   sqflite: ^2.3.0

@@ -3,11 +3,31 @@ import 'package:get/get.dart';
 import 'package:camera/camera.dart';
 import '../controllers/identification_controller.dart';
 
-class CameraView extends GetView<IdentificationController> {
+class CameraView extends StatefulWidget {
   const CameraView({super.key});
 
   @override
+  State<CameraView> createState() => _CameraViewState();
+}
+
+class _CameraViewState extends State<CameraView> {
+  IdentificationController? controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controller only when this screen is created
+    controller = Get.put(IdentificationController());
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (controller == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Identify Plant', style: TextStyle(fontSize: 22)),
@@ -15,7 +35,7 @@ class CameraView extends GetView<IdentificationController> {
         foregroundColor: Colors.white,
       ),
       body: Obx(() {
-        if (!controller.isInitialized) {
+        if (!controller!.isInitialized) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -23,7 +43,7 @@ class CameraView extends GetView<IdentificationController> {
           children: [
             // Camera Preview
             SizedBox.expand(
-              child: CameraPreview(controller.cameraController!),
+              child: CameraPreview(controller!.cameraController!),
             ),
             
             // Controls
@@ -48,13 +68,13 @@ class CameraView extends GetView<IdentificationController> {
                   children: [
                     // Gallery Button
                     IconButton(
-                      onPressed: controller.pickFromGallery,
+                      onPressed: controller!.pickFromGallery,
                       icon: const Icon(Icons.photo_library, color: Colors.white, size: 32),
                     ),
                     
                     // Capture Button
                     GestureDetector(
-                      onTap: controller.takePicture,
+                      onTap: controller!.takePicture,
                       child: Container(
                         width: 70,
                         height: 70,
@@ -62,7 +82,7 @@ class CameraView extends GetView<IdentificationController> {
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 3),
                         ),
-                        child: controller.isProcessing
+                        child: controller!.isProcessing
                             ? const CircularProgressIndicator(color: Colors.white)
                             : const Icon(Icons.camera, color: Colors.white, size: 32),
                       ),

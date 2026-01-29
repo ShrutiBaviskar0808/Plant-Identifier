@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../../../core/data/models/plant_catalog.dart';
 
 class PlantDetailView extends StatelessWidget {
@@ -21,16 +22,7 @@ class PlantDetailView extends StatelessWidget {
             Container(
               height: 250,
               width: double.infinity,
-              child: Image.asset(
-                plant.imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[300],
-                    child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
-                  );
-                },
-              ),
+              child: _buildPlantImage(),
             ),
             Padding(
               padding: EdgeInsets.all(16),
@@ -59,6 +51,63 @@ class PlantDetailView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildPlantImage() {
+    return Builder(
+      builder: (context) => FutureBuilder<bool>(
+        future: _checkAssetExists(plant.imageUrl, context),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container(
+              color: Colors.grey[300],
+              child: const Center(
+                child: CircularProgressIndicator(color: Colors.green),
+              ),
+            );
+          }
+          
+          if (snapshot.hasData && snapshot.data == true) {
+            return Image.asset(
+              plant.imageUrl,
+              fit: BoxFit.cover,
+              cacheWidth: kIsWeb ? null : 800,
+              cacheHeight: kIsWeb ? null : 600,
+              errorBuilder: (context, error, stackTrace) {
+                return _buildErrorWidget();
+              },
+            );
+          }
+          
+          return _buildErrorWidget();
+        },
+      ),
+    );
+  }
+
+  Widget _buildErrorWidget() {
+    return Container(
+      color: Colors.grey[300],
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.local_florist, size: 60, color: Colors.grey),
+            SizedBox(height: 8),
+            Text('Image not available', style: TextStyle(color: Colors.grey)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _checkAssetExists(String assetPath, BuildContext context) async {
+    try {
+      await DefaultAssetBundle.of(context).load(assetPath);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   Widget _buildCareInfo() {
