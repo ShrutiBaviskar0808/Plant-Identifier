@@ -5,6 +5,7 @@ import '../controllers/home_controller.dart';
 import '../../garden/controllers/garden_controller.dart';
 import '../../care/controllers/care_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
+import '../../../core/data/models/plant_catalog.dart';
 
 import '../../identification/views/camera_view.dart';
 import '../../identification/views/plant_search_view.dart';
@@ -13,6 +14,7 @@ import '../../care/views/care_view.dart';
 import '../../profile/views/profile_view.dart';
 import '../../notifications/views/notifications_view.dart';
 import 'plant_catalog_view.dart';
+import 'plant_detail_view.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -470,16 +472,16 @@ class PremiumHomeTabView extends StatelessWidget {
           ),
         ),
         Container(
-          height: 250,
+          height: 200,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16),
-            itemCount: 5,
+            itemCount: _getFeaturedPlants().length,
             itemBuilder: (context, index) {
               return Container(
-                width: 180,
-                margin: EdgeInsets.only(right: 16),
-                child: _buildFeaturedPlantCard(index),
+                width: 140,
+                margin: EdgeInsets.only(right: 12),
+                child: _buildFeaturedPlantCard(_getFeaturedPlants()[index]),
               );
             },
           ),
@@ -488,55 +490,73 @@ class PremiumHomeTabView extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturedPlantCard(int index) {
-    final plants = [
+  List<Map<String, String>> _getFeaturedPlants() {
+    return [
       {
         'name': 'Monstera Deliciosa',
-        'image':
-            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300'
+        'image': 'assets/images/monstera deliciosa.jpg',
+        'tag': 'Trending',
       },
       {
         'name': 'Snake Plant',
-        'image':
-            'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=300'
-      },
-      {
-        'name': 'Fiddle Leaf Fig',
-        'image':
-            'https://images.unsplash.com/photo-1545239705-1564e58b9e4a?w=300'
+        'image': 'assets/images/snake plant.jpg',
+        'tag': 'Beginner',
       },
       {
         'name': 'Peace Lily',
-        'image':
-            'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300'
+        'image': 'assets/images/peace lily.jpg',
+        'tag': 'Air Purifier',
+      },
+      {
+        'name': 'Pothos',
+        'image': 'assets/images/pothos.jpg',
+        'tag': 'Low Light',
       },
       {
         'name': 'Rubber Plant',
-        'image':
-            'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300'
+        'image': 'assets/images/rubber plant.jpg',
+        'tag': 'Popular',
+      },
+      {
+        'name': 'ZZ Plant',
+        'image': 'assets/images/zz plant.jpg',
+        'tag': 'Low Care',
       },
     ];
+  }
 
-    final plant = plants[index % plants.length];
-
+  Widget _buildFeaturedPlantCard(Map<String, String> plant) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        // Find the plant in catalog and navigate to details
+        final catalogPlants = PlantCatalogData.getAllPlants();
+        final catalogPlant = catalogPlants.firstWhere(
+          (p) => p.name.toLowerCase() == plant['name']!.toLowerCase(),
+          orElse: () => catalogPlants.first,
+        );
+        Navigator.push(
+          Get.context!,
+          MaterialPageRoute(
+            builder: (context) => PlantDetailView(plant: catalogPlant),
+          ),
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: Offset(0, 4),
+              blurRadius: 8,
+              offset: Offset(0, 2),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           child: Stack(
             children: [
-              Image.network(
+              Image.asset(
                 plant['image']!,
                 width: double.infinity,
                 height: double.infinity,
@@ -545,7 +565,7 @@ class PremiumHomeTabView extends StatelessWidget {
                   return Container(
                     color: Colors.grey[300],
                     child: Icon(Icons.local_florist,
-                        size: 40, color: Colors.grey[600]),
+                        size: 30, color: Colors.grey[600]),
                   );
                 },
               ),
@@ -556,23 +576,42 @@ class PremiumHomeTabView extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withValues(alpha: 0.8),
+                      Colors.black.withValues(alpha: 0.7),
                     ],
                   ),
                 ),
               ),
               Positioned(
-                bottom: 12,
-                left: 12,
-                right: 12,
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    plant['tag']!,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 8,
+                left: 8,
+                right: 8,
                 child: Text(
                   plant['name']!,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
