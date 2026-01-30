@@ -312,7 +312,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    plant.scientificName.isNotEmpty ? plant.scientificName : 'Unknown',
+                    plant.careRequirements.water.frequency.isNotEmpty ? '💧 ${plant.careRequirements.water.frequency}' : '🌱 Low maintenance',
                     style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     overflow: TextOverflow.ellipsis,
                   ),
