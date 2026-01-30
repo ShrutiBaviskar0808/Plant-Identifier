@@ -305,6 +305,7 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
           title: Text(
             widget.plant['name'],
             style: TextStyle(
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
             ),
