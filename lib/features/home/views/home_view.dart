@@ -494,32 +494,32 @@ class PremiumHomeTabView extends StatelessWidget {
     return [
       {
         'name': 'Monstera Deliciosa',
-        'image': 'assets/images/monstera deliciosa.jpg',
+        'image': 'assets/images/Monstera Deliciosa.jpg',
         'tag': 'Trending',
       },
       {
         'name': 'Snake Plant',
-        'image': 'assets/images/snake plant.jpg',
+        'image': 'assets/images/Snake Plant.jpg',
         'tag': 'Beginner',
       },
       {
         'name': 'Peace Lily',
-        'image': 'assets/images/peace lily.jpg',
+        'image': 'assets/images/Peace Lily.jpg',
         'tag': 'Air Purifier',
       },
       {
         'name': 'Pothos',
-        'image': 'assets/images/pothos.jpg',
+        'image': 'assets/images/Pothos.jpg',
         'tag': 'Low Light',
       },
       {
         'name': 'Rubber Plant',
-        'image': 'assets/images/rubber plant.jpg',
+        'image': 'assets/images/Rubber Plant.jpg',
         'tag': 'Popular',
       },
       {
         'name': 'ZZ Plant',
-        'image': 'assets/images/zz plant.jpg',
+        'image': 'assets/images/ZZ Plant.jpg',
         'tag': 'Low Care',
       },
     ];
@@ -563,9 +563,34 @@ class PremiumHomeTabView extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    color: Colors.grey[300],
-                    child: Icon(Icons.local_florist,
-                        size: 30, color: Colors.grey[600]),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.green.withValues(alpha: 0.3),
+                          Colors.green.withValues(alpha: 0.1),
+                        ],
+                      ),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.local_florist, size: 40, color: Colors.green[700]),
+                          SizedBox(height: 4),
+                          Text(
+                            plant['name']!,
+                            style: TextStyle(
+                              color: Colors.green[700],
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),
