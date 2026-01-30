@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'dart:convert';
+import 'dart:async';
 import '../../garden/controllers/garden_controller.dart';
 import '../../../core/data/models/plant.dart';
 
@@ -41,14 +42,29 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
                 if (plant is Map<String, dynamic>) {
                   // ✅ CORRECT IMAGE EXTRACTION
                   String imageUrl = '';
+                  List<String> allImages = [];
+                  
+                  // Extract all images from the images array
                   if (plant['images'] is List && plant['images'].isNotEmpty) {
-                    imageUrl = plant['images'][0].toString();
+                    for (var img in plant['images']) {
+                      if (img != null && img.toString().isNotEmpty) {
+                        String cleanUrl = img.toString().replaceAll('"', '').trim();
+                        if (cleanUrl.startsWith('http')) {
+                          allImages.add(cleanUrl);
+                        }
+                      }
+                    }
+                    // Use first image as main image
+                    if (allImages.isNotEmpty) {
+                      imageUrl = allImages.first;
+                    }
                   }
 
                   plantList.add({
                     'name': plant['name'] ?? 'Unknown Plant',
                     'scientific_name': plant['scientific_name'] ?? '',
                     'image_url': imageUrl,
+                    'images': allImages, // Store all cleaned images
                     'water_requirement': plant['water_requirement'] ?? 'Weekly',
                     'difficulty': plant['difficulty'] ?? 'Easy',
                     'description': plant['description'] ?? '',
@@ -235,10 +251,47 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
   }
 }
 
-class _PlantDetailScreen extends StatelessWidget {
+class _PlantDetailScreen extends StatefulWidget {
   final Map<String, dynamic> plant;
 
   const _PlantDetailScreen({required this.plant});
+
+  @override
+  State<_PlantDetailScreen> createState() => _PlantDetailScreenState();
+}
+
+class _PlantDetailScreenState extends State<_PlantDetailScreen> {
+  late PageController _pageController;
+  late Timer _timer;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _startAutoSlide();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _startAutoSlide() {
+    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
+      final images = _getPlantImages();
+      if (images.isNotEmpty) {
+        _currentPage = (_currentPage + 1) % images.length;
+        _pageController.animateToPage(
+          _currentPage,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,7 +301,7 @@ class _PlantDetailScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            plant['name'],
+            widget.plant['name'],
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
@@ -267,7 +320,13 @@ class _PlantDetailScreen extends StatelessWidget {
               Container(
                 height: 250,
                 child: PageView.builder(
+                  controller: _pageController,
                   itemCount: images.length,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPage = index;
+                    });
+                  },
                   itemBuilder: (context, index) {
                     return Container(
                       margin: EdgeInsets.symmetric(horizontal: 4),
@@ -301,7 +360,7 @@ class _PlantDetailScreen extends StatelessWidget {
                       margin: EdgeInsets.symmetric(horizontal: 2),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.green[300],
+                        color: _currentPage == index ? Colors.green[600] : Colors.green[300],
                       ),
                     ),
                   ),
@@ -309,16 +368,16 @@ class _PlantDetailScreen extends StatelessWidget {
               ],
               SizedBox(height: 16),
               Text(
-                plant['name'],
+                widget.plant['name'],
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 4),
               Text(
-                plant['scientific_name'],
+                widget.plant['scientific_name'],
                 style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[600]),
               ),
               SizedBox(height: 16),
-              if (plant['description'] != null && plant['description'].isNotEmpty) ...[
+              if (widget.plant['description'] != null && widget.plant['description'].isNotEmpty) ...[
                 Text(
                   'Description',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -326,20 +385,20 @@ class _PlantDetailScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 SafeArea(
                   child: Text(
-                    plant['description'],
+                    widget.plant['description'],
                     style: TextStyle(fontSize: 14, height: 1.5),
                   ),
                 ),
                 SizedBox(height: 16),
               ],
-              if (plant['habitat'] != null && plant['habitat'].isNotEmpty) ...[
+              if (widget.plant['habitat'] != null && widget.plant['habitat'].isNotEmpty) ...[
                 Text(
                   'Habitat',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text(
-                  plant['habitat'],
+                  widget.plant['habitat'],
                   style: TextStyle(fontSize: 14, height: 1.5),
                 ),
                 SizedBox(height: 16),
@@ -349,7 +408,7 @@ class _PlantDetailScreen extends StatelessWidget {
                   Icon(Icons.water_drop, color: Colors.blue, size: 20),
                   SizedBox(width: 8),
                   Text(
-                    'Water: ${plant['water_requirement']}',
+                    'Water: ${widget.plant['water_requirement']}',
                     style: TextStyle(fontSize: 14),
                   ),
                 ],
@@ -360,7 +419,7 @@ class _PlantDetailScreen extends StatelessWidget {
                   Icon(Icons.star, color: Colors.orange, size: 20),
                   SizedBox(width: 8),
                   Text(
-                    'Difficulty: ${plant['difficulty']}',
+                    'Difficulty: ${widget.plant['difficulty']}',
                     style: TextStyle(fontSize: 14),
                   ),
                 ],
@@ -393,47 +452,43 @@ class _PlantDetailScreen extends StatelessWidget {
     List<String> images = [];
     
     // Add main image
-    if (plant['image_url'] != null && plant['image_url'].isNotEmpty) {
-      images.add(plant['image_url']);
+    if (widget.plant['image_url'] != null && widget.plant['image_url'].isNotEmpty) {
+      images.add(widget.plant['image_url']);
     }
     
-    // Add additional images from API if available
-    if (plant['images'] is List && plant['images'].isNotEmpty) {
-      for (var img in plant['images']) {
+    // Add additional images from API 'images' array
+    if (widget.plant['images'] is List && widget.plant['images'].isNotEmpty) {
+      for (var img in widget.plant['images']) {
         if (img != null && img.toString().isNotEmpty && images.length < 3) {
-          images.add(img.toString());
-        }
-      }
-    }
-    
-    // Add from plantInfo if available
-    if (plant['plantInfo'] is Map && images.length < 3) {
-      final plantInfo = plant['plantInfo'] as Map;
-      if (plantInfo['additional_images'] is List) {
-        for (var img in plantInfo['additional_images']) {
-          if (img != null && img.toString().isNotEmpty && images.length < 3) {
-            images.add(img.toString());
+          String imageUrl = img.toString();
+          // Clean URL if it has quotes or extra characters
+          imageUrl = imageUrl.replaceAll('"', '').trim();
+          if (imageUrl.startsWith('http') && !images.contains(imageUrl)) {
+            images.add(imageUrl);
           }
         }
       }
     }
     
-    // Remove duplicates
-    images = images.toSet().toList();
-    
-    // Ensure we have exactly 3 images by duplicating if needed
-    final originalImages = List<String>.from(images);
-    while (images.length < 3 && originalImages.isNotEmpty) {
-      for (String img in originalImages) {
-        if (images.length < 3) {
-          images.add(img);
+    // Add from plantInfo if available
+    if (widget.plant['plantInfo'] is Map && images.length < 3) {
+      final plantInfo = widget.plant['plantInfo'] as Map;
+      if (plantInfo['images'] is List) {
+        for (var img in plantInfo['images']) {
+          if (img != null && img.toString().isNotEmpty && images.length < 3) {
+            String imageUrl = img.toString();
+            imageUrl = imageUrl.replaceAll('"', '').trim();
+            if (imageUrl.startsWith('http') && !images.contains(imageUrl)) {
+              images.add(imageUrl);
+            }
+          }
         }
       }
     }
     
-    // If still no images, add placeholders
-    if (images.isEmpty) {
-      images = ['', '', ''];
+    // If we have less than 3 unique images, use placeholders instead of duplicating
+    while (images.length < 3) {
+      images.add(''); // This will show placeholder icon
     }
     
     return images.take(3).toList();
