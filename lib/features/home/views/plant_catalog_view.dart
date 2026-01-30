@@ -226,51 +226,194 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
   }
 
   void _showPlantDetails(Map<String, dynamic> plant) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.8,
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _PlantDetailScreen(plant: plant),
+      ),
+    );
+  }
+}
+
+class _PlantDetailScreen extends StatelessWidget {
+  final Map<String, dynamic> plant;
+
+  const _PlantDetailScreen({required this.plant});
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> images = _getPlantImages();
+    
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            plant['name'],
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.green[800],
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.green[800]),
         ),
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                plant['image_url'],
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image Slider
+              Container(
+                height: 250,
+                child: PageView.builder(
+                  itemCount: images.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      margin: EdgeInsets.symmetric(horizontal: 4),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          images[index],
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.green[300],
+                              child: Icon(Icons.local_florist, size: 60, color: Colors.white),
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-            SizedBox(height: 12),
-            Text(
-              plant['name'],
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              plant['scientific_name'],
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-            SizedBox(height: 16),
-            if (plant['description'] != null && plant['description'].isNotEmpty)
+              if (images.length > 1) ..[
+                SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    images.length,
+                    (index) => Container(
+                      width: 8,
+                      height: 8,
+                      margin: EdgeInsets.symmetric(horizontal: 2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.green[300],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              SizedBox(height: 16),
               Text(
-                plant['description'],
-                style: TextStyle(fontSize: 14),
+                plant['name'],
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-            if (plant['habitat'] != null && plant['habitat'].isNotEmpty)
-              Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Text('Habitat: ${plant['habitat']}'),
+              SizedBox(height: 4),
+              Text(
+                plant['scientific_name'],
+                style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[600]),
               ),
-          ],
+              SizedBox(height: 16),
+              if (plant['description'] != null && plant['description'].isNotEmpty) ...[
+                Text(
+                  'Description',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                SafeArea(
+                  child: Text(
+                    plant['description'],
+                    style: TextStyle(fontSize: 14, height: 1.5),
+                  ),
+                ),
+                SizedBox(height: 16),
+              ],
+              if (plant['habitat'] != null && plant['habitat'].isNotEmpty) ...[
+                Text(
+                  'Habitat',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  plant['habitat'],
+                  style: TextStyle(fontSize: 14, height: 1.5),
+                ),
+                SizedBox(height: 16),
+              ],
+              Row(
+                children: [
+                  Icon(Icons.water_drop, color: Colors.blue, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Water: ${plant['water_requirement']}',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(Icons.star, color: Colors.orange, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Difficulty: ${plant['difficulty']}',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ],
+              ),
+              SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // Add to garden logic here if needed
+                  },
+                  icon: Icon(Icons.add),
+                  label: Text('Add to My Garden'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  List<String> _getPlantImages() {
+    List<String> images = [];
+    
+    // Add main image
+    if (plant['image_url'] != null && plant['image_url'].isNotEmpty) {
+      images.add(plant['image_url']);
+    }
+    
+    // Add additional images from API if available
+    if (plant['images'] is List && plant['images'].isNotEmpty) {
+      for (var img in plant['images']) {
+        if (img != null && img.toString().isNotEmpty) {
+          images.add(img.toString());
+        }
+      }
+    }
+    
+    // Remove duplicates
+    images = images.toSet().toList();
+    
+    // If no images, add placeholder
+    if (images.isEmpty) {
+      images.add(''); // This will trigger error builder
+    }
+    
+    return images;
   }
 }
