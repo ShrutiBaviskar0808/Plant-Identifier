@@ -145,6 +145,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
               fontFamily: 'Poppins',
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
+              fontSize: 18,
             ),
           ),
           backgroundColor: Colors.transparent,
@@ -165,7 +166,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Search plants by name, family...',
-                      hintStyle: TextStyle(fontFamily: 'Poppins'),
+                      hintStyle: TextStyle(fontFamily: 'Poppins', fontSize: 14),
                       prefixIcon: Icon(Icons.search, color: Colors.green),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
@@ -198,7 +199,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                         return Container(
                           margin: EdgeInsets.only(right: 8),
                           child: FilterChip(
-                            label: Text(category),
+                            label: Text(category, style: TextStyle(fontSize: 13)),
                             selected: isSelected,
                             onSelected: (_) => _filterByCategory(category),
                             backgroundColor: Colors.white,
@@ -272,15 +273,29 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                     plant.imageUrls.first,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
+                      // Try assets image as fallback
+                      final assetPath = 'assets/images/${plant.commonName}.jpg';
+                      return Image.asset(
+                        assetPath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.green.withValues(alpha: 0.1),
+                            child: Icon(Icons.local_florist, color: Colors.green, size: 30),
+                          );
+                        },
+                      );
+                    },
+                  )
+                : Image.asset(
+                    'assets/images/${plant.commonName}.jpg',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: Colors.green.withValues(alpha: 0.1),
                         child: Icon(Icons.local_florist, color: Colors.green, size: 30),
                       );
                     },
-                  )
-                : Container(
-                    color: Colors.green.withValues(alpha: 0.1),
-                    child: Icon(Icons.local_florist, color: Colors.green, size: 30),
                   ),
           ),
         ),
