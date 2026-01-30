@@ -63,7 +63,7 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
 
                   plantList.add({
                     'name': plant['name'] ?? 'Unknown Plant',
-                    'scientific_name': plant['scientific_name'] ?? '',
+                    'scientific_name': plant['scientificName'] ?? plant['scientific_name'] ?? '',
                     'image_url': imageUrl,
                     'images': allImages, // Store all cleaned images
                     'water_requirement': plant['water_requirement'] ?? 'Weekly',
@@ -333,20 +333,56 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
                   itemBuilder: (context, index) {
                     return Container(
                       margin: EdgeInsets.symmetric(horizontal: 4),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          images[index],
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.green[300],
-                              child: Icon(Icons.local_florist,
-                                  size: 60, color: Colors.white),
-                            );
-                          },
-                        ),
+                      child: Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              images[index],
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.green[300],
+                                  child: Icon(Icons.local_florist,
+                                      size: 60, color: Colors.white),
+                                );
+                              },
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                  colors: [
+                                    Colors.black.withValues(alpha: 0.7),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(12),
+                                  bottomRight: Radius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                widget.plant['scientific_name'] ?? '',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -379,7 +415,7 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
               ),
               SizedBox(height: 4),
               Text(
-                widget.plant['scientific_name'],
+                widget.plant['scientific_name'] ?? '',
                 style: TextStyle(
                     fontSize: 16,
                     fontStyle: FontStyle.italic,
