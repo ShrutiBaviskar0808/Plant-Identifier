@@ -289,7 +289,7 @@ class _PlantDetailScreen extends StatelessWidget {
                   },
                 ),
               ),
-              if (images.length > 1) ..[
+              if (images.length > 1) ...[
                 SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -400,8 +400,20 @@ class _PlantDetailScreen extends StatelessWidget {
     // Add additional images from API if available
     if (plant['images'] is List && plant['images'].isNotEmpty) {
       for (var img in plant['images']) {
-        if (img != null && img.toString().isNotEmpty) {
+        if (img != null && img.toString().isNotEmpty && images.length < 3) {
           images.add(img.toString());
+        }
+      }
+    }
+    
+    // Add from plantInfo if available
+    if (plant['plantInfo'] is Map && images.length < 3) {
+      final plantInfo = plant['plantInfo'] as Map;
+      if (plantInfo['additional_images'] is List) {
+        for (var img in plantInfo['additional_images']) {
+          if (img != null && img.toString().isNotEmpty && images.length < 3) {
+            images.add(img.toString());
+          }
         }
       }
     }
@@ -409,11 +421,21 @@ class _PlantDetailScreen extends StatelessWidget {
     // Remove duplicates
     images = images.toSet().toList();
     
-    // If no images, add placeholder
-    if (images.isEmpty) {
-      images.add(''); // This will trigger error builder
+    // Ensure we have exactly 3 images by duplicating if needed
+    final originalImages = List<String>.from(images);
+    while (images.length < 3 && originalImages.isNotEmpty) {
+      for (String img in originalImages) {
+        if (images.length < 3) {
+          images.add(img);
+        }
+      }
     }
     
-    return images;
+    // If still no images, add placeholders
+    if (images.isEmpty) {
+      images = ['', '', ''];
+    }
+    
+    return images.take(3).toList();
   }
 }
