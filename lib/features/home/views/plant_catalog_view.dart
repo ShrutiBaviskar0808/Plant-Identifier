@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+// ignore: unused_import
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:convert';
 
@@ -125,42 +126,12 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
           child: Container(
             width: 60,
             height: 60,
-            child: plant['image_url'] != null && plant['image_url'].toString().isNotEmpty
-                ? Image.network(
-                    plant['image_url'].toString(),
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                    headers: {
-                      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    },
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        color: Colors.grey[300],
-                        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      // Fallback to a working plant image URL
-                      return Image.network(
-                        'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=200&h=200&fit=crop',
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.green[300],
-                            child: Icon(Icons.local_florist, color: Colors.white),
-                          );
-                        },
-                      );
-                    },
-                  )
-                : Container(
-                    color: Colors.green[300],
-                    child: Icon(Icons.local_florist, color: Colors.white),
-                  ),
+            child: Image.network(
+              plant['image_url']?.toString() ?? 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=200&h=200&fit=crop',
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         title: Text(
