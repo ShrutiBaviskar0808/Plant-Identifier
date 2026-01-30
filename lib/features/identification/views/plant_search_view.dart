@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../../core/data/models/plant.dart';
 import '../../../core/data/services/plant_database_service.dart';
 import '../../../core/data/services/user_plant_service.dart';
@@ -29,14 +31,80 @@ class _PlantSearchViewState extends State<PlantSearchView> {
   Future<void> _loadAllPlants() async {
     setState(() => _isLoading = true);
     try {
+      // Load database plants
       await _plantService.initializeSampleData();
-      _allPlants = await _plantService.getAllPlants();
+      List<Plant> databasePlants = await _plantService.getAllPlants();
+      
+      // Load catalog plants from API
+      List<Plant> catalogPlants = await _loadCatalogPlants();
+      
+      // Combine both lists
+      _allPlants = [...databasePlants, ...catalogPlants];
       _searchResults = _allPlants;
     } catch (e) {
       Get.snackbar('Error', 'Failed to load plants');
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  Future<List<Plant>> _loadCatalogPlants() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          'https://publicassetsdata.sfo3.cdn.digitaloceanspaces.com/smit/MockAPI/plants_database.json',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final dynamic jsonData = json.decode(response.body);
+        final List<Plant> catalogPlants = [];
+
+        if (jsonData is Map<String, dynamic>) {
+          jsonData.forEach((key, value) {
+            if (value is List) {
+              for (var plant in value) {
+                if (plant is Map<String, dynamic>) {
+                  catalogPlants.add(Plant(
+                    id: plant['name'].toString().replaceAll(' ', '_').toLowerCase(),
+                    commonName: plant['name'] ?? 'Unknown Plant',
+                    scientificName: plant['scientificName'] ?? plant['scientific_name'] ?? '',
+                    category: 'catalog',
+                    family: 'Unknown',
+                    description: plant['description'] ?? '',
+                    imageUrls: plant['images'] is List && plant['images'].isNotEmpty 
+                        ? [plant['images'][0].toString().replaceAll('"', '').trim()] 
+                        : [],
+                    tags: [plant['difficulty'] ?? 'Easy'],
+                    careRequirements: PlantCareRequirements(
+                      water: WaterRequirement(
+                        frequency: plant['water_requirement'] ?? 'Weekly',
+                        amount: 'medium',
+                        notes: '',
+                      ),
+                      light: LightRequirement(
+                        level: 'medium',
+                        hoursPerDay: 6,
+                        placement: 'indoor',
+                      ),
+                      soilType: 'Well-draining',
+                      growthSeason: 'Spring',
+                      temperature: TemperatureRange(minTemp: 18, maxTemp: 25),
+                      fertilizer: 'Monthly',
+                      pruning: 'As needed',
+                    ),
+                  ));
+                }
+              }
+            }
+          });
+        }
+        return catalogPlants;
+      }
+    } catch (e) {
+      print('Error loading catalog plants: $e');
+    }
+    return [];
   }
 
   void _performSearch(String query) {
@@ -68,97 +136,99 @@ class _PlantSearchViewState extends State<PlantSearchView> {
   Widget build(BuildContext context) {
     final categories = ['All', ...(_allPlants.map((p) => p.category).toSet().toList())];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Search Plants',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
-            color: Colors.green[800],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Search Plants',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.bold,
+              color: Colors.green[800],
+            ),
           ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.green[800]),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.green[800]),
-      ),
-      body: Column(
-        children: [
-          // Search Bar
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.green.withValues(alpha: 0.1),
-            ),
-            child: Column(
-              children: [
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search plants by name, family...',
-                    hintStyle: TextStyle(fontFamily: 'Poppins'),
-                    prefixIcon: Icon(Icons.search, color: Colors.green),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              _performSearch('');
-                            },
-                          )
-                        : null,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                  onChanged: _performSearch,
-                ),
-                SizedBox(height: 12),
-                // Category Filter
-                Container(
-                  height: 40,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      final isSelected = category == _selectedCategory;
-                      return Container(
-                        margin: EdgeInsets.only(right: 8),
-                        child: FilterChip(
-                          label: Text(category),
-                          selected: isSelected,
-                          onSelected: (_) => _filterByCategory(category),
-                          backgroundColor: Colors.white,
-                          selectedColor: Colors.green.withValues(alpha: 0.2),
-                          checkmarkColor: Colors.green,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Results
-          Expanded(
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: Colors.green))
-                : _searchResults.isEmpty
-                    ? _buildEmptyState()
-                    : ListView.builder(
-                        padding: EdgeInsets.all(16),
-                        itemCount: _searchResults.length,
-                        itemBuilder: (context, index) {
-                          return _buildPlantCard(_searchResults[index]);
-                        },
+        body: Column(
+          children: [
+            // Search Bar
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(alpha: 0.1),
+              ),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search plants by name, family...',
+                      hintStyle: TextStyle(fontFamily: 'Poppins'),
+                      prefixIcon: Icon(Icons.search, color: Colors.green),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: Icon(Icons.clear),
+                              onPressed: () {
+                                _searchController.clear();
+                                _performSearch('');
+                              },
+                            )
+                          : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
                       ),
-          ),
-        ],
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    onChanged: _performSearch,
+                  ),
+                  SizedBox(height: 12),
+                  // Category Filter
+                  Container(
+                    height: 40,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        final category = categories[index];
+                        final isSelected = category == _selectedCategory;
+                        return Container(
+                          margin: EdgeInsets.only(right: 8),
+                          child: FilterChip(
+                            label: Text(category),
+                            selected: isSelected,
+                            onSelected: (_) => _filterByCategory(category),
+                            backgroundColor: Colors.white,
+                            selectedColor: Colors.green.withValues(alpha: 0.2),
+                            checkmarkColor: Colors.green,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Results
+            Expanded(
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator(color: Colors.green))
+                  : _searchResults.isEmpty
+                      ? _buildEmptyState()
+                      : ListView.builder(
+                          padding: EdgeInsets.all(16),
+                          itemCount: _searchResults.length,
+                          itemBuilder: (context, index) {
+                            return _buildPlantCard(_searchResults[index]);
+                          },
+                        ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -193,10 +263,26 @@ class _PlantSearchViewState extends State<PlantSearchView> {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: Colors.green.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(Icons.local_florist, color: Colors.green, size: 30),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: plant.imageUrls.isNotEmpty
+                ? Image.network(
+                    plant.imageUrls.first,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.green.withValues(alpha: 0.1),
+                        child: Icon(Icons.local_florist, color: Colors.green, size: 30),
+                      );
+                    },
+                  )
+                : Container(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    child: Icon(Icons.local_florist, color: Colors.green, size: 30),
+                  ),
+          ),
         ),
         title: Text(
           plant.commonName,
@@ -225,7 +311,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                 ),
                 SizedBox(width: 8),
                 Text(
-                  plant.family,
+                  plant.scientificName.isNotEmpty ? plant.scientificName : 'Unknown',
                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],
