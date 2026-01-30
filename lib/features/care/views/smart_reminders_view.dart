@@ -19,7 +19,7 @@ class SmartRemindersView extends StatelessWidget {
           elevation: 0,
           iconTheme: IconThemeData(color: Colors.blue[800]),
         ),
-        body: Padding(
+        body: SingleChildScrollView(
           padding: EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
