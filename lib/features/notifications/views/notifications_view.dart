@@ -30,11 +30,21 @@ class _NotificationsViewState extends State<NotificationsView> {
       appBar: AppBar(
         title: Row(
           children: [
-            Icon(Icons.notifications, color: Colors.green),
+            Icon(Icons.notifications, color: Colors.green[800]),
             SizedBox(width: 8),
-            Text('Notifications', style: TextStyle(fontSize: 22)),
+            Text(
+              'Notifications',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[800],
+              ),
+            ),
           ],
         ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.green[800]),
         actions: [
           if (notifications.isNotEmpty)
             TextButton.icon(

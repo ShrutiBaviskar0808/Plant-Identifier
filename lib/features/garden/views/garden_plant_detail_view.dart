@@ -12,9 +12,16 @@ class GardenPlantDetailView extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(userPlant.customName ?? userPlant.plant.commonName),
-          backgroundColor: Colors.green,
-          foregroundColor: Colors.white,
+          title: Text(
+            userPlant.customName ?? userPlant.plant.commonName,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.green[800],
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.green[800]),
         ),
         body: SingleChildScrollView(
           child: Column(

@@ -7,8 +7,16 @@ class HelpSupportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Help & Support'),
+        title: Text(
+          'Help & Support',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.green[800],
+          ),
+        ),
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: IconThemeData(color: Colors.green[800]),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -490,7 +498,16 @@ class _PolicyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.green[800],
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.green[800]),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

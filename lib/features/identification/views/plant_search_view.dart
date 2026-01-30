@@ -70,9 +70,17 @@ class _PlantSearchViewState extends State<PlantSearchView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Search Plants', style: TextStyle(fontFamily: 'Poppins')),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
+        title: Text(
+          'Search Plants',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.bold,
+            color: Colors.green[800],
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.green[800]),
       ),
       body: Column(
         children: [

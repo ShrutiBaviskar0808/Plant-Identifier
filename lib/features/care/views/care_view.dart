@@ -19,6 +19,7 @@ class CareView extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        iconTheme: IconThemeData(color: Colors.green[800]),
         actions: [
           Stack(
             children: [

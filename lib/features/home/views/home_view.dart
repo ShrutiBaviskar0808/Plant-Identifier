@@ -14,7 +14,6 @@ import '../../profile/views/profile_view.dart';
 import '../../notifications/views/notifications_view.dart';
 import 'plant_catalog_view.dart';
 
-
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
 
@@ -25,7 +24,7 @@ class HomeView extends GetView<HomeController> {
     Get.put(GardenController());
     Get.put(CareController());
     Get.put(ProfileController());
-    
+
     return SafeArea(
       child: Scaffold(
         body: Obx(() {
@@ -52,67 +51,69 @@ class HomeView extends GetView<HomeController> {
           return currentView;
         }),
         bottomNavigationBar: Obx(() => Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.white.withValues(alpha: 0.9),
-                Colors.white,
-              ],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 20,
-                offset: Offset(0, -5),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.9),
+                    Colors.white,
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 20,
+                    offset: Offset(0, -5),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            currentIndex: controller.currentIndex,
-            onTap: controller.changeTabIndex,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            selectedItemColor: Colors.green,
-            unselectedItemColor: Colors.grey,
-            selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, fontFamily: 'Poppins'),
-            unselectedLabelStyle: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined),
-                activeIcon: Icon(Icons.home),
-                label: 'Home',
+              child: BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                currentIndex: controller.currentIndex,
+                onTap: controller.changeTabIndex,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                selectedItemColor: Colors.green,
+                unselectedItemColor: Colors.grey,
+                selectedLabelStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    fontFamily: 'Poppins'),
+                unselectedLabelStyle:
+                    TextStyle(fontSize: 14, fontFamily: 'Poppins'),
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home_outlined),
+                    activeIcon: Icon(Icons.home),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.camera_alt_outlined),
+                    activeIcon: Icon(Icons.camera_alt),
+                    label: 'Scan',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.local_florist_outlined),
+                    activeIcon: Icon(Icons.local_florist),
+                    label: 'Garden',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.schedule_outlined),
+                    activeIcon: Icon(Icons.schedule),
+                    label: 'Care',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person_outline),
+                    activeIcon: Icon(Icons.person),
+                    label: 'Profile',
+                  ),
+                ],
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.camera_alt_outlined),
-                activeIcon: Icon(Icons.camera_alt),
-                label: 'Scan',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.local_florist_outlined),
-                activeIcon: Icon(Icons.local_florist),
-                label: 'Garden',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.schedule_outlined),
-                activeIcon: Icon(Icons.schedule),
-                label: 'Care',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                activeIcon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
-          ),
-        )),
+            )),
       ),
     );
   }
-
-
 }
 
 class PremiumHomeTabView extends StatelessWidget {
@@ -131,11 +132,13 @@ class PremiumHomeTabView extends StatelessWidget {
             return Stack(
               children: [
                 IconButton(
-                  icon: Icon(Icons.notifications_outlined, color: Colors.green[800]),
+                  icon: Icon(Icons.notifications_outlined,
+                      color: Colors.green[800]),
                   onPressed: () {
                     controller.getUnreadNotificationCount(); // Update count
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => const NotificationsView()),
+                      MaterialPageRoute(
+                          builder: (context) => const NotificationsView()),
                     );
                   },
                 ),
@@ -246,7 +249,7 @@ class PremiumHomeTabView extends StatelessWidget {
           _buildActionCard(
             icon: Icons.menu_book,
             title: 'Plant Catalog',
-            subtitle: 'Explore 50+ plants with detailed care guides',
+            subtitle: 'Explore 500+ plants with detailed care guides',
             color: Colors.green,
             onTap: () => Navigator.push(
               context,
@@ -292,7 +295,7 @@ class PremiumHomeTabView extends StatelessWidget {
           ),
         );
       }
-      
+
       return Container(
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -321,30 +324,30 @@ class PremiumHomeTabView extends StatelessWidget {
               ],
             ),
             SizedBox(height: 8),
-            ...controller.careReminders.take(2).map((reminder) => 
-              Padding(
-                padding: EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    Icon(Icons.schedule, size: 16, color: Colors.blue[600]),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        '${reminder.plantName} - ${reminder.careType}',
-                        style: TextStyle(fontSize: 14),
-                      ),
+            ...controller.careReminders.take(2).map(
+                  (reminder) => Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Icon(Icons.schedule, size: 16, color: Colors.blue[600]),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${reminder.plantName} - ${reminder.careType}',
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                        Text(
+                          _formatDueTime(reminder.dueDate),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      _formatDueTime(reminder.dueDate),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
           ],
         ),
       );
@@ -487,15 +490,35 @@ class PremiumHomeTabView extends StatelessWidget {
 
   Widget _buildFeaturedPlantCard(int index) {
     final plants = [
-      {'name': 'Monstera Deliciosa', 'image': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300'},
-      {'name': 'Snake Plant', 'image': 'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=300'},
-      {'name': 'Fiddle Leaf Fig', 'image': 'https://images.unsplash.com/photo-1545239705-1564e58b9e4a?w=300'},
-      {'name': 'Peace Lily', 'image': 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300'},
-      {'name': 'Rubber Plant', 'image': 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300'},
+      {
+        'name': 'Monstera Deliciosa',
+        'image':
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300'
+      },
+      {
+        'name': 'Snake Plant',
+        'image':
+            'https://images.unsplash.com/photo-1593691509543-c55fb32d8de5?w=300'
+      },
+      {
+        'name': 'Fiddle Leaf Fig',
+        'image':
+            'https://images.unsplash.com/photo-1545239705-1564e58b9e4a?w=300'
+      },
+      {
+        'name': 'Peace Lily',
+        'image':
+            'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300'
+      },
+      {
+        'name': 'Rubber Plant',
+        'image':
+            'https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=300'
+      },
     ];
-    
+
     final plant = plants[index % plants.length];
-    
+
     return GestureDetector(
       onTap: () {},
       child: Container(
@@ -521,7 +544,8 @@ class PremiumHomeTabView extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     color: Colors.grey[300],
-                    child: Icon(Icons.local_florist, size: 40, color: Colors.grey[600]),
+                    child: Icon(Icons.local_florist,
+                        size: 40, color: Colors.grey[600]),
                   );
                 },
               ),
@@ -672,7 +696,7 @@ class PremiumHomeTabView extends StatelessWidget {
   String _formatDueTime(DateTime dueDate) {
     final now = DateTime.now();
     final difference = dueDate.difference(now);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays}d';
     } else if (difference.inHours > 0) {
@@ -689,7 +713,7 @@ class PremiumHomeTabView extends StatelessWidget {
     String plantName = '';
     String careType = 'Watering';
     DateTime selectedDate = DateTime.now().add(Duration(hours: 1));
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -775,9 +799,11 @@ class PremiumHomeTabView extends StatelessWidget {
             ),
             child: Column(
               children: [
-                _buildTipItem(Icons.water_drop, 'Water plants early morning for best absorption'),
+                _buildTipItem(Icons.water_drop,
+                    'Water plants early morning for best absorption'),
                 SizedBox(height: 12),
-                _buildTipItem(Icons.wb_sunny, 'Rotate plants weekly for even growth'),
+                _buildTipItem(
+                    Icons.wb_sunny, 'Rotate plants weekly for even growth'),
                 SizedBox(height: 12),
                 _buildTipItem(Icons.eco, 'Check soil moisture before watering'),
               ],

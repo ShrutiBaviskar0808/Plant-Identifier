@@ -13,7 +13,18 @@ class GardenView extends GetView<GardenController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Garden', style: TextStyle(fontSize: 22, fontFamily: 'Poppins')),
+        title: Text(
+          'My Garden',
+          style: TextStyle(
+            fontSize: 22,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.bold,
+            color: Colors.green[800],
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.green[800]),
       ),
       body: Obx(() {
         if (controller.isLoading) {

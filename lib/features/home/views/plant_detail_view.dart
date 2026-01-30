@@ -19,9 +19,16 @@ class PlantDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(plantName),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
+        title: Text(
+          plantName,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.green[800],
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.green[800]),
       ),
       body: SingleChildScrollView(
         child: Column(

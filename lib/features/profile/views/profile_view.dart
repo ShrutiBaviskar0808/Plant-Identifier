@@ -11,7 +11,17 @@ class ProfileView extends GetView<ProfileController> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Profile', style: TextStyle(fontSize: 22)),
+          title: Text(
+            'Profile',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.green[800],
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.green[800]),
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

@@ -30,9 +30,17 @@ class _CameraViewState extends State<CameraView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Identify Plant', style: TextStyle(fontSize: 22)),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
+        title: Text(
+          'Identify Plant',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Colors.green[800],
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.green[800]),
       ),
       body: Obx(() {
         if (!controller!.isInitialized) {
