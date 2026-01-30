@@ -43,12 +43,13 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
                   // ✅ CORRECT IMAGE EXTRACTION
                   String imageUrl = '';
                   List<String> allImages = [];
-                  
+
                   // Extract all images from the images array
                   if (plant['images'] is List && plant['images'].isNotEmpty) {
                     for (var img in plant['images']) {
                       if (img != null && img.toString().isNotEmpty) {
-                        String cleanUrl = img.toString().replaceAll('"', '').trim();
+                        String cleanUrl =
+                            img.toString().replaceAll('"', '').trim();
                         if (cleanUrl.startsWith('http')) {
                           allImages.add(cleanUrl);
                         }
@@ -95,6 +96,7 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
           title: Text(
             'Plant Catalog',
             style: TextStyle(
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
             ),
@@ -296,7 +298,7 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final List<String> images = _getPlantImages();
-    
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -339,7 +341,8 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
                               color: Colors.green[300],
-                              child: Icon(Icons.local_florist, size: 60, color: Colors.white),
+                              child: Icon(Icons.local_florist,
+                                  size: 60, color: Colors.white),
                             );
                           },
                         ),
@@ -360,7 +363,9 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
                       margin: EdgeInsets.symmetric(horizontal: 2),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _currentPage == index ? Colors.green[600] : Colors.green[300],
+                        color: _currentPage == index
+                            ? Colors.green[600]
+                            : Colors.green[300],
                       ),
                     ),
                   ),
@@ -374,10 +379,14 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
               SizedBox(height: 4),
               Text(
                 widget.plant['scientific_name'],
-                style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[600]),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.grey[600]),
               ),
               SizedBox(height: 16),
-              if (widget.plant['description'] != null && widget.plant['description'].isNotEmpty) ...[
+              if (widget.plant['description'] != null &&
+                  widget.plant['description'].isNotEmpty) ...[
                 Text(
                   'Description',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -391,7 +400,8 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
                 ),
                 SizedBox(height: 16),
               ],
-              if (widget.plant['habitat'] != null && widget.plant['habitat'].isNotEmpty) ...[
+              if (widget.plant['habitat'] != null &&
+                  widget.plant['habitat'].isNotEmpty) ...[
                 Text(
                   'Habitat',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -425,20 +435,48 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
                 ],
               ),
               SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // Add to garden logic here if needed
-                  },
-                  icon: Icon(Icons.add),
-                  label: Text('Add to My Garden'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 12),
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.green.withValues(alpha: 0.1), Colors.blue.withValues(alpha: 0.05)],
                   ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Plant Care Tips',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.lightbulb, color: Colors.orange, size: 16),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Best grown in bright, indirect sunlight',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.schedule, color: Colors.blue, size: 16),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Water when top soil feels dry',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -450,12 +488,13 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
 
   List<String> _getPlantImages() {
     List<String> images = [];
-    
+
     // Add main image
-    if (widget.plant['image_url'] != null && widget.plant['image_url'].isNotEmpty) {
+    if (widget.plant['image_url'] != null &&
+        widget.plant['image_url'].isNotEmpty) {
       images.add(widget.plant['image_url']);
     }
-    
+
     // Add additional images from API 'images' array
     if (widget.plant['images'] is List && widget.plant['images'].isNotEmpty) {
       for (var img in widget.plant['images']) {
@@ -469,7 +508,7 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
         }
       }
     }
-    
+
     // Add from plantInfo if available
     if (widget.plant['plantInfo'] is Map && images.length < 3) {
       final plantInfo = widget.plant['plantInfo'] as Map;
@@ -485,12 +524,12 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
         }
       }
     }
-    
+
     // If we have less than 3 unique images, use placeholders instead of duplicating
     while (images.length < 3) {
       images.add(''); // This will show placeholder icon
     }
-    
+
     return images.take(3).toList();
   }
 }
