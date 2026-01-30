@@ -8,75 +8,78 @@ class ProfileView extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile', style: TextStyle(fontSize: 22)),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Profile Header
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      child: const Icon(Icons.person, size: 40, color: Colors.white),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Plant Enthusiast',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Profile', style: TextStyle(fontSize: 22)),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // Profile Header
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        child: const Icon(Icons.person, size: 40, color: Colors.white),
                       ),
-                    ),
-                    Text(
-                      'Member since 2024',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Plant Enthusiast',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                      Text(
+                        'Member since 2024',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            
-            const SizedBox(height: 24),
-            
-            // Menu Items
-            _buildMenuItem(
-              context,
-              Icons.local_florist,
-              'My Plants',
-              'View your plant collection',
-              () => Get.find<HomeController>().changeTabIndex(2),
-            ),
-            _buildMenuItem(
-              context,
-              Icons.settings,
-              'Settings',
-              'App preferences',
-              () => controller.showSettings(),
-            ),
-            _buildMenuItem(
-              context,
-              Icons.help,
-              'Help & Support',
-              'Get help and support',
-              () => controller.showHelp(),
-            ),
-            _buildMenuItem(
-              context,
-              Icons.info,
-              'About',
-              'About this app',
-              () => controller.showAbout(),
-            ),
-          ],
+              
+              const SizedBox(height: 24),
+              
+              // Menu Items
+              _buildMenuItem(
+                context,
+                Icons.local_florist,
+                'My Plants',
+                'View your plant collection',
+                () => Get.find<HomeController>().changeTabIndex(2),
+              ),
+              _buildMenuItem(
+                context,
+                Icons.settings,
+                'Settings',
+                'App preferences',
+                () => controller.showSettings(),
+              ),
+              _buildMenuItem(
+                context,
+                Icons.help,
+                'Help & Support',
+                'Get help and support',
+                () => controller.showHelp(),
+              ),
+              _buildMenuItem(
+                context,
+                Icons.info,
+                'About',
+                'About this app',
+                () => controller.showAbout(),
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );

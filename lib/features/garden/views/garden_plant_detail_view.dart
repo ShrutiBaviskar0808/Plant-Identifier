@@ -9,88 +9,93 @@ class GardenPlantDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(userPlant.customName ?? userPlant.plant.commonName),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 250,
-              width: double.infinity,
-              child: userPlant.imagePath != null
-                  ? Image.file(
-                      File(userPlant.imagePath!),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[300],
-                          child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
-                        );
-                      },
-                    )
-                  : userPlant.plant.imageUrls.isNotEmpty
-                      ? Image.asset(
-                          userPlant.plant.imageUrls.first,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[300],
-                              child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
-                            );
-                          },
-                        )
-                      : Container(
-                          color: Colors.grey[300],
-                          child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
-                        ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    userPlant.customName ?? userPlant.plant.commonName,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    userPlant.plant.scientificName,
-                    style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[600]),
-                  ),
-                  SizedBox(height: 8),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'Added: ${userPlant.dateAdded.day}/${userPlant.dateAdded.month}/${userPlant.dateAdded.year}',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    userPlant.plant.description,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 20),
-                  _buildCareInfo(),
-                  if (userPlant.notes != null && userPlant.notes!.isNotEmpty) ...[
-                    SizedBox(height: 20),
-                    _buildNotesSection(),
-                  ],
-                ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(userPlant.customName ?? userPlant.plant.commonName),
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 250,
+                width: double.infinity,
+                child: userPlant.imagePath != null
+                    ? Image.file(
+                        File(userPlant.imagePath!),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return _buildNetworkOrPlaceholderImage();
+                        },
+                      )
+                    : _buildNetworkOrPlaceholderImage(),
               ),
-            ),
-          ],
+              Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      userPlant.customName ?? userPlant.plant.commonName,
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      userPlant.plant.scientificName,
+                      style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.grey[600]),
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'Added: ${userPlant.dateAdded.day}/${userPlant.dateAdded.month}/${userPlant.dateAdded.year}',
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      userPlant.plant.description,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 20),
+                    _buildCareInfo(),
+                    if (userPlant.notes != null && userPlant.notes!.isNotEmpty) ...[
+                      SizedBox(height: 20),
+                      _buildNotesSection(),
+                    ],
+                    SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildNetworkOrPlaceholderImage() {
+    if (userPlant.plant.imageUrls.isNotEmpty) {
+      return Image.network(
+        userPlant.plant.imageUrls.first,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
+          );
+        },
+      );
+    }
+    return Container(
+      color: Colors.grey[300],
+      child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
     );
   }
 

@@ -26,87 +26,89 @@ class HomeView extends GetView<HomeController> {
     Get.put(CareController());
     Get.put(ProfileController());
     
-    return Scaffold(
-      body: Obx(() {
-        Widget currentView;
-        switch (controller.currentIndex) {
-          case 0:
-            currentView = const PremiumHomeTabView();
-            break;
-          case 1:
-            currentView = const CameraView();
-            break;
-          case 2:
-            currentView = const GardenView();
-            break;
-          case 3:
-            currentView = const CareView();
-            break;
-          case 4:
-            currentView = const ProfileView();
-            break;
-          default:
-            currentView = const PremiumHomeTabView();
-        }
-        return currentView;
-      }),
-      bottomNavigationBar: Obx(() => Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.white.withValues(alpha: 0.9),
-              Colors.white,
+    return SafeArea(
+      child: Scaffold(
+        body: Obx(() {
+          Widget currentView;
+          switch (controller.currentIndex) {
+            case 0:
+              currentView = const PremiumHomeTabView();
+              break;
+            case 1:
+              currentView = const CameraView();
+              break;
+            case 2:
+              currentView = const GardenView();
+              break;
+            case 3:
+              currentView = const CareView();
+              break;
+            case 4:
+              currentView = const ProfileView();
+              break;
+            default:
+              currentView = const PremiumHomeTabView();
+          }
+          return currentView;
+        }),
+        bottomNavigationBar: Obx(() => Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.white.withValues(alpha: 0.9),
+                Colors.white,
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: Offset(0, -5),
+              ),
             ],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 20,
-              offset: Offset(0, -5),
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          currentIndex: controller.currentIndex,
-          onTap: controller.changeTabIndex,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          selectedItemColor: Colors.green,
-          unselectedItemColor: Colors.grey,
-          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, fontFamily: 'Poppins'),
-          unselectedLabelStyle: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.camera_alt_outlined),
-              activeIcon: Icon(Icons.camera_alt),
-              label: 'Scan',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.local_florist_outlined),
-              activeIcon: Icon(Icons.local_florist),
-              label: 'Garden',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.schedule_outlined),
-              activeIcon: Icon(Icons.schedule),
-              label: 'Care',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-        ),
-      )),
+          child: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            currentIndex: controller.currentIndex,
+            onTap: controller.changeTabIndex,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            selectedItemColor: Colors.green,
+            unselectedItemColor: Colors.grey,
+            selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, fontFamily: 'Poppins'),
+            unselectedLabelStyle: TextStyle(fontSize: 14, fontFamily: 'Poppins'),
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                activeIcon: Icon(Icons.home),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.camera_alt_outlined),
+                activeIcon: Icon(Icons.camera_alt),
+                label: 'Scan',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.local_florist_outlined),
+                activeIcon: Icon(Icons.local_florist),
+                label: 'Garden',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.schedule_outlined),
+                activeIcon: Icon(Icons.schedule),
+                label: 'Care',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline),
+                activeIcon: Icon(Icons.person),
+                label: 'Profile',
+              ),
+            ],
+          ),
+        )),
+      ),
     );
   }
 
@@ -224,7 +226,7 @@ class PremiumHomeTabView extends StatelessWidget {
                   _buildQuickTipsSection(),
                   _buildWeatherSection(),
                   _buildPlantOfTheWeekSection(),
-                  SizedBox(height: 20),
+                  SizedBox(height: 30),
                 ],
               ),
             ),

@@ -51,6 +51,9 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
                     'image_url': imageUrl,
                     'water_requirement': plant['water_requirement'] ?? 'Weekly',
                     'difficulty': plant['difficulty'] ?? 'Easy',
+                    'description': plant['description'] ?? '',
+                    'habitat': plant['habitat'] ?? '',
+                    'plantInfo': plant['plantInfo'] ?? {},
                   });
                 }
               }
@@ -70,41 +73,43 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Plant Catalog',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.green[800],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Plant Catalog',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.green[800],
+            ),
           ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.green[800]),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.green[800]),
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF4CAF50).withValues(alpha: 0.1),
-              Color(0xFF8BC34A).withValues(alpha: 0.05),
-            ],
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF4CAF50).withValues(alpha: 0.1),
+                Color(0xFF8BC34A).withValues(alpha: 0.05),
+              ],
+            ),
           ),
+          child: isLoading
+              ? Center(
+                  child: CircularProgressIndicator(color: Colors.green),
+                )
+              : ListView.builder(
+                  padding: EdgeInsets.fromLTRB(16, 16, 16, 20),
+                  itemCount: plants.length,
+                  itemBuilder: (context, index) {
+                    return _buildPlantCard(plants[index], context);
+                  },
+                ),
         ),
-        child: isLoading
-            ? Center(
-                child: CircularProgressIndicator(color: Colors.green),
-              )
-            : ListView.builder(
-                padding: EdgeInsets.all(16),
-                itemCount: plants.length,
-                itemBuilder: (context, index) {
-                  return _buildPlantCard(plants[index], context);
-                },
-              ),
       ),
     );
   }
@@ -196,7 +201,7 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
         scientificName: plant['scientific_name'],
         category: 'houseplant',
         family: 'Unknown',
-        description: 'Added from catalog',
+        description: plant['description'] ?? 'Added from catalog',
         imageUrls: plant['image_url'].isNotEmpty ? [plant['image_url']] : [],
         tags: [plant['difficulty']],
         careRequirements: PlantCareRequirements(
@@ -252,6 +257,17 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
               plant['scientific_name'],
               style: TextStyle(fontStyle: FontStyle.italic),
             ),
+            SizedBox(height: 16),
+            if (plant['description'] != null && plant['description'].isNotEmpty)
+              Text(
+                plant['description'],
+                style: TextStyle(fontSize: 14),
+              ),
+            if (plant['habitat'] != null && plant['habitat'].isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text('Habitat: ${plant['habitat']}'),
+              ),
           ],
         ),
       ),
