@@ -274,7 +274,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       // Try assets image as fallback
-                      final assetPath = 'assets/images/${plant.commonName}.jpg';
+                      final assetPath = 'assets/images/${plant.commonName.toLowerCase()}.jpg';
                       return Image.asset(
                         assetPath,
                         fit: BoxFit.cover,
@@ -288,7 +288,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                     },
                   )
                 : Image.asset(
-                    'assets/images/${plant.commonName}.jpg',
+                    'assets/images/${plant.commonName.toLowerCase()}.jpg',
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
