@@ -1,14 +1,71 @@
 import 'package:flutter/material.dart';
-import '../../../core/data/models/plant_catalog.dart';
-import 'plant_detail_view.dart';
+import 'package:http/http.dart' as http;
+import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:convert';
 
-class PlantCatalogView extends StatelessWidget {
+class PlantCatalogView extends StatefulWidget {
   const PlantCatalogView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final plants = PlantCatalogData.getAllPlants();
+  State<PlantCatalogView> createState() => _PlantCatalogViewState();
+}
 
+class _PlantCatalogViewState extends State<PlantCatalogView> {
+  List<Map<String, dynamic>> plants = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlants();
+  }
+
+  Future<void> _loadPlants() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://publicassetsdata.sfo3.cdn.digitaloceanspaces.com/smit/MockAPI/plants_database.json'),
+      );
+
+      if (response.statusCode == 200) {
+        final dynamic jsonData = json.decode(response.body);
+        final List<Map<String, dynamic>> plantList = [];
+        
+        if (jsonData is Map<String, dynamic>) {
+          jsonData.forEach((key, value) {
+            if (value is List<dynamic>) {
+              for (var plant in value) {
+                if (plant is Map<String, dynamic>) {
+                  final imageUrl = plant['image_url']?.toString() ?? '';
+                  print('Plant: ${plant['name']}, Image URL: $imageUrl');
+                  plantList.add({
+                    'name': plant['name'] ?? 'Unknown Plant',
+                    'scientific_name': plant['scientific_name'] ?? '',
+                    'image_url': imageUrl,
+                    'water_requirement': plant['water_requirement'] ?? 'Weekly',
+                    'difficulty': plant['difficulty'] ?? 'Easy',
+                  });
+                }
+              }
+            }
+          });
+        }
+
+        print('Total plants loaded: ${plantList.length}');
+        setState(() {
+          plants = plantList;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading plants: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -33,152 +90,100 @@ class PlantCatalogView extends StatelessWidget {
             ],
           ),
         ),
-        child: GridView.builder(
-          padding: EdgeInsets.all(16),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.8,
-          ),
-          itemCount: plants.length,
-          cacheExtent: 200,
-          itemBuilder: (context, index) {
-            final plant = plants[index];
-            return _buildPlantCard(plant, context);
-          },
-        ),
+        child: isLoading
+            ? Center(child: CircularProgressIndicator(color: Colors.green))
+            : ListView.builder(
+                padding: EdgeInsets.all(16),
+                itemCount: plants.length,
+                itemBuilder: (context, index) {
+                  final plant = plants[index];
+                  return _buildPlantCard(plant, context);
+                },
+              ),
       ),
     );
   }
 
-  Widget _buildPlantCard(PlantCatalogItem plant, BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlantDetailView(plant: plant),
+  Widget _buildPlantCard(Map<String, dynamic> plant, BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 3,
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                child: Image.asset(
-                  plant.imageUrl,
-                  width: double.infinity,
-                  height: double.infinity,
+        ],
+      ),
+      child: ListTile(
+        contentPadding: EdgeInsets.all(12),
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: plant['image_url'] != null && plant['image_url'].toString().isNotEmpty
+              ? CachedNetworkImage(
+                  imageUrl: plant['image_url'].toString(),
+                  width: 60,
+                  height: 60,
                   fit: BoxFit.cover,
-                  cacheWidth: 200,
-                  cacheHeight: 200,
-                  errorBuilder: (context, error, stackTrace) {
+                  placeholder: (context, url) => Container(
+                    width: 60,
+                    height: 60,
+                    color: Colors.grey[300],
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  errorWidget: (context, url, error) {
+                    print('Image load error for ${plant['name']}: $error');
                     return Container(
-                      color: Colors.grey[300],
-                      child: Icon(
-                        Icons.local_florist,
-                        size: 40,
-                        color: Colors.grey[600],
-                      ),
+                      width: 60,
+                      height: 60,
+                      color: Colors.green[300],
+                      child: Icon(Icons.local_florist, color: Colors.white),
                     );
                   },
+                )
+              : Container(
+                  width: 60,
+                  height: 60,
+                  color: Colors.green[300],
+                  child: Icon(Icons.local_florist, color: Colors.white),
                 ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(6),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    plant.name,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 1),
-                  Text(
-                    plant.scientificName,
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey[600],
-                      fontStyle: FontStyle.italic,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 3),
-                  Row(
-                    children: [
-                      Icon(Icons.water_drop, size: 10, color: Colors.blue),
-                      SizedBox(width: 2),
-                      Expanded(
-                        child: Text(
-                          plant.waterRequirement.frequency,
-                          style: TextStyle(fontSize: 9, color: Colors.grey[700]),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 3),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: _getDifficultyColor(plant.difficulty),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      plant.difficulty,
-                      style: TextStyle(
-                        fontSize: 8,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        ),
+        title: Text(
+          plant['name'] ?? 'Unknown Plant',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.water_drop, size: 14, color: Colors.blue),
+                SizedBox(width: 4),
+                Text(
+                  plant['water_requirement'] ?? 'Weekly',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                ),
+              ],
             ),
           ],
         ),
+        trailing: ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          ),
+          child: Text('Add to Garden', style: TextStyle(fontSize: 10)),
+        ),
       ),
     );
-  }
-
-  Color _getDifficultyColor(String difficulty) {
-    switch (difficulty.toLowerCase()) {
-      case 'very easy':
-        return Colors.green;
-      case 'easy':
-        return Colors.lightGreen;
-      case 'moderate':
-        return Colors.orange;
-      case 'hard':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
   }
 }

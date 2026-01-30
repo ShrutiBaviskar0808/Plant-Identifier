@@ -440,40 +440,25 @@ class _PlantCatalogListViewState extends State<PlantCatalogListView> {
   }
 
   Widget _buildPlantImage(Map<String, dynamic> plant) {
-    final plantName = plant['name']?.toString().toLowerCase() ?? '';
+    final imageUrl = plant['image_url']?.toString() ?? '';
     
-    // Use plant-specific search terms for better images
-    String searchTerm = 'plant';
-    
-    if (plantName.contains('velvetleaf')) {
-      searchTerm = 'velvetleaf+plant+leaf';
-    } else if (plantName.contains('mercury')) {
-      searchTerm = 'mercury+plant+green+leaf';
-    } else if (plantName.contains('box+elder')) {
-      searchTerm = 'box+elder+tree+leaves';
-    } else if (plantName.contains('japanese+maple')) {
-      searchTerm = 'japanese+maple+tree+red+leaves';
-    } else if (plantName.contains('norway+maple')) {
-      searchTerm = 'norway+maple+tree+leaves';
-    } else if (plantName.contains('sycamore')) {
-      searchTerm = 'sycamore+tree+leaves';
+    if (imageUrl.isNotEmpty) {
+      return Image.network(
+        imageUrl,
+        width: 60,
+        height: 60,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return _buildPlaceholderImage();
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return _buildPlaceholderImage();
+        },
+      );
     }
     
-    final imageUrl = 'https://source.unsplash.com/200x200/?$searchTerm';
-    
-    return Image.network(
-      imageUrl,
-      width: 60,
-      height: 60,
-      fit: BoxFit.cover,
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return _buildPlaceholderImage();
-      },
-      errorBuilder: (context, error, stackTrace) {
-        return _buildPlaceholderImage();
-      },
-    );
+    return _buildPlaceholderImage();
   }
 
   Widget _buildPlaceholderImage() {
