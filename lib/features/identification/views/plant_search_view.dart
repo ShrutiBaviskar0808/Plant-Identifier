@@ -310,9 +310,12 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                   ),
                 ),
                 SizedBox(width: 8),
-                Text(
-                  plant.scientificName.isNotEmpty ? plant.scientificName : 'Unknown',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                Expanded(
+                  child: Text(
+                    plant.scientificName.isNotEmpty ? plant.scientificName : 'Unknown',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
