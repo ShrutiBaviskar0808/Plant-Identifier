@@ -122,34 +122,46 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
         contentPadding: EdgeInsets.all(12),
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: plant['image_url'] != null && plant['image_url'].toString().isNotEmpty
-              ? CachedNetworkImage(
-                  imageUrl: plant['image_url'].toString(),
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
+          child: Container(
+            width: 60,
+            height: 60,
+            child: plant['image_url'] != null && plant['image_url'].toString().isNotEmpty
+                ? Image.network(
+                    plant['image_url'].toString(),
                     width: 60,
                     height: 60,
-                    color: Colors.grey[300],
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    fit: BoxFit.cover,
+                    headers: {
+                      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.grey[300],
+                        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback to a working plant image URL
+                      return Image.network(
+                        'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=200&h=200&fit=crop',
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.green[300],
+                            child: Icon(Icons.local_florist, color: Colors.white),
+                          );
+                        },
+                      );
+                    },
+                  )
+                : Container(
+                    color: Colors.green[300],
+                    child: Icon(Icons.local_florist, color: Colors.white),
                   ),
-                  errorWidget: (context, url, error) {
-                    print('Image load error for ${plant['name']}: $error');
-                    return Container(
-                      width: 60,
-                      height: 60,
-                      color: Colors.green[300],
-                      child: Icon(Icons.local_florist, color: Colors.white),
-                    );
-                  },
-                )
-              : Container(
-                  width: 60,
-                  height: 60,
-                  color: Colors.green[300],
-                  child: Icon(Icons.local_florist, color: Colors.white),
-                ),
+          ),
         ),
         title: Text(
           plant['name'] ?? 'Unknown Plant',
