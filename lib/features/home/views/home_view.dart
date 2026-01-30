@@ -12,7 +12,7 @@ import '../../garden/views/garden_view.dart';
 import '../../care/views/care_view.dart';
 import '../../profile/views/profile_view.dart';
 import '../../notifications/views/notifications_view.dart';
-import 'plant_catalog_list_view.dart';
+import 'plant_catalog_view.dart';
 
 
 class HomeView extends GetView<HomeController> {
@@ -248,7 +248,7 @@ class PremiumHomeTabView extends StatelessWidget {
             color: Colors.green,
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PlantCatalogListView()),
+              MaterialPageRoute(builder: (context) => PlantCatalogView()),
             ),
             isFullWidth: true,
           ),
