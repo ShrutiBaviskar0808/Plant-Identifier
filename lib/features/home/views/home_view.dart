@@ -15,6 +15,10 @@ import '../../profile/views/profile_view.dart';
 import '../../notifications/views/notifications_view.dart';
 import 'plant_catalog_view.dart';
 import 'plant_detail_view.dart';
+import '../../care/views/smart_reminders_view.dart';
+import '../../care/views/light_tracker_view.dart';
+import '../../care/views/soil_analysis_view.dart';
+import '../../care/views/growth_stats_view.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -227,7 +231,7 @@ class PremiumHomeTabView extends StatelessWidget {
                   ),
                   _buildQuickActions(context),
                   _buildFeaturedSection(),
-                  _buildPlantCareTools(),
+                  _buildPlantCareTools(context),
                   _buildQuickTipsSection(),
                   _buildWeatherSection(),
                   _buildPlantOfTheWeekSection(),
@@ -647,7 +651,7 @@ class PremiumHomeTabView extends StatelessWidget {
     );
   }
 
-  Widget _buildPlantCareTools() {
+  Widget _buildPlantCareTools(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -678,24 +682,40 @@ class PremiumHomeTabView extends StatelessWidget {
                 title: 'Smart Reminders',
                 subtitle: 'Never miss care',
                 color: Colors.blue,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SmartRemindersView()),
+                ),
               ),
               _buildFeatureCard(
                 icon: Icons.wb_sunny,
                 title: 'Light Tracker',
                 subtitle: 'Optimal lighting',
                 color: Colors.orange,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LightTrackerView()),
+                ),
               ),
               _buildFeatureCard(
                 icon: Icons.science,
                 title: 'Soil Analysis',
                 subtitle: 'Test soil health',
                 color: Colors.brown,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SoilAnalysisView()),
+                ),
               ),
               _buildFeatureCard(
                 icon: Icons.trending_up,
                 title: 'Growth Stats',
                 subtitle: 'Track progress',
                 color: Colors.green,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => GrowthStatsView()),
+                ),
               ),
             ],
           ),
@@ -709,50 +729,54 @@ class PremiumHomeTabView extends StatelessWidget {
     required String title,
     required String subtitle,
     required Color color,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            color.withValues(alpha: 0.1),
-            color.withValues(alpha: 0.05),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withValues(alpha: 0.1),
+              color.withValues(alpha: 0.05),
+            ],
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 36),
+            SizedBox(height: 6),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.black54,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 36),
-          SizedBox(height: 6),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: 2),
-          Text(
-            subtitle,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.black54,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
       ),
     );
   }
