@@ -364,173 +364,10 @@ class _PlantSearchViewState extends State<PlantSearchView> {
   }
 
   void _showPlantDetails(Plant plant) {
-    Get.bottomSheet(
-      Container(
-        height: MediaQuery.of(Get.context!).size.height * 0.85,
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Plant Image
-            Container(
-              height: 200,
-              width: double.infinity,
-              margin: EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: Colors.grey[200],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: plant.imageUrls.isNotEmpty
-                    ? Image.network(
-                        plant.imageUrls.first,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.green.withValues(alpha: 0.1),
-                            child: Icon(Icons.local_florist, color: Colors.green, size: 60),
-                          );
-                        },
-                      )
-                    : Container(
-                        color: Colors.green.withValues(alpha: 0.1),
-                        child: Icon(Icons.local_florist, color: Colors.green, size: 60),
-                      ),
-              ),
-            ),
-            // Plant Info
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.local_florist, color: Colors.green, size: 24),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            plant.commonName,
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      plant.scientificName,
-                      style: TextStyle(fontStyle: FontStyle.italic, fontSize: 16),
-                    ),
-                    SizedBox(height: 16),
-                    _buildDetailRow('Category', plant.category),
-                    _buildDetailRow('Family', plant.family),
-                    SizedBox(height: 16),
-                    Text(
-                      'Care Requirements',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    _buildCareDetails(plant.careRequirements),
-                    SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ),
-            // Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => Get.back(),
-                    icon: Icon(Icons.close),
-                    label: Text('Close'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[600],
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Get.back();
-                      _showAddToGardenDialog(plant);
-                    },
-                    icon: Icon(Icons.add),
-                    label: Text('Add to Garden'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              '$label:',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-          Expanded(child: Text(value)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCareDetails(PlantCareRequirements care) {
-    return Container(
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.green.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          _buildCareRow(Icons.water_drop, 'Water', '${care.water.frequency}'),
-          _buildCareRow(Icons.wb_sunny, 'Light', '${care.light.level}'),
-          _buildCareRow(Icons.thermostat, 'Temperature', '${care.temperature.minTemp}-${care.temperature.maxTemp}°C'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCareRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: Colors.green[700]),
-          SizedBox(width: 8),
-          SizedBox(
-            width: 80,
-            child: Text(
-              '$label:',
-              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
-            ),
-          ),
-          Expanded(
-            child: Text(value, style: TextStyle(fontSize: 12)),
-          ),
-        ],
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _PlantDetailFullScreen(plant: plant),
       ),
     );
   }
@@ -642,5 +479,125 @@ class _PlantSearchViewState extends State<PlantSearchView> {
         colorText: Colors.white,
       );
     }
+  }
+}
+
+class _PlantDetailFullScreen extends StatelessWidget {
+  final Plant plant;
+
+  const _PlantDetailFullScreen({required this.plant});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            plant.commonName,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.green[800],
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.green[800]),
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Plant Image
+              Container(
+                height: 250,
+                width: double.infinity,
+                margin: EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey[200],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: plant.imageUrls.isNotEmpty
+                      ? Image.network(
+                          plant.imageUrls.first,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.green.withValues(alpha: 0.1),
+                              child: Icon(Icons.local_florist, color: Colors.green, size: 60),
+                            );
+                          },
+                        )
+                      : Container(
+                          color: Colors.green.withValues(alpha: 0.1),
+                          child: Icon(Icons.local_florist, color: Colors.green, size: 60),
+                        ),
+                ),
+              ),
+              // Plant Info
+              Text(
+                plant.commonName,
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                plant.scientificName,
+                style: TextStyle(fontStyle: FontStyle.italic, fontSize: 16, color: Colors.grey[600]),
+              ),
+              SizedBox(height: 16),
+              if (plant.description.isNotEmpty) ...[
+                Text(
+                  'Description',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  plant.description,
+                  style: TextStyle(fontSize: 14, height: 1.4),
+                ),
+                SizedBox(height: 16),
+              ],
+              Text('Category: ${plant.category}'),
+              Text('Family: ${plant.family}'),
+              SizedBox(height: 16),
+              Text(
+                'Care Requirements',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.water_drop, size: 16, color: Colors.green[700]),
+                        SizedBox(width: 8),
+                        Text('Water: ${plant.careRequirements.water.frequency}'),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.wb_sunny, size: 16, color: Colors.green[700]),
+                        SizedBox(width: 8),
+                        Text('Light: ${plant.careRequirements.light.level}'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

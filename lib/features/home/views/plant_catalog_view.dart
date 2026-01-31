@@ -314,210 +314,216 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
           elevation: 0,
           iconTheme: IconThemeData(color: Colors.green[800]),
         ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image Slider
-              Container(
-                height: 250,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: images.length,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentPage = index;
-                    });
-                  },
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: EdgeInsets.symmetric(horizontal: 4),
-                      child: Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              images[index],
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.green[300],
-                                  child: Icon(Icons.local_florist,
-                                      size: 60, color: Colors.white),
-                                );
-                              },
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.bottomCenter,
-                                  end: Alignment.topCenter,
-                                  colors: [
-                                    Colors.black.withValues(alpha: 0.7),
-                                    Colors.transparent,
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(12),
-                                  bottomRight: Radius.circular(12),
-                                ),
-                              ),
-                              child: Text(
-                                widget.plant['scientific_name'] ?? '',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontStyle: FontStyle.italic,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-              if (images.length > 1) ...[
-                SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    images.length,
-                    (index) => Container(
-                      width: 8,
-                      height: 8,
-                      margin: EdgeInsets.symmetric(horizontal: 2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _currentPage == index
-                            ? Colors.green[600]
-                            : Colors.green[300],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-              SizedBox(height: 16),
-              Text(
-                widget.plant['name'],
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4),
-              Text(
-                widget.plant['scientific_name'] ?? '',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontStyle: FontStyle.italic,
-                    color: Colors.grey[600]),
-              ),
-              SizedBox(height: 16),
-              if (widget.plant['description'] != null &&
-                  widget.plant['description'].isNotEmpty) ...[
-                Text(
-                  'Description',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                SafeArea(
-                  child: Text(
-                    widget.plant['description'],
-                    style: TextStyle(fontSize: 14, height: 1.5),
-                  ),
-                ),
-                SizedBox(height: 16),
-              ],
-              if (widget.plant['habitat'] != null &&
-                  widget.plant['habitat'].isNotEmpty) ...[
-                Text(
-                  'Habitat',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  widget.plant['habitat'],
-                  style: TextStyle(fontSize: 14, height: 1.5),
-                ),
-                SizedBox(height: 16),
-              ],
-              Row(
-                children: [
-                  Icon(Icons.water_drop, color: Colors.blue, size: 20),
-                  SizedBox(width: 8),
-                  Text(
-                    'Water: ${widget.plant['water_requirement']}',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ],
-              ),
-              SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(Icons.star, color: Colors.orange, size: 20),
-                  SizedBox(width: 8),
-                  Text(
-                    'Difficulty: ${widget.plant['difficulty']}',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ],
-              ),
-              SizedBox(height: 24),
-              Container(
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
                 padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.green.withValues(alpha: 0.1), Colors.blue.withValues(alpha: 0.05)],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Image Slider
+                    Container(
+                      height: 250,
+                      width: double.infinity,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: images.length,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentPage = index;
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  child: Image.network(
+                                    images[index],
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: Colors.green[300],
+                                        child: Icon(Icons.local_florist,
+                                            size: 60, color: Colors.white),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  left: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.bottomCenter,
+                                        end: Alignment.topCenter,
+                                        colors: [
+                                          Colors.black.withValues(alpha: 0.7),
+                                          Colors.transparent,
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(12),
+                                        bottomRight: Radius.circular(12),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      widget.plant['scientific_name'] ?? '',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    if (images.length > 1) ...[
+                      SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          images.length,
+                          (index) => Container(
+                            width: 8,
+                            height: 8,
+                            margin: EdgeInsets.symmetric(horizontal: 2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _currentPage == index
+                                  ? Colors.green[600]
+                                  : Colors.green[300],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                    SizedBox(height: 16),
                     Text(
-                      'Plant Care Tips',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      widget.plant['name'],
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      widget.plant['scientific_name'] ?? '',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.grey[600]),
+                    ),
+                    SizedBox(height: 16),
+                    if (widget.plant['description'] != null &&
+                        widget.plant['description'].isNotEmpty) ...[
+                      Text(
+                        'Description',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        widget.plant['description'],
+                        style: TextStyle(fontSize: 14, height: 1.5),
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                    if (widget.plant['habitat'] != null &&
+                        widget.plant['habitat'].isNotEmpty) ...[
+                      Text(
+                        'Habitat',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        widget.plant['habitat'],
+                        style: TextStyle(fontSize: 14, height: 1.5),
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                    Row(
+                      children: [
+                        Icon(Icons.water_drop, color: Colors.blue, size: 20),
+                        SizedBox(width: 8),
+                        Text(
+                          'Water: ${widget.plant['water_requirement']}',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.lightbulb, color: Colors.orange, size: 16),
+                        Icon(Icons.star, color: Colors.orange, size: 20),
                         SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Best grown in bright, indirect sunlight',
-                            style: TextStyle(fontSize: 12),
-                          ),
+                        Text(
+                          'Difficulty: ${widget.plant['difficulty']}',
+                          style: TextStyle(fontSize: 14),
                         ),
                       ],
                     ),
-                    SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(Icons.schedule, color: Colors.blue, size: 16),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Water when top soil feels dry',
-                            style: TextStyle(fontSize: 12),
-                          ),
+                    SizedBox(height: 24),
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.green.withValues(alpha: 0.1), Colors.blue.withValues(alpha: 0.05)],
                         ),
-                      ],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Plant Care Tips',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(Icons.lightbulb, color: Colors.orange, size: 16),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Best grown in bright, indirect sunlight',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(Icons.schedule, color: Colors.blue, size: 16),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Water when top soil feels dry',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
+                    SizedBox(height: 80), // Extra space at bottom
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
