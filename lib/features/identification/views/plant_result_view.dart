@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:io';
 import '../../../core/data/models/plant.dart';
-import '../../../core/data/services/user_plant_service.dart';
 import '../../garden/controllers/garden_controller.dart';
 
 class PlantResultView extends StatelessWidget {
@@ -19,104 +18,106 @@ class PlantResultView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Plant Identification',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.green[800],
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.green[800]),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: _buildImageWidget(),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Plant Identification',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.green[800],
             ),
-            
-            SizedBox(height: 20),
-            
-            // Identification Results
-            if (identificationResults.isNotEmpty) ...{
-              Text(
-                'Identification Results',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green[700],
-                ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.green[800]),
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: _buildImageWidget(),
               ),
-              SizedBox(height: 16),
               
-              // Top match
-              _buildPlantCard(identificationResults.first, confidence, true),
+              SizedBox(height: 20),
               
-              // Other matches
-              if (identificationResults.length > 1) ...{
-                SizedBox(height: 16),
+              // Identification Results
+              if (identificationResults.isNotEmpty) ...{
                 Text(
-                  'Other Possible Matches',
+                  'Identification Results',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: Colors.green[700],
                   ),
                 ),
-                SizedBox(height: 8),
-                ...identificationResults.skip(1).map((plant) => 
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 8),
-                    child: _buildPlantCard(plant, confidence - 0.1, false),
-                  )
-                ),
-              },
-            } else ...{
-              _buildNoResultsCard(),
-            },
-            
-            SizedBox(height: 30),
-            
-            // Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(Icons.camera_alt),
-                    label: Text('Scan Another'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[600],
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 12),
+                SizedBox(height: 16),
+                
+                // Top match
+                _buildPlantCard(identificationResults.first, confidence, true),
+                
+                // Other matches
+                if (identificationResults.length > 1) ...{
+                  SizedBox(height: 16),
+                  Text(
+                    'Other Possible Matches',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                if (identificationResults.isNotEmpty) ...{
-                  SizedBox(width: 12),
+                  SizedBox(height: 8),
+                  ...identificationResults.skip(1).map((plant) => 
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8),
+                      child: _buildPlantCard(plant, confidence - 0.1, false),
+                    )
+                  ),
+                },
+              } else ...{
+                _buildNoResultsCard(),
+              },
+              
+              SizedBox(height: 30),
+              
+              // Action Buttons
+              Row(
+                children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () => _showSaveDialog(context, identificationResults.first),
-                      icon: Icon(Icons.add),
-                      label: Text('Save to Garden'),
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(Icons.camera_alt),
+                      label: Text('Scan Another'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: Colors.grey[600],
                         foregroundColor: Colors.white,
                         padding: EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
-                },
-              ],
-            ),
-          ],
+                  if (identificationResults.isNotEmpty) ...{
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _showSaveDialog(context, identificationResults.first),
+                        icon: Icon(Icons.add),
+                        label: Text('Save to Garden'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  },
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -279,7 +280,10 @@ class PlantResultView extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: TextStyle(fontSize: 12),
+              style: TextStyle(
+                color: Colors.grey[700],
+                fontSize: 12,
+              ),
             ),
           ),
         ],
@@ -289,75 +293,35 @@ class PlantResultView extends StatelessWidget {
 
   Widget _buildImageWidget() {
     return Container(
-      height: 200,
       width: double.infinity,
-      child: FutureBuilder<bool>(
-        future: _checkImageExists(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container(
-              color: Colors.grey[300],
-              child: Center(
-                child: CircularProgressIndicator(color: Colors.green),
-              ),
-            );
-          }
-          
-          if (snapshot.hasData && snapshot.data == true) {
-            return Image.file(
-              File(imagePath),
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return _buildImageErrorWidget();
-              },
-            );
-          }
-          
-          return _buildImageErrorWidget();
+      height: 250,
+      child: Image.file(
+        File(imagePath),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: Icon(
+              Icons.image_not_supported,
+              size: 50,
+              color: Colors.grey[600],
+            ),
+          );
         },
-      ),
-    );
-  }
-
-  Future<bool> _checkImageExists() async {
-    try {
-      final file = File(imagePath);
-      return await file.exists();
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Widget _buildImageErrorWidget() {
-    return Container(
-      height: 200,
-      width: double.infinity,
-      color: Colors.grey[300],
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.image_not_supported, size: 48, color: Colors.grey[600]),
-          SizedBox(height: 8),
-          Text(
-            'Image not available',
-            style: TextStyle(color: Colors.grey[600]),
-          ),
-        ],
       ),
     );
   }
 
   Widget _buildNoResultsCard() {
     return Card(
+      elevation: 2,
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.all(24),
         child: Column(
           children: [
             Icon(
               Icons.search_off,
-              size: 48,
+              size: 64,
               color: Colors.grey[400],
             ),
             SizedBox(height: 16),
@@ -366,13 +330,17 @@ class PlantResultView extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Colors.grey[700],
               ),
             ),
             SizedBox(height: 8),
             Text(
               'Try taking a clearer photo with better lighting, or focus on leaves/flowers.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
             ),
           ],
         ),
@@ -381,109 +349,41 @@ class PlantResultView extends StatelessWidget {
   }
 
   void _showSaveDialog(BuildContext context, Plant plant) {
-    final nameController = TextEditingController(text: plant.commonName);
-    final notesController = TextEditingController();
-    String selectedGroup = 'decorative';
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Save to My Garden'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: 'Plant Name',
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                ),
-              ),
-              SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: selectedGroup,
-                decoration: InputDecoration(
-                  labelText: 'Group',
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                ),
-                items: ['indoor', 'outdoor', 'edible', 'decorative']
-                    .map((group) => DropdownMenuItem(
-                          value: group,
-                          child: Text(group.capitalize!),
-                        ))
-                    .toList(),
-                onChanged: (value) => selectedGroup = value!,
-              ),
-              SizedBox(height: 12),
-              TextField(
-                controller: notesController,
-                decoration: InputDecoration(
-                  labelText: 'Notes (optional)',
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                ),
-                maxLines: 2,
-              ),
-            ],
-          ),
-        ),
+        title: Text('Save to Garden'),
+        content: Text('Add "${plant.commonName}" to your garden collection?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.pop(context),
             child: Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () => _savePlant(
-              context,
-              plant,
-              nameController.text,
-              notesController.text,
-              selectedGroup,
-            ),
+            onPressed: () async {
+              try {
+                final gardenController = Get.find<GardenController>();
+                await gardenController.addPlantToGarden(plant);
+                Navigator.pop(context);
+                Get.snackbar(
+                  'Success',
+                  'Plant added to your garden!',
+                  backgroundColor: Colors.green,
+                  colorText: Colors.white,
+                );
+              } catch (e) {
+                Get.snackbar(
+                  'Error',
+                  'Failed to save plant: $e',
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+              }
+            },
             child: Text('Save'),
           ),
         ],
       ),
     );
-  }
-
-  Future<void> _savePlant(BuildContext context, Plant plant, String customName, String notes, String group) async {
-    try {
-      final userPlantService = UserPlantService();
-      await userPlantService.addPlant(
-        plant,
-        customName: customName.isNotEmpty ? customName : null,
-        notes: notes.isNotEmpty ? notes : null,
-        group: group,
-        imagePath: imagePath,
-      );
-
-      // Refresh garden data
-      final gardenController = Get.find<GardenController>();
-      await gardenController.loadUserPlants();
-
-      Navigator.of(context).pop(); // Close dialog
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Plant saved to your garden successfully'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          margin: EdgeInsets.all(16),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to save plant: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
   }
 }
