@@ -27,28 +27,49 @@ class ProfileView extends GetView<ProfileController> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // Profile Header
+              // Plant Care Tips Card
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        child: const Icon(Icons.person, size: 40, color: Colors.white),
+                      Row(
+                        children: [
+                          Icon(Icons.lightbulb, color: Colors.amber, size: 28),
+                          SizedBox(width: 12),
+                          Text(
+                            'Daily Plant Tip',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green[700],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Plant Enthusiast',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
                         ),
-                      ),
-                      Text(
-                        'Member since 2024',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        child: Row(
+                          children: [
+                            Icon(Icons.water_drop, color: Colors.blue, size: 20),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Water your plants early morning for best absorption and growth.',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                  height: 1.3,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

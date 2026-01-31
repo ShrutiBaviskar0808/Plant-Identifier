@@ -31,13 +31,21 @@ class GardenPlantDetailView extends StatelessWidget {
                 height: 250,
                 width: double.infinity,
                 child: userPlant.imagePath != null
-                    ? Image.file(
-                        File(userPlant.imagePath!),
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildNetworkOrPlaceholderImage();
-                        },
-                      )
+                    ? userPlant.imagePath!.startsWith('http')
+                        ? Image.network(
+                            userPlant.imagePath!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return _buildNetworkOrPlaceholderImage();
+                            },
+                          )
+                        : Image.file(
+                            File(userPlant.imagePath!),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return _buildNetworkOrPlaceholderImage();
+                            },
+                          )
                     : _buildNetworkOrPlaceholderImage(),
               ),
               Padding(

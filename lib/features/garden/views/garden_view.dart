@@ -223,18 +223,34 @@ class _PlantCard extends StatelessWidget {
                 child: plant.imagePath != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                        child: Image.file(
-                          File(plant.imagePath!),
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(Icons.local_florist, size: 48);
-                          },
-                        ),
+                        child: plant.imagePath!.startsWith('http')
+                            ? Image.network(
+                                plant.imagePath!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(Icons.local_florist, size: 48);
+                                },
+                              )
+                            : Image.file(
+                                File(plant.imagePath!),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return plant.plant.imageUrls.isNotEmpty
+                                      ? Image.network(
+                                          plant.plant.imageUrls.first,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Icon(Icons.local_florist, size: 48);
+                                          },
+                                        )
+                                      : Icon(Icons.local_florist, size: 48);
+                                },
+                              ),
                       )
                     : plant.plant.imageUrls.isNotEmpty
                         ? ClipRRect(
                             borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                            child: Image.asset(
+                            child: Image.network(
                               plant.plant.imageUrls.first,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {

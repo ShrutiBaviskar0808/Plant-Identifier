@@ -366,43 +366,82 @@ class _PlantSearchViewState extends State<PlantSearchView> {
   void _showPlantDetails(Plant plant) {
     Get.bottomSheet(
       Container(
+        height: MediaQuery.of(Get.context!).size.height * 0.85,
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Icon(Icons.local_florist, color: Colors.green, size: 24),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    plant.commonName,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
+            // Plant Image
+            Container(
+              height: 200,
+              width: double.infinity,
+              margin: EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.grey[200],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: plant.imageUrls.isNotEmpty
+                    ? Image.network(
+                        plant.imageUrls.first,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.green.withValues(alpha: 0.1),
+                            child: Icon(Icons.local_florist, color: Colors.green, size: 60),
+                          );
+                        },
+                      )
+                    : Container(
+                        color: Colors.green.withValues(alpha: 0.1),
+                        child: Icon(Icons.local_florist, color: Colors.green, size: 60),
+                      ),
+              ),
+            ),
+            // Plant Info
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.local_florist, color: Colors.green, size: 24),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            plant.commonName,
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      plant.scientificName,
+                      style: TextStyle(fontStyle: FontStyle.italic, fontSize: 16),
+                    ),
+                    SizedBox(height: 16),
+                    _buildDetailRow('Category', plant.category),
+                    _buildDetailRow('Family', plant.family),
+                    SizedBox(height: 16),
+                    Text(
+                      'Care Requirements',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    _buildCareDetails(plant.careRequirements),
+                    SizedBox(height: 20),
+                  ],
                 ),
-              ],
+              ),
             ),
-            SizedBox(height: 8),
-            Text(
-              plant.scientificName,
-              style: TextStyle(fontStyle: FontStyle.italic, fontSize: 16),
-            ),
-            SizedBox(height: 16),
-            _buildDetailRow('Category', plant.category),
-            _buildDetailRow('Family', plant.family),
-            SizedBox(height: 16),
-            Text(
-              'Care Requirements',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            _buildCareDetails(plant.careRequirements),
-            SizedBox(height: 20),
+            // Action Buttons
             Row(
               children: [
                 Expanded(
@@ -562,11 +601,19 @@ class _PlantSearchViewState extends State<PlantSearchView> {
   Future<void> _addPlantToGarden(Plant plant, String customName, String notes, String group) async {
     try {
       final userPlantService = UserPlantService();
+      
+      // For catalog plants, we'll use the network image URL as imagePath
+      String? imagePath;
+      if (plant.imageUrls.isNotEmpty) {
+        imagePath = plant.imageUrls.first;
+      }
+      
       await userPlantService.addPlant(
         plant,
         customName: customName.isNotEmpty ? customName : null,
         notes: notes.isNotEmpty ? notes : null,
         group: group,
+        imagePath: imagePath,
       );
 
       // Refresh garden data if controller exists
@@ -582,7 +629,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
       Get.snackbar(
         'Success!',
         'Plant added to your garden successfully',
-        snackPosition: SnackPosition.TOP,
+        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
         icon: Icon(Icons.check_circle, color: Colors.white),
