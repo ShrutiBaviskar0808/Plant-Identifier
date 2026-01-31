@@ -128,9 +128,10 @@ class UserPlantService {
   // Get plants added this month
   int getPlantsAddedThisMonth() {
     final now = DateTime.now();
-    final thisMonth = DateTime(now.year, now.month);
+    final thisMonth = DateTime(now.year, now.month, 1); // Start of current month
     return _userPlants.where((plant) {
-      return plant.dateAdded.isAfter(thisMonth);
+      return plant.dateAdded.isAfter(thisMonth.subtract(Duration(days: 1))) && 
+             plant.dateAdded.isBefore(now.add(Duration(days: 1)));
     }).length;
   }
 }

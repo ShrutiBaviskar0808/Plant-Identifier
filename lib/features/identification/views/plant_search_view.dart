@@ -279,6 +279,8 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                         assetPath = 'assets/images/Monstera Deliciosa.jpg';
                       } else if (plant.commonName.toLowerCase().contains('snake')) {
                         assetPath = 'assets/images/Snake Plant.jpg';
+                      } else if (plant.commonName.toLowerCase().contains('hibiscus')) {
+                        assetPath = 'assets/images/hibiscus.jpg';
                       } else {
                         assetPath = 'assets/images/${plant.commonName}.jpg';
                       }
@@ -301,6 +303,8 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                       assetPath = 'assets/images/Monstera Deliciosa.jpg';
                     } else if (plant.commonName.toLowerCase().contains('snake')) {
                       assetPath = 'assets/images/Snake Plant.jpg';
+                    } else if (plant.commonName.toLowerCase().contains('hibiscus')) {
+                      assetPath = 'assets/images/hibiscus.jpg';
                     } else {
                       assetPath = 'assets/images/${plant.commonName}.jpg';
                     }
