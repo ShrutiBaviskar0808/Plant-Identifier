@@ -14,6 +14,7 @@ class IdentificationController extends GetxController {
   final RxList<CameraDescription> _cameras = <CameraDescription>[].obs;
   final RxBool _isInitialized = false.obs;
   final RxBool _isProcessing = false.obs;
+  final RxString _flashMode = 'off'.obs;
   final ImagePicker _imagePicker = ImagePicker();
   final PlantDatabaseService _plantService = PlantDatabaseService();
   final ImageAnalysisService _imageAnalysisService = ImageAnalysisService();
@@ -23,6 +24,7 @@ class IdentificationController extends GetxController {
   List<CameraDescription> get cameras => _cameras;
   bool get isInitialized => _isInitialized.value;
   bool get isProcessing => _isProcessing.value;
+  String get flashMode => _flashMode.value;
   List<Plant> get identificationResults => _identificationResults;
 
   @override
@@ -184,5 +186,28 @@ class IdentificationController extends GetxController {
         ),
       ),
     );
+  }
+
+  Future<void> toggleFlash() async {
+    if (_cameraController?.value.isInitialized != true) return;
+    
+    try {
+      switch (_flashMode.value) {
+        case 'off':
+          await _cameraController!.setFlashMode(FlashMode.auto);
+          _flashMode.value = 'auto';
+          break;
+        case 'auto':
+          await _cameraController!.setFlashMode(FlashMode.always);
+          _flashMode.value = 'on';
+          break;
+        case 'on':
+          await _cameraController!.setFlashMode(FlashMode.off);
+          _flashMode.value = 'off';
+          break;
+      }
+    } catch (e) {
+      print('Failed to toggle flash: $e');
+    }
   }
 }

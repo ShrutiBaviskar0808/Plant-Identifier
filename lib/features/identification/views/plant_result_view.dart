@@ -174,6 +174,24 @@ class PlantResultView extends StatelessWidget {
                 fontSize: 14,
               ),
             ),
+            SizedBox(height: 12),
+            // Plant Description
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
+              ),
+              child: Text(
+                plant.description,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[800],
+                  height: 1.4,
+                ),
+              ),
+            ),
             SizedBox(height: 8),
             _buildInfoRow('Category', plant.category),
             _buildInfoRow('Family', plant.family),

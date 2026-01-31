@@ -97,10 +97,18 @@ class _CameraViewState extends State<CameraView> {
                     ),
                     
                     // Flash Button
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.flash_off, color: Colors.white, size: 32),
-                    ),
+                    Obx(() => IconButton(
+                      onPressed: controller!.toggleFlash,
+                      icon: Icon(
+                        controller!.flashMode == 'off' 
+                          ? Icons.flash_off
+                          : controller!.flashMode == 'auto'
+                            ? Icons.flash_auto
+                            : Icons.flash_on,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                    )),
                   ],
                 ),
               ),
