@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/data/services/notification_service.dart';
+import 'watering_guide_view.dart';
+import 'light_requirements_view.dart';
+import 'fertilizing_tips_view.dart';
+import 'pest_control_view.dart';
 
 
-class CareView extends StatelessWidget {
+class CareView extends StatefulWidget {
   const CareView({super.key});
+
+  @override
+  State<CareView> createState() => _CareViewState();
+}
+
+class _CareViewState extends State<CareView> {
+  List<bool> taskCompleted = [false, false, false];
 
   @override
   Widget build(BuildContext context) {
@@ -20,44 +31,7 @@ class CareView extends StatelessWidget {
           ),
         ),
         iconTheme: IconThemeData(color: Colors.green[800]),
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: Icon(Icons.notifications_outlined, color: Colors.green[800]),
-                onPressed: () {},
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  constraints: BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
-                  ),
-                  child: Text(
-                    '3',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          IconButton(
-            icon: Icon(Icons.search, color: Colors.green[800]),
-            onPressed: () {},
-          ),
-        ],
+
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -193,6 +167,9 @@ class CareView extends StatelessWidget {
                   ),
                   child: InkWell(
                     onTap: () {
+                      setState(() {
+                        taskCompleted[reminders.indexOf(reminder)] = !taskCompleted[reminders.indexOf(reminder)];
+                      });
                       NotificationService.addNotification(PlantNotification(
                         id: DateTime.now().millisecondsSinceEpoch.toString(),
                         title: 'Task Completed! 🎉',
@@ -206,7 +183,7 @@ class CareView extends StatelessWidget {
                       );
                     },
                     child: Icon(
-                      Icons.check,
+                      taskCompleted[reminders.indexOf(reminder)] ? Icons.check : Icons.add,
                       color: Colors.green,
                       size: 20,
                     ),
@@ -281,17 +258,24 @@ class CareView extends StatelessWidget {
             childAspectRatio: 1.1,
             children: guides.map((guide) => InkWell(
               onTap: () {
-                NotificationService.addNotification(PlantNotification(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
-                  title: 'Care Guide Accessed',
-                  message: 'Opened ${guide['title']} - ${guide['desc']}',
-                  type: NotificationType.general,
-                ));
-                Get.snackbar(
-                  guide['title'] as String,
-                  guide['desc'] as String,
-                  snackPosition: SnackPosition.BOTTOM,
-                );
+                Widget targetView;
+                switch (guide['title']) {
+                  case 'Watering Guide':
+                    targetView = WateringGuideView();
+                    break;
+                  case 'Light Requirements':
+                    targetView = LightRequirementsView();
+                    break;
+                  case 'Fertilizing Tips':
+                    targetView = FertilizingTipsView();
+                    break;
+                  case 'Pest Control':
+                    targetView = PestControlView();
+                    break;
+                  default:
+                    targetView = WateringGuideView();
+                }
+                Navigator.push(context, MaterialPageRoute(builder: (context) => targetView));
               },
               child: Container(
                 padding: EdgeInsets.all(16),
