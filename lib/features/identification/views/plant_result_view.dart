@@ -363,7 +363,10 @@ class PlantResultView extends StatelessWidget {
             onPressed: () async {
               try {
                 final gardenController = Get.find<GardenController>();
-                await gardenController.addPlantToGarden(plant);
+                await gardenController.addPlantToGarden(
+                  plant,
+                  imagePath: imagePath, // Pass the scanned image path
+                );
                 Navigator.pop(context);
                 Get.snackbar(
                   'Success',

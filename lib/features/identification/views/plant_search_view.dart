@@ -273,8 +273,15 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                     plant.imageUrls.first,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
-                      // Try assets image as fallback
-                      final assetPath = 'assets/images/${plant.commonName.toLowerCase()}.jpg';
+                      // Try assets image as fallback with correct naming
+                      String assetPath;
+                      if (plant.commonName.toLowerCase().contains('monstera')) {
+                        assetPath = 'assets/images/Monstera Deliciosa.jpg';
+                      } else if (plant.commonName.toLowerCase().contains('snake')) {
+                        assetPath = 'assets/images/Snake Plant.jpg';
+                      } else {
+                        assetPath = 'assets/images/${plant.commonName}.jpg';
+                      }
                       return Image.asset(
                         assetPath,
                         fit: BoxFit.cover,
@@ -287,16 +294,27 @@ class _PlantSearchViewState extends State<PlantSearchView> {
                       );
                     },
                   )
-                : Image.asset(
-                    'assets/images/${plant.commonName.toLowerCase()}.jpg',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.green.withValues(alpha: 0.1),
-                        child: Icon(Icons.local_florist, color: Colors.green, size: 30),
-                      );
-                    },
-                  ),
+                : () {
+                    // Direct asset loading with correct naming
+                    String assetPath;
+                    if (plant.commonName.toLowerCase().contains('monstera')) {
+                      assetPath = 'assets/images/Monstera Deliciosa.jpg';
+                    } else if (plant.commonName.toLowerCase().contains('snake')) {
+                      assetPath = 'assets/images/Snake Plant.jpg';
+                    } else {
+                      assetPath = 'assets/images/${plant.commonName}.jpg';
+                    }
+                    return Image.asset(
+                      assetPath,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.green.withValues(alpha: 0.1),
+                          child: Icon(Icons.local_florist, color: Colors.green, size: 30),
+                        );
+                      },
+                    );
+                  }(),
           ),
         ),
         title: Text(

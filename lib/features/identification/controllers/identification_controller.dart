@@ -75,25 +75,134 @@ class IdentificationController extends GetxController {
 
   Future<void> _setupCamera() async {
     try {
-      // Request permission using system dialog
-      final status = await Permission.camera.request();
-      if (status != PermissionStatus.granted) {
-        Get.snackbar(
-          'Permission Denied',
-          'Camera permission is required',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        return;
-      }
-      
-      await _initializeCamera();
+      // Always show permission dialog first
+      await _showCameraPermissionDialog();
     } catch (e) {
       Get.snackbar(
         'Camera Error',
-        'Failed to setup camera',
+        'Failed to setup camera: $e',
         snackPosition: SnackPosition.BOTTOM,
       );
     }
+  }
+
+  Future<void> _showCameraPermissionDialog() async {
+    await Get.dialog(
+      Material(
+        color: Colors.black.withValues(alpha: 0.8),
+        child: Center(
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 40),
+            padding: EdgeInsets.symmetric(vertical: 40, horizontal: 32),
+            decoration: BoxDecoration(
+              color: Color(0xFF3A3A3C),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF5A5A5C),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(Icons.videocam, color: Colors.white, size: 40),
+                ),
+                SizedBox(height: 32),
+                Text(
+                  'Allow Plant Identifier\nto take pictures and\nrecord video?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                  ),
+                ),
+                SizedBox(height: 40),
+                Container(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      Get.back();
+                      final status = await Permission.camera.request();
+                      if (status == PermissionStatus.granted) {
+                        await _initializeCamera();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF007AFF),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: Text(
+                      'While using the app',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      Get.back();
+                      final status = await Permission.camera.request();
+                      if (status == PermissionStatus.granted) {
+                        await _initializeCamera();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF5A5A5C),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: Text(
+                      'Only this time',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton(
+                    onPressed: () => Get.back(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF5A5A5C),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                    child: Text(
+                      "Don't allow",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
   }
 
   Future<void> _initializeCamera() async {

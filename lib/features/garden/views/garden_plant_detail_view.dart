@@ -115,11 +115,11 @@ class GardenPlantDetailView extends StatelessWidget {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 12),
-        _buildInfoRow(Icons.water_drop, 'Watering', userPlant.plant.description),
-        _buildInfoRow(Icons.wb_sunny, 'Light', 'Bright, indirect light'),
-        _buildInfoRow(Icons.thermostat, 'Temperature', '65-75°F'),
-        _buildInfoRow(Icons.grass, 'Soil', 'Well-draining potting mix'),
-        _buildInfoRow(Icons.warning, 'Toxicity', 'Check plant details'),
+        _buildInfoRow(Icons.water_drop, 'Watering', '${userPlant.plant.careRequirements.water.frequency} - ${userPlant.plant.careRequirements.water.amount}'),
+        _buildInfoRow(Icons.wb_sunny, 'Light', '${userPlant.plant.careRequirements.light.level} (${userPlant.plant.careRequirements.light.hoursPerDay}h/day)'),
+        _buildInfoRow(Icons.thermostat, 'Temperature', '${userPlant.plant.careRequirements.temperature.minTemp}-${userPlant.plant.careRequirements.temperature.maxTemp}°C'),
+        _buildInfoRow(Icons.grass, 'Soil', userPlant.plant.careRequirements.soilType),
+        _buildInfoRow(Icons.eco, 'Fertilizer', userPlant.plant.careRequirements.fertilizer.isNotEmpty ? userPlant.plant.careRequirements.fertilizer : 'Monthly'),
       ],
     );
   }

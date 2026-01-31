@@ -45,6 +45,7 @@ class GardenController extends GetxController {
     String? customName,
     String? notes,
     String? group,
+    String? imagePath,
   }) async {
     try {
       await _userPlantService.addPlant(
@@ -52,9 +53,10 @@ class GardenController extends GetxController {
         customName: customName,
         notes: notes,
         group: group,
+        imagePath: imagePath,
       );
       await loadUserPlants();
-      Get.snackbar('Success', 'Plant added to your garden!');
+      // Removed duplicate success message - handled in calling code
     } catch (e) {
       Get.snackbar('Error', 'Failed to add plant: $e');
     }
