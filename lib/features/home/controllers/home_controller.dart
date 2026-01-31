@@ -32,9 +32,7 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadHomeData();
-    // Initialize notification count to 0 (no default notifications)
-    _notificationCount.value = 0;
+    // Load data lazily - only when needed
   }
 
 
@@ -55,6 +53,10 @@ class HomeController extends GetxController {
       _showCameraOptionsDialog();
     } else {
       _currentIndex.value = index;
+      // Load home data when home tab is accessed
+      if (index == 0 && _plantTips.isEmpty) {
+        _loadHomeData();
+      }
     }
   }
 
@@ -204,15 +206,22 @@ class HomeController extends GetxController {
   }
 
   Future<void> _loadHomeData() async {
+    if (_isLoading.value) return; // Prevent multiple simultaneous loads
+    
     _isLoading.value = true;
     
     try {
-      await Future.wait([
-        _loadCareReminders(),
-        _loadPlantTips(),
-        _loadPlantAnalytics(),
-        _loadCommunityPosts(),
-      ]);
+      // Load only essential data first
+      await _loadPlantTips();
+      
+      // Load other data in background
+      Future.microtask(() async {
+        await Future.wait([
+          _loadCareReminders(),
+          _loadPlantAnalytics(),
+          _loadCommunityPosts(),
+        ]);
+      });
     } catch (e) {
       print('Error loading home data: $e');
     } finally {
@@ -236,6 +245,7 @@ class HomeController extends GetxController {
   }
 
   Future<void> _loadPlantAnalytics() async {
+    // Reduced sample data for better performance
     _plantAnalytics.value = [
       PlantAnalytics(
         plantName: 'Monstera Deliciosa',
@@ -244,35 +254,20 @@ class HomeController extends GetxController {
         daysOwned: 45,
         wateringFrequency: 7,
       ),
-      PlantAnalytics(
-        plantName: 'Snake Plant',
-        growthRate: 65,
-        healthScore: 88,
-        daysOwned: 120,
-        wateringFrequency: 14,
-      ),
     ];
   }
 
   Future<void> _loadCommunityPosts() async {
+    // Reduced sample data for better performance
     _communityPosts.value = [
       CommunityPost(
         id: '1',
         username: 'PlantLover123',
         content: 'My Monstera just grew a new leaf! 🌱',
-        imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300',
+        imageUrl: null, // Removed image URL to reduce loading
         likes: 24,
         comments: 5,
         timeAgo: '2h ago',
-      ),
-      CommunityPost(
-        id: '2',
-        username: 'GreenThumb',
-        content: 'Tips for caring for succulents in winter?',
-        imageUrl: null,
-        likes: 12,
-        comments: 8,
-        timeAgo: '4h ago',
       ),
     ];
   }

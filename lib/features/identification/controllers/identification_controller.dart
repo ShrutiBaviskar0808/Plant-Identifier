@@ -30,8 +30,7 @@ class IdentificationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _initializeServices();
-    // Don't automatically initialize camera - let it be called manually
+    // Initialize services lazily - only when needed
   }
 
   Future<void> _initializeServices() async {
@@ -76,7 +75,7 @@ class IdentificationController extends GetxController {
 
   Future<void> _setupCamera() async {
     try {
-      // Request permission first
+      // Request permission using system dialog
       final status = await Permission.camera.request();
       if (status != PermissionStatus.granted) {
         Get.snackbar(
@@ -87,13 +86,28 @@ class IdentificationController extends GetxController {
         return;
       }
       
+      await _initializeCamera();
+    } catch (e) {
+      Get.snackbar(
+        'Camera Error',
+        'Failed to setup camera',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<void> _initializeCamera() async {
+    try {
+      // Initialize services only when camera is needed
+      await _initializeServices();
+      
       final cameras = await availableCameras();
       _cameras.assignAll(cameras);
 
       if (_cameras.isNotEmpty) {
         _cameraController = CameraController(
           _cameras.first,
-          ResolutionPreset.high,
+          ResolutionPreset.medium, // Reduced from high to medium
           enableAudio: false,
         );
         await _cameraController!.initialize();
@@ -102,7 +116,7 @@ class IdentificationController extends GetxController {
     } catch (e) {
       Get.snackbar(
         'Camera Error',
-        'Failed to setup camera',
+        'Failed to initialize camera',
         snackPosition: SnackPosition.BOTTOM,
       );
     }
