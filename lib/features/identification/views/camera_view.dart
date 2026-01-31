@@ -18,6 +18,10 @@ class _CameraViewState extends State<CameraView> {
     super.initState();
     // Initialize controller only when this screen is created
     controller = Get.put(IdentificationController());
+    // Manually trigger camera initialization
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller?.initializeCamera();
+    });
   }
 
   @override

@@ -65,7 +65,9 @@ class HomeController extends GetxController {
           children: [
             Icon(Icons.camera_alt, color: Colors.green[700]),
             SizedBox(width: 8),
-            Text('Choose Camera Option'),
+            Expanded(
+              child: Text('Choose Camera Option'),
+            ),
           ],
         ),
         content: Column(
@@ -77,7 +79,7 @@ class HomeController extends GetxController {
               subtitle: 'Capture a new photo',
               onTap: () {
                 Get.back();
-                _currentIndex.value = 1; // Navigate to camera
+                navigateToCamera();
               },
             ),
             SizedBox(height: 12),
@@ -178,12 +180,18 @@ class HomeController extends GetxController {
   }
 
   void navigateToCamera() {
-    Navigator.of(Get.context!).push(
-      MaterialPageRoute(builder: (context) {
-        Get.put(IdentificationController());
-        return const CameraView();
-      }),
-    );
+    try {
+      Get.put(IdentificationController());
+      Navigator.of(Get.context!).push(
+        MaterialPageRoute(builder: (context) => const CameraView()),
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to open camera: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 
   void navigateToGarden() {
