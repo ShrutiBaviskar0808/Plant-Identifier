@@ -14,7 +14,14 @@ class ImageAnalysisService {
       if (!await imageFile.exists()) {
         throw Exception('Image file not found');
       }
-
+      
+      // Check if file is readable and not corrupted
+      final fileSize = await imageFile.length();
+      if (fileSize == 0) {
+        throw Exception('Image file is empty or corrupted');
+      }
+      
+      // Simulate processing delay
       await Future.delayed(Duration(seconds: 2));
 
       // Use the updated PlantApiService identification method
@@ -22,35 +29,14 @@ class ImageAnalysisService {
       if (apiResult != null) {
         return [PlantModelConverter.fromApiModel(apiResult)];
       }
+      
+      // Return empty list instead of fallback to show "No Plant Identified"
       return [];
     } catch (e) {
       print('Image analysis failed: $e');
-      return _createFallbackPlants(imagePath);
+      // Return empty list to show "No Plant Identified" instead of crashing
+      return [];
     }
-  }
-
-  List<Plant> _createFallbackPlants(String imagePath) {
-    final plantNames = ['Rose', 'Sunflower', 'Orchid'];
-    
-    return plantNames.map((name) => Plant(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      commonName: name,
-      scientificName: '$name species',
-      category: 'flowering',
-      family: 'Plantae',
-      description: 'Beautiful $name flower',
-      careRequirements: PlantCareRequirements(
-        water: WaterRequirement(frequency: 'weekly', amount: 'medium', notes: ''),
-        light: LightRequirement(level: 'medium', hoursPerDay: 6, placement: 'indoor'),
-        soilType: 'Well-draining',
-        growthSeason: 'Spring to Fall',
-        temperature: TemperatureRange(minTemp: 18, maxTemp: 25),
-        fertilizer: 'Monthly',
-        pruning: 'As needed',
-      ),
-      imageUrls: [],
-      tags: ['flowering'],
-    )).toList();
   }
 
   double calculateConfidence(Plant plant, String imagePath) {

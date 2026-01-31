@@ -40,12 +40,7 @@ class PlantResultView extends StatelessWidget {
             // Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.file(
-                File(imagePath),
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+              child: _buildImageWidget(),
             ),
             
             SizedBox(height: 20),
@@ -268,6 +263,68 @@ class PlantResultView extends StatelessWidget {
               value,
               style: TextStyle(fontSize: 12),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageWidget() {
+    return Container(
+      height: 200,
+      width: double.infinity,
+      child: FutureBuilder<bool>(
+        future: _checkImageExists(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container(
+              color: Colors.grey[300],
+              child: Center(
+                child: CircularProgressIndicator(color: Colors.green),
+              ),
+            );
+          }
+          
+          if (snapshot.hasData && snapshot.data == true) {
+            return Image.file(
+              File(imagePath),
+              height: 200,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return _buildImageErrorWidget();
+              },
+            );
+          }
+          
+          return _buildImageErrorWidget();
+        },
+      ),
+    );
+  }
+
+  Future<bool> _checkImageExists() async {
+    try {
+      final file = File(imagePath);
+      return await file.exists();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Widget _buildImageErrorWidget() {
+    return Container(
+      height: 200,
+      width: double.infinity,
+      color: Colors.grey[300],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.image_not_supported, size: 48, color: Colors.grey[600]),
+          SizedBox(height: 8),
+          Text(
+            'Image not available',
+            style: TextStyle(color: Colors.grey[600]),
           ),
         ],
       ),

@@ -113,6 +113,16 @@ class IdentificationController extends GetxController {
 
   Future<void> _analyzeImage(File imageFile) async {
     try {
+      // Validate image file first
+      if (!await imageFile.exists()) {
+        throw Exception('Image file does not exist');
+      }
+      
+      final fileSize = await imageFile.length();
+      if (fileSize == 0) {
+        throw Exception('Image file is empty');
+      }
+      
       // Show loading dialog
       Get.dialog(
         AlertDialog(
@@ -158,13 +168,21 @@ class IdentificationController extends GetxController {
       // Close loading dialog if open
       if (Get.isDialogOpen ?? false) Get.back();
       
-      Get.snackbar(
-        'Analysis Failed',
-        'Failed to analyze image: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      // Show error with fallback results
+      _showAnalysisError(imageFile.path);
     }
+  }
+  
+  void _showAnalysisError(String imagePath) {
+    // Navigate to results with empty results to show "No Plant Identified"
+    Navigator.of(Get.context!).push(
+      MaterialPageRoute(
+        builder: (context) => PlantResultView(
+          imagePath: imagePath,
+          identificationResults: [],
+          confidence: 0.0,
+        ),
+      ),
+    );
   }
 }
