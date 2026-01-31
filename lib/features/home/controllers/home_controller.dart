@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../../../core/data/services/notification_service.dart';
 import '../../identification/views/camera_view.dart';
+import '../../identification/views/plant_search_view.dart';
 import '../../identification/controllers/identification_controller.dart';
 import '../../garden/views/garden_view.dart';
 import '../../garden/controllers/garden_controller.dart';
@@ -49,7 +50,131 @@ class HomeController extends GetxController {
   }
 
   void changeTabIndex(int index) {
-    _currentIndex.value = index;
+    if (index == 1) {
+      // Show camera options dialog when scan tab is tapped
+      _showCameraOptionsDialog();
+    } else {
+      _currentIndex.value = index;
+    }
+  }
+
+  void _showCameraOptionsDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.camera_alt, color: Colors.green[700]),
+            SizedBox(width: 8),
+            Text('Choose Camera Option'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildCameraOption(
+              icon: Icons.camera_alt,
+              title: 'Take Photo',
+              subtitle: 'Capture a new photo',
+              onTap: () {
+                Get.back();
+                _currentIndex.value = 1; // Navigate to camera
+              },
+            ),
+            SizedBox(height: 12),
+            _buildCameraOption(
+              icon: Icons.photo_library,
+              title: 'Choose from Gallery',
+              subtitle: 'Select existing photo',
+              onTap: () {
+                Get.back();
+                _pickFromGallery();
+              },
+            ),
+            SizedBox(height: 12),
+            _buildCameraOption(
+              icon: Icons.search,
+              title: 'Search Plants',
+              subtitle: 'Browse plant database',
+              onTap: () {
+                Get.back();
+                _navigateToPlantSearch();
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCameraOption({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: Colors.green[700]),
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey[400], size: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _pickFromGallery() {
+    final identificationController = Get.put(IdentificationController());
+    identificationController.pickFromGallery();
+  }
+
+  void _navigateToPlantSearch() {
+    Navigator.of(Get.context!).push(
+      MaterialPageRoute(builder: (context) => PlantSearchView()),
+    );
   }
 
   void navigateToCamera() {
