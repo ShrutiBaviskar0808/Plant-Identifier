@@ -96,21 +96,37 @@ class GardenPlantDetailView extends StatelessWidget {
   }
 
   Widget _buildNetworkOrPlaceholderImage() {
-    if (userPlant.plant.imageUrls.isNotEmpty) {
-      return Image.network(
-        userPlant.plant.imageUrls.first,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: Colors.grey[300],
-            child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
-          );
-        },
-      );
+    // Map plant names to correct asset paths
+    String getAssetPath(String plantName) {
+      final name = plantName.toLowerCase();
+      if (name.contains('hibiscus')) return 'assets/images/hibiscus.jpg';
+      if (name.contains('monstera')) return 'assets/images/Monstera Deliciosa.jpg';
+      if (name.contains('snake')) return 'assets/images/Snake Plant.jpg';
+      return 'assets/images/${userPlant.plant.commonName}.jpg';
     }
-    return Container(
-      color: Colors.grey[300],
-      child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
+    
+    return Image.asset(
+      getAssetPath(userPlant.plant.commonName),
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        // Fallback to network image if asset fails
+        if (userPlant.plant.imageUrls.isNotEmpty) {
+          return Image.network(
+            userPlant.plant.imageUrls.first,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Colors.grey[300],
+                child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
+              );
+            },
+          );
+        }
+        return Container(
+          color: Colors.grey[300],
+          child: Icon(Icons.local_florist, size: 60, color: Colors.grey[600]),
+        );
+      },
     );
   }
 

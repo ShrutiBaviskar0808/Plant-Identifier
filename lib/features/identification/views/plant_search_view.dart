@@ -234,6 +234,41 @@ class _PlantSearchViewState extends State<PlantSearchView> {
     );
   }
 
+  Widget _buildPlantImage(Plant plant) {
+    // Map plant names to correct asset paths
+    String getAssetPath(String plantName) {
+      final name = plantName.toLowerCase();
+      if (name.contains('hibiscus')) return 'assets/images/hibiscus.jpg';
+      if (name.contains('monstera')) return 'assets/images/Monstera Deliciosa.jpg';
+      if (name.contains('snake')) return 'assets/images/Snake Plant.jpg';
+      return 'assets/images/${plant.commonName}.jpg';
+    }
+    
+    return Image.asset(
+      getAssetPath(plant.commonName),
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        // If network image URL exists, try that
+        if (plant.imageUrls.isNotEmpty) {
+          return Image.network(
+            plant.imageUrls.first,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                color: Colors.green.withValues(alpha: 0.1),
+                child: Icon(Icons.local_florist, color: Colors.green, size: 30),
+              );
+            },
+          );
+        }
+        return Container(
+          color: Colors.green.withValues(alpha: 0.1),
+          child: Icon(Icons.local_florist, color: Colors.green, size: 30),
+        );
+      },
+    );
+  }
+
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -268,57 +303,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: plant.imageUrls.isNotEmpty
-                ? Image.network(
-                    plant.imageUrls.first,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      // Try assets image as fallback with correct naming
-                      String assetPath;
-                      if (plant.commonName.toLowerCase().contains('monstera')) {
-                        assetPath = 'assets/images/Monstera Deliciosa.jpg';
-                      } else if (plant.commonName.toLowerCase().contains('snake')) {
-                        assetPath = 'assets/images/Snake Plant.jpg';
-                      } else if (plant.commonName.toLowerCase().contains('hibiscus')) {
-                        assetPath = 'assets/images/hibiscus.jpg';
-                      } else {
-                        assetPath = 'assets/images/${plant.commonName}.jpg';
-                      }
-                      return Image.asset(
-                        assetPath,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.green.withValues(alpha: 0.1),
-                            child: Icon(Icons.local_florist, color: Colors.green, size: 30),
-                          );
-                        },
-                      );
-                    },
-                  )
-                : () {
-                    // Direct asset loading with correct naming
-                    String assetPath;
-                    if (plant.commonName.toLowerCase().contains('monstera')) {
-                      assetPath = 'assets/images/Monstera Deliciosa.jpg';
-                    } else if (plant.commonName.toLowerCase().contains('snake')) {
-                      assetPath = 'assets/images/Snake Plant.jpg';
-                    } else if (plant.commonName.toLowerCase().contains('hibiscus')) {
-                      assetPath = 'assets/images/hibiscus.jpg';
-                    } else {
-                      assetPath = 'assets/images/${plant.commonName}.jpg';
-                    }
-                    return Image.asset(
-                      assetPath,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.green.withValues(alpha: 0.1),
-                          child: Icon(Icons.local_florist, color: Colors.green, size: 30),
-                        );
-                      },
-                    );
-                  }(),
+            child: _buildPlantImage(plant),
           ),
         ),
         title: Text(
@@ -384,41 +369,46 @@ class _PlantSearchViewState extends State<PlantSearchView> {
     Get.dialog(
       AlertDialog(
         title: Text('Add to My Garden'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'Plant Name',
-                border: OutlineInputBorder(),
-              ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Plant Name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: selectedGroup,
+                  decoration: InputDecoration(
+                    labelText: 'Group',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: ['indoor', 'outdoor', 'edible', 'decorative']
+                      .map((group) => DropdownMenuItem(
+                            value: group,
+                            child: Text(group.capitalize!),
+                          ))
+                      .toList(),
+                  onChanged: (value) => selectedGroup = value!,
+                ),
+                SizedBox(height: 16),
+                TextField(
+                  controller: notesController,
+                  decoration: InputDecoration(
+                    labelText: 'Notes (optional)',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 2,
+                ),
+              ],
             ),
-            SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: selectedGroup,
-              decoration: InputDecoration(
-                labelText: 'Group',
-                border: OutlineInputBorder(),
-              ),
-              items: ['indoor', 'outdoor', 'edible', 'decorative']
-                  .map((group) => DropdownMenuItem(
-                        value: group,
-                        child: Text(group.capitalize!),
-                      ))
-                  .toList(),
-              onChanged: (value) => selectedGroup = value!,
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: notesController,
-              decoration: InputDecoration(
-                labelText: 'Notes (optional)',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 2,
-            ),
-          ],
+          ),
         ),
         actions: [
           TextButton(
@@ -523,21 +513,39 @@ class _PlantDetailFullScreen extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: plant.imageUrls.isNotEmpty
-                      ? Image.network(
-                          plant.imageUrls.first,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.green.withValues(alpha: 0.1),
-                              child: Icon(Icons.local_florist, color: Colors.green, size: 60),
-                            );
-                          },
-                        )
-                      : Container(
+                  child: () {
+                    // Map plant names to correct asset paths
+                    String getAssetPath(String plantName) {
+                      final name = plantName.toLowerCase();
+                      if (name.contains('hibiscus')) return 'assets/images/hibiscus.jpg';
+                      if (name.contains('monstera')) return 'assets/images/Monstera Deliciosa.jpg';
+                      if (name.contains('snake')) return 'assets/images/Snake Plant.jpg';
+                      return 'assets/images/${plant.commonName}.jpg';
+                    }
+                    
+                    return Image.asset(
+                      getAssetPath(plant.commonName),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        if (plant.imageUrls.isNotEmpty) {
+                          return Image.network(
+                            plant.imageUrls.first,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.green.withValues(alpha: 0.1),
+                                child: Icon(Icons.local_florist, color: Colors.green, size: 60),
+                              );
+                            },
+                          );
+                        }
+                        return Container(
                           color: Colors.green.withValues(alpha: 0.1),
                           child: Icon(Icons.local_florist, color: Colors.green, size: 60),
-                        ),
+                        );
+                      },
+                    );
+                  }(),
                 ),
               ),
               // Plant Info

@@ -203,6 +203,37 @@ class _PlantCard extends StatelessWidget {
     required this.onDelete,
   });
 
+  Widget _buildAssetImageFallback(Plant plant) {
+    // Map plant names to correct asset paths
+    String getAssetPath(String plantName) {
+      final name = plantName.toLowerCase();
+      if (name.contains('hibiscus')) return 'assets/images/hibiscus.jpg';
+      if (name.contains('monstera')) return 'assets/images/Monstera Deliciosa.jpg';
+      if (name.contains('snake')) return 'assets/images/Snake Plant.jpg';
+      return 'assets/images/${plant.commonName}.jpg';
+    }
+    
+    return ClipRRect(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      child: Image.asset(
+        getAssetPath(plant.commonName),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          if (plant.imageUrls.isNotEmpty) {
+            return Image.network(
+              plant.imageUrls.first,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.local_florist, size: 48);
+              },
+            );
+          }
+          return Icon(Icons.local_florist, size: 48);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -228,37 +259,18 @@ class _PlantCard extends StatelessWidget {
                                 plant.imagePath!,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
-                                  return Icon(Icons.local_florist, size: 48);
+                                  return _buildAssetImageFallback(plant.plant);
                                 },
                               )
                             : Image.file(
                                 File(plant.imagePath!),
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
-                                  return plant.plant.imageUrls.isNotEmpty
-                                      ? Image.network(
-                                          plant.plant.imageUrls.first,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Icon(Icons.local_florist, size: 48);
-                                          },
-                                        )
-                                      : Icon(Icons.local_florist, size: 48);
+                                  return _buildAssetImageFallback(plant.plant);
                                 },
                               ),
                       )
-                    : plant.plant.imageUrls.isNotEmpty
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                            child: Image.network(
-                              plant.plant.imageUrls.first,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(Icons.local_florist, size: 48);
-                              },
-                            ),
-                          )
-                        : Icon(Icons.local_florist, size: 48),
+                    : _buildAssetImageFallback(plant.plant),
               ),
             ),
             
