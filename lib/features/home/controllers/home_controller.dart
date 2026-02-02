@@ -25,7 +25,8 @@ class HomeController extends GetxController {
   int get notificationCount => _notificationCount.value;
 
   int getUnreadNotificationCount() {
-    _notificationCount.value = NotificationService.getUnreadCount();
+    // Return current value, update in background
+    _updateNotificationCount();
     return _notificationCount.value;
   }
 
@@ -33,6 +34,11 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     // Load data lazily - only when needed
+    _updateNotificationCount();
+  }
+  
+  Future<void> _updateNotificationCount() async {
+    _notificationCount.value = await NotificationService.getUnreadCount();
   }
 
 
@@ -278,12 +284,14 @@ class HomeController extends GetxController {
       _careReminders.removeWhere((reminder) => reminder.id == taskId);
       
       // Add completion notification
-      NotificationService.addNotification(PlantNotification(
+      await NotificationService.addNotification(PlantNotification(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: 'Task Completed! 🎉',
         message: '${removedReminder.plantName} ${removedReminder.careType} completed successfully',
         type: NotificationType.general,
       ));
+      
+      await _updateNotificationCount();
       
       Get.snackbar(
         'Task Completed',
@@ -333,13 +341,6 @@ class HomeController extends GetxController {
   }
 
   void navigateToAnalytics() {
-    NotificationService.addNotification(PlantNotification(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: 'Analytics Viewed',
-      message: 'Check your plant growth progress and health metrics',
-      type: NotificationType.general,
-    ));
-    
     Get.snackbar(
       'Plant Analytics',
       'Track your plant growth and health metrics',
@@ -348,13 +349,6 @@ class HomeController extends GetxController {
   }
 
   void navigateToCommunity() {
-    NotificationService.addNotification(PlantNotification(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: 'Community Accessed',
-      message: 'Connect with fellow plant enthusiasts and share tips',
-      type: NotificationType.general,
-    ));
-    
     Get.snackbar(
       'Community',
       'Connect with fellow plant enthusiasts',
@@ -362,7 +356,7 @@ class HomeController extends GetxController {
     );
   }
 
-  void addReminder(String plantName, String careType, DateTime dueDate) {
+  Future<void> addReminder(String plantName, String careType, DateTime dueDate) async {
     final reminder = CareReminder(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       plantName: plantName,
@@ -372,19 +366,11 @@ class HomeController extends GetxController {
     );
     _careReminders.add(reminder);
     
-    // Add notification for the reminder
-    NotificationService.scheduleReminderNotification(plantName, careType, dueDate);
-    
-    // Add immediate notification
-    NotificationService.addNotification(PlantNotification(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: 'Reminder Created',
-      message: 'New $careType reminder set for $plantName',
-      type: NotificationType.general,
-    ));
+    // Only add the scheduled reminder notification (not the "Reminder Created" one)
+    await NotificationService.scheduleReminderNotification(plantName, careType, dueDate);
     
     // Update notification count
-    _notificationCount.value = NotificationService.getUnreadCount();
+    await _updateNotificationCount();
     
     update();
     
@@ -396,13 +382,13 @@ class HomeController extends GetxController {
   }
 
   // Clear all app data (for app reset/uninstall)
-  void clearAllData() {
+  Future<void> clearAllData() async {
     _careReminders.clear();
     _plantTips.clear();
     _plantAnalytics.clear();
     _communityPosts.clear();
     _notificationCount.value = 0;
-    NotificationService.clearAllAppData();
+    await NotificationService.clearAllAppData();
     update();
   }
 }

@@ -18,9 +18,10 @@ class _NotificationsViewState extends State<NotificationsView> {
     _loadNotifications();
   }
 
-  void _loadNotifications() {
+  Future<void> _loadNotifications() async {
+    final loadedNotifications = await NotificationService.getNotifications();
     setState(() {
-      notifications = NotificationService.getNotifications();
+      notifications = loadedNotifications;
     });
   }
 
@@ -101,14 +102,14 @@ class _NotificationsViewState extends State<NotificationsView> {
           ),
           SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () {
-              NotificationService.addNotification(PlantNotification(
+            onPressed: () async {
+              await NotificationService.addNotification(PlantNotification(
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
                 title: 'Test Notification',
                 message: 'This is a sample notification to get you started!',
                 type: NotificationType.general,
               ));
-              _loadNotifications();
+              await _loadNotifications();
             },
             icon: Icon(Icons.add),
             label: Text('Add Sample Notification'),
@@ -253,10 +254,10 @@ class _NotificationsViewState extends State<NotificationsView> {
             ),
           ],
         ),
-        onTap: () {
+        onTap: () async {
           if (!notification.isRead) {
-            NotificationService.markAsRead(notification.id);
-            _loadNotifications();
+            await NotificationService.markAsRead(notification.id);
+            await _loadNotifications();
           }
         },
         trailing: PopupMenuButton(
@@ -273,10 +274,10 @@ class _NotificationsViewState extends State<NotificationsView> {
               ),
             ),
           ],
-          onSelected: (value) {
+          onSelected: (value) async {
             if (value == 'mark_read') {
-              NotificationService.markAsRead(notification.id);
-              _loadNotifications();
+              await NotificationService.markAsRead(notification.id);
+              await _loadNotifications();
             }
           },
         ),
@@ -295,9 +296,9 @@ class _NotificationsViewState extends State<NotificationsView> {
             child: Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              NotificationService.clearAll();
-              _loadNotifications();
+            onPressed: () async {
+              await NotificationService.clearAll();
+              await _loadNotifications();
               Get.back();
               Get.snackbar(
                 'Cleared',
