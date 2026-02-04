@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/data/local/database_service.dart';
 import '../screens/settings_screen.dart';
-import '../screens/help_support_screen.dart';
 
 class ProfileController extends GetxController {
   // Observable variables for profile statistics
@@ -128,31 +127,9 @@ class ProfileController extends GetxController {
     );
   }
 
-  // Show help dialog
-  void showHelpDialog() {
-    Get.dialog(
-      AlertDialog(
-        title: Text('Help & Support'),
-        content: Text('For help and support, please contact us at support@plantidentifier.com'),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void showSettings() {
     Navigator.of(Get.context!).push(
       MaterialPageRoute(builder: (context) => const SettingsScreen()),
-    );
-  }
-
-  void showHelp() {
-    Navigator.of(Get.context!).push(
-      MaterialPageRoute(builder: (context) => const HelpSupportScreen()),
     );
   }
 

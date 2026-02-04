@@ -145,7 +145,7 @@ class _PlantSearchViewState extends State<PlantSearchView> {
               fontFamily: 'Poppins',
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
-              fontSize: 18,
+              fontSize: 15,
             ),
           ),
           backgroundColor: Colors.transparent,

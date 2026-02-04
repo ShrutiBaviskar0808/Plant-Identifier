@@ -16,7 +16,7 @@ class GardenView extends GetView<GardenController> {
         title: Text(
           'My Garden',
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 15,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.bold,
             color: Colors.green[800],

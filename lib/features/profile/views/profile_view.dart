@@ -14,7 +14,7 @@ class ProfileView extends GetView<ProfileController> {
           title: Text(
             'Profile',
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
             ),
@@ -94,13 +94,7 @@ class ProfileView extends GetView<ProfileController> {
                 'App preferences',
                 () => controller.showSettings(),
               ),
-              _buildMenuItem(
-                context,
-                Icons.help,
-                'Help & Support',
-                'Get help and support',
-                () => controller.showHelp(),
-              ),
+
               _buildMenuItem(
                 context,
                 Icons.info,

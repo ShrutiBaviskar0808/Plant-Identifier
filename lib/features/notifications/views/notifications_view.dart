@@ -36,7 +36,7 @@ class _NotificationsViewState extends State<NotificationsView> {
             Text(
               'Notifications',
               style: TextStyle(
-                fontSize: 22,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: Colors.green[800],
               ),
