@@ -23,7 +23,6 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _scaleAnimation;
-  late Animation<double> _rotationAnimation;
   late Animation<double> _floatingAnimation;
   late Animation<Color?> _colorAnimation;
   bool _isImageExpanded = false;
@@ -66,10 +65,6 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
       CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
     );
     
-    _rotationAnimation = Tween<double>(begin: -0.1, end: 0.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
-    );
-    
     _floatingAnimation = Tween<double>(begin: -10.0, end: 10.0).animate(
       CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut),
     );
@@ -104,9 +99,8 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
         backgroundColor: Colors.grey[50],
         body: CustomScrollView(
           slivers: [
-            // Custom App Bar with 3D Image Slider
             SliverAppBar(
-              expandedHeight: 400,
+              expandedHeight: 280,
               pinned: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
@@ -136,39 +130,10 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                   );
                 },
               ),
-              actions: [
-                AnimatedBuilder(
-                  animation: _fadeAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _fadeAnimation.value,
-                      child: Container(
-                        margin: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.95),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.favorite_border, color: Colors.red),
-                          onPressed: () {},
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
               flexibleSpace: FlexibleSpaceBar(
                 background: _build3DImageSlider(),
               ),
             ),
-            // Content
             SliverToBoxAdapter(
               child: FadeTransition(
                 opacity: _fadeAnimation,
@@ -201,19 +166,18 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
       ),
       child: Stack(
         children: [
-          // Floating background elements
           AnimatedBuilder(
             animation: _floatingAnimation,
             builder: (context, child) {
               return Positioned(
-                top: 50 + _floatingAnimation.value,
-                right: 30,
+                top: 40 + _floatingAnimation.value,
+                right: 25,
                 child: Container(
-                  width: 60,
-                  height: 60,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     color: _colorAnimation.value,
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(25),
                   ),
                 ),
               );
@@ -223,20 +187,19 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
             animation: _floatingAnimation,
             builder: (context, child) {
               return Positioned(
-                bottom: 100 - _floatingAnimation.value * 0.5,
-                left: 20,
+                bottom: 80 - _floatingAnimation.value * 0.5,
+                left: 15,
                 child: Container(
-                  width: 40,
-                  height: 40,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
                     color: Colors.blue.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(15),
                   ),
                 ),
               );
             },
           ),
-          // 3D Image carousel
           PageView.builder(
             controller: _pageController,
             onPageChanged: (index) {
@@ -261,20 +224,20 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                       ..setEntry(3, 2, 0.001)
                       ..rotateY(value),
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 15),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                            spreadRadius: 5,
+                            color: Colors.black.withValues(alpha: 0.25),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                            spreadRadius: 3,
                           ),
                         ],
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(20),
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
@@ -295,10 +258,9 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
               );
             },
           ),
-          // Modern indicators with animation
           if (images.length > 1)
             Positioned(
-              bottom: 30,
+              bottom: 20,
               left: 0,
               right: 0,
               child: Row(
@@ -307,20 +269,20 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                   images.length,
                   (index) => AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 6),
-                    width: _currentImageIndex == index ? 30 : 10,
-                    height: 10,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: _currentImageIndex == index ? 24 : 8,
+                    height: 8,
                     decoration: BoxDecoration(
                       color: _currentImageIndex == index
                           ? Colors.white
                           : Colors.white.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(4),
                       boxShadow: _currentImageIndex == index
                           ? [
                               BoxShadow(
                                 color: Colors.white.withValues(alpha: 0.5),
-                                blurRadius: 8,
-                                spreadRadius: 2,
+                                blurRadius: 6,
+                                spreadRadius: 1,
                               ),
                             ]
                           : null,
@@ -329,38 +291,6 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                 ),
               ),
             ),
-          // Presentation overlay
-          Positioned(
-            bottom: 80,
-            right: 20,
-            child: AnimatedBuilder(
-              animation: _rotationAnimation,
-              builder: (context, child) {
-                return Transform.rotate(
-                  angle: _rotationAnimation.value,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.camera_alt,
-                      color: Colors.green,
-                      size: 20,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
         ],
       ),
     );
@@ -376,37 +306,35 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(35),
-                topRight: Radius.circular(35),
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, -5),
-                  spreadRadius: 5,
+                  blurRadius: 15,
+                  offset: const Offset(0, -3),
+                  spreadRadius: 3,
                 ),
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Drag indicator
                   Center(
                     child: Container(
-                      width: 50,
-                      height: 5,
+                      width: 40,
+                      height: 4,
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(3),
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   
-                  // Plant Name with animation
                   AnimatedBuilder(
                     animation: _slideAnimation,
                     builder: (context, child) {
@@ -419,7 +347,7 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                           child: Text(
                             plantName,
                             style: const TextStyle(
-                              fontSize: 28,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -428,9 +356,8 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                       );
                     },
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   
-                  // Scientific name with typewriter effect
                   AnimatedBuilder(
                     animation: _fadeAnimation,
                     builder: (context, child) {
@@ -439,39 +366,38 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                         child: Text(
                           scientificName,
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontStyle: FontStyle.italic,
                             color: Colors.grey[600],
-                            letterSpacing: 1.2,
+                            letterSpacing: 1.0,
                           ),
                         ),
                       );
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 18),
                   
-                  // Enhanced Care Plan Button
                   AnimatedBuilder(
                     animation: _floatingAnimation,
                     builder: (context, child) {
                       return Transform.translate(
-                        offset: Offset(0, _floatingAnimation.value * 0.3),
+                        offset: Offset(0, _floatingAnimation.value * 0.2),
                         child: Container(
                           width: double.infinity,
-                          height: 55,
+                          height: 42,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color(0xFF4CAF50), Color(0xFF45A049), Color(0xFF2E7D32)],
+                              colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
-                                blurRadius: 15,
-                                offset: const Offset(0, 8),
-                                spreadRadius: 2,
+                                color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                                spreadRadius: 1,
                               ),
                             ],
                           ),
@@ -481,25 +407,24 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: Row(
+                            child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.eco,
                                   color: Colors.white,
-                                  size: 24,
+                                  size: 18,
                                 ),
-                                const SizedBox(width: 12),
-                                const Text(
+                                SizedBox(width: 8),
+                                Text(
                                   'Get Care Plan',
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
-                                    letterSpacing: 0.5,
                                   ),
                                 ),
                               ],
@@ -510,9 +435,8 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                     },
                   ),
                   
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
                   
-                  // Section title with animation
                   AnimatedBuilder(
                     animation: _slideController,
                     builder: (context, child) {
@@ -527,7 +451,7 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                         child: const Text(
                           'General information',
                           style: TextStyle(
-                            fontSize: 22,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
@@ -535,13 +459,12 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   
                   _buildEnhancedInfoGrid(),
                   
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   
-                  // Description with fade-in
                   if (description.isNotEmpty) ...[
                     AnimatedBuilder(
                       animation: _fadeAnimation,
@@ -549,28 +472,42 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                         return Opacity(
                           opacity: _fadeAnimation.value,
                           child: Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(15),
+                              borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: Colors.grey[200]!,
                                 width: 1,
                               ),
                             ),
-                            child: Text(
-                              description,
-                              style: TextStyle(
-                                fontSize: 16,
-                                height: 1.6,
-                                color: Colors.grey[700],
-                              ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Description',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  description,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    height: 1.5,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         );
                       },
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
                   ],
                   
                   _buildDetailedCareInfo(),
@@ -651,9 +588,9 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.6,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+        childAspectRatio: 2.0,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
       ),
       itemCount: infoItems.length,
       itemBuilder: (context, index) {
@@ -667,11 +604,7 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                 end: Offset.zero,
               ).animate(CurvedAnimation(
                 parent: _slideController,
-                curve: Interval(
-                  index * 0.1,
-                  0.5 + index * 0.1,
-                  curve: Curves.easeOutCubic,
-                ),
+                curve: Curves.easeOutCubic,
               )),
               child: _buildEnhanced3DInfoCard(
                 icon: item['icon'] as IconData,
@@ -701,8 +634,8 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
           alignment: Alignment.center,
           transform: Matrix4.identity()
             ..setEntry(3, 2, 0.001)
-            ..rotateX(0.1 * math.sin(_floatingController.value * 2 * math.pi))
-            ..rotateY(0.05 * math.cos(_floatingController.value * 2 * math.pi)),
+            ..rotateX(0.05 * math.sin(_floatingController.value * 2 * math.pi))
+            ..rotateY(0.03 * math.cos(_floatingController.value * 2 * math.pi)),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -710,51 +643,51 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                 end: Alignment.bottomRight,
                 colors: [
                   Colors.white,
-                  color.withValues(alpha: 0.05),
+                  color.withValues(alpha: 0.03),
                 ],
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: 0.2),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                  spreadRadius: 2,
+                  color: color.withValues(alpha: 0.15),
+                  blurRadius: 10,
+                  offset: const Offset(0, 6),
+                  spreadRadius: 1,
                 ),
                 BoxShadow(
                   color: Colors.white.withValues(alpha: 0.8),
-                  blurRadius: 10,
-                  offset: const Offset(-5, -5),
+                  blurRadius: 8,
+                  offset: const Offset(-3, -3),
                 ),
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: gradient,
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
-                          color: color.withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                          color: color.withValues(alpha: 0.25),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
                     child: Icon(
                       icon,
                       color: Colors.white,
-                      size: 20,
+                      size: 14,
                     ),
                   ),
                   Column(
@@ -763,16 +696,16 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                       Text(
                         title,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 9,
                           color: Colors.grey[600],
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         subtitle,
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
@@ -790,8 +723,6 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
     );
   }
 
-
-
   Widget _buildErrorWidget() {
     return Container(
       color: Colors.grey[300],
@@ -799,9 +730,9 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.local_florist, size: 60, color: Colors.grey),
-            SizedBox(height: 8),
-            Text('Image not available', style: TextStyle(color: Colors.grey)),
+            Icon(Icons.local_florist, size: 50, color: Colors.grey),
+            SizedBox(height: 6),
+            Text('Image not available', style: TextStyle(color: Colors.grey, fontSize: 12)),
           ],
         ),
       ),
@@ -833,14 +764,14 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.green.withValues(alpha: 0.1), Colors.teal.withValues(alpha: 0.05)],
+                    colors: [Colors.green.withValues(alpha: 0.08), Colors.teal.withValues(alpha: 0.04)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: Colors.green.withValues(alpha: 0.2),
                     width: 1,
@@ -849,24 +780,24 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [Colors.green, Colors.teal],
                         ),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(
                         Icons.spa,
                         color: Colors.white,
-                        size: 20,
+                        size: 16,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     const Text(
                       'Care Requirements',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
@@ -874,7 +805,7 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               if (isApiPlant) ..._buildEnhancedApiCareInfo() else ..._buildEnhancedLegacyCareInfo(),
             ],
           ),
@@ -889,39 +820,15 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
       {'icon': Icons.wb_sunny, 'label': 'Light', 'value': widget.plantApi!.lightRequirement, 'color': Colors.orange},
       {'icon': Icons.thermostat, 'label': 'Temperature', 'value': widget.plantApi!.temperature, 'color': Colors.red},
       {'icon': Icons.grass, 'label': 'Soil', 'value': widget.plantApi!.soilType, 'color': Colors.brown},
-      {'icon': Icons.science, 'label': 'Fertilizer', 'value': widget.plantApi!.fertilizer, 'color': Colors.purple},
-      {'icon': Icons.warning, 'label': 'Toxicity', 'value': widget.plantApi!.toxicity, 'color': Colors.red},
-      {'icon': Icons.straighten, 'label': 'Mature Size', 'value': widget.plantApi!.matureSize, 'color': Colors.green},
-      {'icon': Icons.calendar_month, 'label': 'Growing Season', 'value': widget.plantApi!.growingSeason, 'color': Colors.teal},
     ];
     
     return [
-      ...careItems.asMap().entries.map((entry) {
-        final index = entry.key;
-        final item = entry.value;
-        return AnimatedBuilder(
-          animation: _slideController,
-          builder: (context, child) {
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: Offset(index.isEven ? -1 : 1, 0),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: _slideController,
-                curve: Interval(
-                  0.4 + index * 0.05,
-                  0.8 + index * 0.05,
-                  curve: Curves.easeOutCubic,
-                ),
-              )),
-              child: _buildEnhancedCareInfoRow(
-                item['icon'] as IconData,
-                item['label'] as String,
-                item['value'] as String,
-                item['color'] as Color,
-              ),
-            );
-          },
+      ...careItems.map((item) {
+        return _buildEnhancedCareInfoRow(
+          item['icon'] as IconData,
+          item['label'] as String,
+          item['value'] as String,
+          item['color'] as Color,
         );
       }).toList(),
       if (widget.plantApi!.benefits.isNotEmpty)
@@ -935,37 +842,15 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
       {'icon': Icons.wb_sunny, 'label': 'Light', 'value': widget.plant!.lightRequirement, 'color': Colors.orange},
       {'icon': Icons.thermostat, 'label': 'Temperature', 'value': widget.plant!.temperature, 'color': Colors.red},
       {'icon': Icons.grass, 'label': 'Soil', 'value': widget.plant!.soilType, 'color': Colors.brown},
-      {'icon': Icons.science, 'label': 'Fertilizer', 'value': widget.plant!.fertilizer, 'color': Colors.purple},
-      {'icon': Icons.warning, 'label': 'Toxicity', 'value': widget.plant!.toxicity, 'color': Colors.red},
     ];
     
     return [
-      ...careItems.asMap().entries.map((entry) {
-        final index = entry.key;
-        final item = entry.value;
-        return AnimatedBuilder(
-          animation: _slideController,
-          builder: (context, child) {
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: Offset(index.isEven ? -1 : 1, 0),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: _slideController,
-                curve: Interval(
-                  0.4 + index * 0.05,
-                  0.8 + index * 0.05,
-                  curve: Curves.easeOutCubic,
-                ),
-              )),
-              child: _buildEnhancedCareInfoRow(
-                item['icon'] as IconData,
-                item['label'] as String,
-                item['value'] as String,
-                item['color'] as Color,
-              ),
-            );
-          },
+      ...careItems.map((item) {
+        return _buildEnhancedCareInfoRow(
+          item['icon'] as IconData,
+          item['label'] as String,
+          item['value'] as String,
+          item['color'] as Color,
         );
       }).toList(),
       if (widget.plant!.benefits.isNotEmpty)
@@ -974,241 +859,194 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
   }
 
   Widget _buildEnhancedCareInfoRow(IconData icon, String label, String value, Color color) {
-    return AnimatedBuilder(
-      animation: _floatingController,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, math.sin(_floatingController.value * 2 * math.pi + label.hashCode) * 2),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white,
+            color.withValues(alpha: 0.02),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withValues(alpha: 0.15),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               gradient: LinearGradient(
+                colors: [color, color.withValues(alpha: 0.7)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Colors.white,
-                  color.withValues(alpha: 0.03),
-                ],
               ),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(
-                color: color.withValues(alpha: 0.2),
-                width: 1,
-              ),
+              borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                  spreadRadius: 1,
+                  color: color.withValues(alpha: 0.25),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: Row(
+            child: Icon(icon, color: Colors.white, size: 16),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [color, color.withValues(alpha: 0.7)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Icon(icon, color: Colors.white, size: 22),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        label,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        value,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[700],
-                          height: 1.3,
-                        ),
-                      ),
-                    ],
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Colors.black87,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.arrow_forward_ios,
-                    color: color,
-                    size: 16,
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[700],
+                    height: 1.2,
                   ),
                 ),
               ],
             ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
   Widget _buildEnhancedBenefitsSection(List<String> benefits) {
-    return AnimatedBuilder(
-      animation: _slideController,
-      builder: (context, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0, 1),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(
-            parent: _slideController,
-            curve: const Interval(0.7, 1.0, curve: Curves.easeOutCubic),
-          )),
-          child: Container(
-            margin: const EdgeInsets.only(top: 16),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.green.withValues(alpha: 0.08),
-                  Colors.teal.withValues(alpha: 0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Colors.green.withValues(alpha: 0.3),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.green.withValues(alpha: 0.1),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Colors.green, Colors.teal],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.green.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(Icons.star, color: Colors.white, size: 24),
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.green.withValues(alpha: 0.06),
+            Colors.teal.withValues(alpha: 0.03),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.green.withValues(alpha: 0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Colors.green, Colors.teal],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.withValues(alpha: 0.25),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
                     ),
-                    const SizedBox(width: 16),
-                    const Text(
-                      'Benefits',
+                  ],
+                ),
+                child: const Icon(Icons.star, color: Colors.white, size: 18),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Benefits',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: benefits.map((benefit) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white,
+                      Colors.green.withValues(alpha: 0.08),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.green.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.withValues(alpha: 0.15),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      color: Colors.green[600],
+                      size: 12,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      benefit,
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Colors.black87,
+                        fontSize: 12,
+                        color: Colors.green[700],
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: benefits.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final benefit = entry.value;
-                    return AnimatedBuilder(
-                      animation: _floatingController,
-                      builder: (context, child) {
-                        return Transform.translate(
-                          offset: Offset(
-                            0,
-                            math.sin(_floatingController.value * 2 * math.pi + index * 0.5) * 3,
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Colors.white,
-                                  Colors.green.withValues(alpha: 0.1),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(25),
-                              border: Border.all(
-                                color: Colors.green.withValues(alpha: 0.4),
-                                width: 1,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.green.withValues(alpha: 0.2),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.check_circle,
-                                  color: Colors.green[600],
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  benefit,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.green[700],
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
+              );
+            }).toList(),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }
