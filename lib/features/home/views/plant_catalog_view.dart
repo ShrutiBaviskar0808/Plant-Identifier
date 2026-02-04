@@ -382,34 +382,6 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                   );
                 },
               ),
-              actions: [
-                AnimatedBuilder(
-                  animation: _fadeAnimation,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _fadeAnimation.value,
-                      child: Container(
-                        margin: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.95),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.favorite_border, color: Colors.red),
-                          onPressed: () {},
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
               flexibleSpace: FlexibleSpaceBar(
                 background: _build3DImageSlider(),
               ),
