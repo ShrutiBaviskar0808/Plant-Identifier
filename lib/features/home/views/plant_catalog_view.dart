@@ -321,7 +321,12 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
   }
 
   void _startAutoSlide() {
+    _autoSlideTimer?.cancel();
     _autoSlideTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
       final images = _getPlantImages();
       if (images.isNotEmpty && _pageController.hasClients) {
         _currentImageIndex = (_currentImageIndex + 1) % images.length;
@@ -337,10 +342,10 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
   @override
   void dispose() {
     _autoSlideTimer?.cancel();
-    _pageController.dispose();
     _animationController.dispose();
     _slideController.dispose();
     _floatingController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 

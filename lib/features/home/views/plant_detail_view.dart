@@ -85,6 +85,11 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
 
   @override
   void dispose() {
+    if (mounted) {
+      _floatingController.stop();
+      _animationController.stop();
+      _slideController.stop();
+    }
     _pageController.dispose();
     _animationController.dispose();
     _slideController.dispose();
