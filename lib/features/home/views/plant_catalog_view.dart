@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:async';
 import '../../garden/controllers/garden_controller.dart';
 import '../../../core/data/models/plant.dart';
 
@@ -40,11 +41,9 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
             if (value is List) {
               for (var plant in value) {
                 if (plant is Map<String, dynamic>) {
-                  // ✅ CORRECT IMAGE EXTRACTION
                   String imageUrl = '';
                   List<String> allImages = [];
 
-                  // Extract all images from the images array
                   if (plant['images'] is List && plant['images'].isNotEmpty) {
                     for (var img in plant['images']) {
                       if (img != null && img.toString().isNotEmpty) {
@@ -55,7 +54,6 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
                         }
                       }
                     }
-                    // Use first image as main image
                     if (allImages.isNotEmpty) {
                       imageUrl = allImages.first;
                     }
@@ -65,7 +63,7 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
                     'name': plant['name'] ?? 'Unknown Plant',
                     'scientific_name': plant['scientificName'] ?? plant['scientific_name'] ?? '',
                     'image_url': imageUrl,
-                    'images': allImages, // Store all cleaned images
+                    'images': allImages,
                     'water_requirement': plant['water_requirement'] ?? 'Weekly',
                     'difficulty': plant['difficulty'] ?? 'Easy',
                     'description': plant['description'] ?? '',
@@ -271,10 +269,10 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _scaleAnimation;
-
   late Animation<double> _floatingAnimation;
   late Animation<Color?> _colorAnimation;
   bool _isImageExpanded = false;
+  Timer? _autoSlideTimer;
 
   @override
   void initState() {
@@ -308,8 +306,6 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
       CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
     );
     
-
-    
     _floatingAnimation = Tween<double>(begin: -10.0, end: 10.0).animate(
       CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut),
     );
@@ -321,10 +317,26 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
     
     _animationController.forward();
     _slideController.forward();
+    _startAutoSlide();
+  }
+
+  void _startAutoSlide() {
+    _autoSlideTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      final images = _getPlantImages();
+      if (images.isNotEmpty && _pageController.hasClients) {
+        _currentImageIndex = (_currentImageIndex + 1) % images.length;
+        _pageController.animateToPage(
+          _currentImageIndex,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
+    _autoSlideTimer?.cancel();
     _pageController.dispose();
     _animationController.dispose();
     _slideController.dispose();
@@ -340,7 +352,7 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
-              expandedHeight: 400,
+              expandedHeight: 300,
               pinned: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
@@ -438,14 +450,14 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
             animation: _floatingAnimation,
             builder: (context, child) {
               return Positioned(
-                top: 50 + _floatingAnimation.value,
+                top: 40 + _floatingAnimation.value,
                 right: 30,
                 child: Container(
-                  width: 60,
-                  height: 60,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     color: _colorAnimation.value,
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(25),
                   ),
                 ),
               );
@@ -455,14 +467,14 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
             animation: _floatingAnimation,
             builder: (context, child) {
               return Positioned(
-                bottom: 100 - _floatingAnimation.value * 0.5,
+                bottom: 80 - _floatingAnimation.value * 0.5,
                 left: 20,
                 child: Container(
-                  width: 40,
-                  height: 40,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
                     color: Colors.blue.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(15),
                   ),
                 ),
               );
@@ -492,20 +504,20 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                       ..setEntry(3, 2, 0.001)
                       ..rotateY(value),
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 15),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                            spreadRadius: 5,
+                            color: Colors.black.withValues(alpha: 0.25),
+                            blurRadius: 15,
+                            offset: const Offset(0, 8),
+                            spreadRadius: 3,
                           ),
                         ],
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(20),
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
@@ -528,7 +540,7 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
           ),
           if (images.length > 1)
             Positioned(
-              bottom: 30,
+              bottom: 20,
               left: 0,
               right: 0,
               child: Row(
@@ -537,20 +549,20 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                   images.length,
                   (index) => AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 6),
-                    width: _currentImageIndex == index ? 30 : 10,
-                    height: 10,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: _currentImageIndex == index ? 24 : 8,
+                    height: 8,
                     decoration: BoxDecoration(
                       color: _currentImageIndex == index
                           ? Colors.white
                           : Colors.white.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(4),
                       boxShadow: _currentImageIndex == index
                           ? [
                               BoxShadow(
                                 color: Colors.white.withValues(alpha: 0.5),
-                                blurRadius: 8,
-                                spreadRadius: 2,
+                                blurRadius: 6,
+                                spreadRadius: 1,
                               ),
                             ]
                           : null,
@@ -574,34 +586,34 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(35),
-                topRight: Radius.circular(35),
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, -5),
-                  spreadRadius: 5,
+                  blurRadius: 15,
+                  offset: const Offset(0, -3),
+                  spreadRadius: 3,
                 ),
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(
                     child: Container(
-                      width: 50,
-                      height: 5,
+                      width: 40,
+                      height: 4,
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(3),
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   
                   AnimatedBuilder(
                     animation: _slideAnimation,
@@ -615,7 +627,7 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                           child: Text(
                             widget.plant['name'] ?? 'Unknown Plant',
                             style: const TextStyle(
-                              fontSize: 28,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -624,7 +636,7 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                       );
                     },
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   
                   AnimatedBuilder(
                     animation: _fadeAnimation,
@@ -634,38 +646,38 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                         child: Text(
                           widget.plant['scientific_name'] ?? '',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontStyle: FontStyle.italic,
                             color: Colors.grey[600],
-                            letterSpacing: 1.2,
+                            letterSpacing: 1.0,
                           ),
                         ),
                       );
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 18),
                   
                   AnimatedBuilder(
                     animation: _floatingAnimation,
                     builder: (context, child) {
                       return Transform.translate(
-                        offset: Offset(0, _floatingAnimation.value * 0.3),
+                        offset: Offset(0, _floatingAnimation.value * 0.2),
                         child: Container(
                           width: double.infinity,
-                          height: 55,
+                          height: 42,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color(0xFF4CAF50), Color(0xFF45A049), Color(0xFF2E7D32)],
+                              colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
-                                blurRadius: 15,
-                                offset: const Offset(0, 8),
-                                spreadRadius: 2,
+                                color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                                spreadRadius: 1,
                               ),
                             ],
                           ),
@@ -675,25 +687,24 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: Row(
+                            child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.add_circle,
                                   color: Colors.white,
-                                  size: 24,
+                                  size: 18,
                                 ),
-                                const SizedBox(width: 12),
-                                const Text(
+                                SizedBox(width: 8),
+                                Text(
                                   'Add to Garden',
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
-                                    letterSpacing: 0.5,
                                   ),
                                 ),
                               ],
@@ -704,7 +715,7 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                     },
                   ),
                   
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
                   
                   AnimatedBuilder(
                     animation: _slideController,
@@ -720,7 +731,7 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                         child: const Text(
                           'Plant Information',
                           style: TextStyle(
-                            fontSize: 22,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
@@ -728,11 +739,11 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                       );
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   
                   _buildEnhancedInfoGrid(),
                   
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   
                   if (widget.plant['description'] != null && widget.plant['description'].isNotEmpty) ...[
                     AnimatedBuilder(
@@ -741,10 +752,10 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                         return Opacity(
                           opacity: _fadeAnimation.value,
                           child: Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(15),
+                              borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: Colors.grey[200]!,
                                 width: 1,
@@ -756,17 +767,17 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                                 const Text(
                                   'Description',
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black87,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 6),
                                 Text(
                                   widget.plant['description'],
                                   style: TextStyle(
-                                    fontSize: 16,
-                                    height: 1.6,
+                                    fontSize: 14,
+                                    height: 1.5,
                                     color: Colors.grey[700],
                                   ),
                                 ),
@@ -776,7 +787,7 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                         );
                       },
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
                   ],
                   
                   _buildCareInformation(),
@@ -802,9 +813,9 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.6,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+        childAspectRatio: 2.0,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
       ),
       itemCount: infoItems.length,
       itemBuilder: (context, index) {
@@ -852,8 +863,8 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
           alignment: Alignment.center,
           transform: Matrix4.identity()
             ..setEntry(3, 2, 0.001)
-            ..rotateX(0.1 * sin(_floatingController.value * 2 * 3.14159))
-            ..rotateY(0.05 * cos(_floatingController.value * 2 * 3.14159)),
+            ..rotateX(0.05 * sin(_floatingController.value * 2 * 3.14159))
+            ..rotateY(0.03 * cos(_floatingController.value * 2 * 3.14159)),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -861,51 +872,51 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                 end: Alignment.bottomRight,
                 colors: [
                   Colors.white,
-                  color.withValues(alpha: 0.05),
+                  color.withValues(alpha: 0.03),
                 ],
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: color.withValues(alpha: 0.2),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                  spreadRadius: 2,
+                  color: color.withValues(alpha: 0.15),
+                  blurRadius: 10,
+                  offset: const Offset(0, 6),
+                  spreadRadius: 1,
                 ),
                 BoxShadow(
                   color: Colors.white.withValues(alpha: 0.8),
-                  blurRadius: 10,
-                  offset: const Offset(-5, -5),
+                  blurRadius: 8,
+                  offset: const Offset(-3, -3),
                 ),
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: gradient,
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
-                          color: color.withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                          color: color.withValues(alpha: 0.25),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
                     child: Icon(
                       icon,
                       color: Colors.white,
-                      size: 20,
+                      size: 16,
                     ),
                   ),
                   Column(
@@ -914,16 +925,16 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                       Text(
                         title,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 10,
                           color: Colors.grey[600],
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         subtitle,
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
@@ -954,27 +965,27 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
             curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
           )),
           child: Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Colors.green.withValues(alpha: 0.08),
-                  Colors.teal.withValues(alpha: 0.05),
+                  Colors.green.withValues(alpha: 0.06),
+                  Colors.teal.withValues(alpha: 0.03),
                 ],
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.green.withValues(alpha: 0.3),
+                color: Colors.green.withValues(alpha: 0.2),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.green.withValues(alpha: 0.1),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                  spreadRadius: 2,
+                  color: Colors.green.withValues(alpha: 0.08),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                  spreadRadius: 1,
                 ),
               ],
             ),
@@ -984,34 +995,34 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [Colors.green, Colors.teal],
                         ),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.green.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
+                            color: Colors.green.withValues(alpha: 0.25),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.spa, color: Colors.white, size: 24),
+                      child: const Icon(Icons.spa, color: Colors.white, size: 20),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
                     const Text(
                       'Care Tips',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                        fontSize: 16,
                         color: Colors.black87,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 _buildCareTip(Icons.lightbulb, 'Best grown in bright, indirect sunlight'),
                 _buildCareTip(Icons.schedule, 'Water when top soil feels dry'),
                 _buildCareTip(Icons.thermostat, 'Prefers temperatures between 18-25°C'),
@@ -1026,16 +1037,16 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
 
   Widget _buildCareTip(IconData icon, String tip) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Row(
         children: [
-          Icon(icon, color: Colors.green[600], size: 16),
-          const SizedBox(width: 12),
+          Icon(icon, color: Colors.green[600], size: 14),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               tip,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 color: Colors.grey[700],
               ),
             ),
@@ -1060,7 +1071,7 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
         child: const Icon(
           Icons.local_florist,
           color: Colors.white,
-          size: 80,
+          size: 60,
         ),
       );
     }
@@ -1091,7 +1102,7 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
           child: const Icon(
             Icons.local_florist,
             color: Colors.white,
-            size: 80,
+            size: 60,
           ),
         );
       },
@@ -1117,7 +1128,7 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
     }
 
     if (images.isEmpty) {
-      images.add(''); // Placeholder
+      images.add('');
     }
 
     return images.take(3).toList();
