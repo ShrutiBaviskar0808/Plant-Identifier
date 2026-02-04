@@ -17,7 +17,7 @@ class GardenPlantDetailView extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
-              fontSize: 15,
+              fontSize: 18,
             ),
           ),
           backgroundColor: Colors.transparent,

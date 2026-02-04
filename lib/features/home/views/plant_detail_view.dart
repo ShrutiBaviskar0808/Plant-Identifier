@@ -81,26 +81,6 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
-              actions: [
-                Container(
-                  margin: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.favorite_border, color: Colors.black87),
-                    onPressed: () {},
-                  ),
-                ),
-              ],
               flexibleSpace: FlexibleSpaceBar(
                 background: _buildImageSlider(),
               ),
@@ -189,7 +169,7 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -197,36 +177,36 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
             Text(
               plantName,
               style: const TextStyle(
-                fontSize: 28,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               scientificName,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontStyle: FontStyle.italic,
                 color: Colors.grey[600],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             
             // Get Care Plan Button
             Container(
               width: double.infinity,
-              height: 56,
+              height: 48,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
@@ -236,13 +216,13 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: const Text(
                   'Get Care Plan',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -250,22 +230,22 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
               ),
             ),
             
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
             
             // General Information
             const Text(
               'General information',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
             
             _buildInfoGrid(),
             
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             
             // Description
             if (description.isNotEmpty) ...[
@@ -277,7 +257,7 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                   color: Colors.grey[700],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
             ],
             
             _buildDetailedCareInfo(),
@@ -347,9 +327,9 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      childAspectRatio: 1.5,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
+      childAspectRatio: 1.8,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
       children: [
         _buildInfoCard(
           icon: Icons.wb_sunny,
@@ -398,36 +378,36 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
               ),
               child: Icon(
                 icon,
                 color: color,
-                size: 20,
+                size: 16,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
               title,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: Colors.grey[600],
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               subtitle,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
@@ -453,19 +433,6 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
       ),
       child: Row(
         children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.share, color: Colors.black87),
-            ),
-          ),
-          const SizedBox(width: 16),
           Expanded(
             child: Container(
               height: 56,
@@ -539,12 +506,12 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
         const Text(
           'Care Requirements',
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         if (isApiPlant) ..._buildApiCareInfo() else ..._buildLegacyCareInfo(),
       ],
     );
@@ -580,8 +547,8 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
 
   Widget _buildCareInfoRow(IconData icon, String label, String value) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.grey[50],
         borderRadius: BorderRadius.circular(12),

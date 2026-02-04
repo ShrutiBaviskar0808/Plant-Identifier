@@ -14,7 +14,7 @@ class ProfileView extends GetView<ProfileController> {
           title: Text(
             'Profile',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
             ),

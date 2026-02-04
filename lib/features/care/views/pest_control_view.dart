@@ -8,7 +8,7 @@ class PestControlView extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Pest Control', style: TextStyle(color: Colors.green[800], fontWeight: FontWeight.bold)),
+          title: Text('Pest Control', style: TextStyle(color: Colors.green[800], fontWeight: FontWeight.bold, fontSize: 18)),
           backgroundColor: Colors.transparent,
           elevation: 0,
           iconTheme: IconThemeData(color: Colors.green[800]),

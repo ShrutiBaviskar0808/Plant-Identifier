@@ -28,6 +28,7 @@ class _CareViewState extends State<CareView> {
           style: TextStyle(
             color: Colors.green[800],
             fontWeight: FontWeight.bold,
+            fontSize: 18,
           ),
         ),
         iconTheme: IconThemeData(color: Colors.green[800]),

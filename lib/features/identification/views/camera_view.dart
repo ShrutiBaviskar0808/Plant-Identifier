@@ -38,7 +38,7 @@ class _CameraViewState extends State<CameraView> {
           title: Text(
             'Identify Plant',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
             ),
