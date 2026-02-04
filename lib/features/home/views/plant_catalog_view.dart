@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'dart:convert';
-import 'dart:async';
+import 'dart:math' as math;
 import '../../garden/controllers/garden_controller.dart';
 import '../../../core/data/models/plant.dart';
 
@@ -247,279 +247,167 @@ class _PlantCatalogViewState extends State<PlantCatalogView> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => _PlantDetailScreen(plant: plant),
+        builder: (context) => _EnhancedPlantDetailScreen(plant: plant),
       ),
     );
   }
 }
 
-class _PlantDetailScreen extends StatefulWidget {
+class _EnhancedPlantDetailScreen extends StatefulWidget {
   final Map<String, dynamic> plant;
 
-  const _PlantDetailScreen({required this.plant});
+  const _EnhancedPlantDetailScreen({required this.plant});
 
   @override
-  State<_PlantDetailScreen> createState() => _PlantDetailScreenState();
+  State<_EnhancedPlantDetailScreen> createState() => _EnhancedPlantDetailScreenState();
 }
 
-class _PlantDetailScreenState extends State<_PlantDetailScreen> {
+class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> with TickerProviderStateMixin {
   late PageController _pageController;
-  late Timer _timer;
-  int _currentPage = 0;
+  int _currentImageIndex = 0;
+  late AnimationController _animationController;
+  late AnimationController _slideController;
+  late AnimationController _floatingController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _scaleAnimation;
+
+  late Animation<double> _floatingAnimation;
+  late Animation<Color?> _colorAnimation;
+  bool _isImageExpanded = false;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
-    _startAutoSlide();
+    _pageController = PageController(viewportFraction: 0.85);
+    
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    _floatingController = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    )..repeat(reverse: true);
+    
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, 0.5), end: Offset.zero).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
+    
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
+    
+
+    
+    _floatingAnimation = Tween<double>(begin: -10.0, end: 10.0).animate(
+      CurvedAnimation(parent: _floatingController, curve: Curves.easeInOut),
+    );
+    
+    _colorAnimation = ColorTween(
+      begin: Colors.green.withValues(alpha: 0.1),
+      end: Colors.green.withValues(alpha: 0.3),
+    ).animate(_floatingController);
+    
+    _animationController.forward();
+    _slideController.forward();
   }
 
   @override
   void dispose() {
-    _timer.cancel();
     _pageController.dispose();
+    _animationController.dispose();
+    _slideController.dispose();
+    _floatingController.dispose();
     super.dispose();
-  }
-
-  void _startAutoSlide() {
-    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
-      final images = _getPlantImages();
-      if (images.isNotEmpty) {
-        _currentPage = (_currentPage + 1) % images.length;
-        _pageController.animateToPage(
-          _currentPage,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<String> images = _getPlantImages();
-
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            widget.plant['name'],
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.green[800],
-            ),
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.green[800]),
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Image Slider
-                    Container(
-                      height: 250,
-                      width: double.infinity,
-                      child: PageView.builder(
-                        controller: _pageController,
-                        itemCount: images.length,
-                        onPageChanged: (index) {
-                          setState(() {
-                            _currentPage = index;
-                          });
-                        },
-                        itemBuilder: (context, index) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  child: Image.network(
-                                    images[index],
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        color: Colors.green[300],
-                                        child: Icon(Icons.local_florist,
-                                            size: 60, color: Colors.white),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 0,
-                                  left: 0,
-                                  right: 0,
-                                  child: Container(
-                                    padding: EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.bottomCenter,
-                                        end: Alignment.topCenter,
-                                        colors: [
-                                          Colors.black.withValues(alpha: 0.7),
-                                          Colors.transparent,
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(12),
-                                        bottomRight: Radius.circular(12),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      widget.plant['scientific_name'] ?? '',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontStyle: FontStyle.italic,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    if (images.length > 1) ...[
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          images.length,
-                          (index) => Container(
-                            width: 8,
-                            height: 8,
-                            margin: EdgeInsets.symmetric(horizontal: 2),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: _currentPage == index
-                                  ? Colors.green[600]
-                                  : Colors.green[300],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                    SizedBox(height: 16),
-                    Text(
-                      widget.plant['name'],
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      widget.plant['scientific_name'] ?? '',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.grey[600]),
-                    ),
-                    SizedBox(height: 16),
-                    if (widget.plant['description'] != null &&
-                        widget.plant['description'].isNotEmpty) ...[
-                      Text(
-                        'Description',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        widget.plant['description'],
-                        style: TextStyle(fontSize: 14, height: 1.5),
-                      ),
-                      SizedBox(height: 16),
-                    ],
-                    if (widget.plant['habitat'] != null &&
-                        widget.plant['habitat'].isNotEmpty) ...[
-                      Text(
-                        'Habitat',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        widget.plant['habitat'],
-                        style: TextStyle(fontSize: 14, height: 1.5),
-                      ),
-                      SizedBox(height: 16),
-                    ],
-                    Row(
-                      children: [
-                        Icon(Icons.water_drop, color: Colors.blue, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Water: ${widget.plant['water_requirement']}',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.star, color: Colors.orange, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Difficulty: ${widget.plant['difficulty']}',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 24),
-                    Container(
-                      padding: EdgeInsets.all(16),
+        backgroundColor: Colors.grey[50],
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 400,
+              pinned: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: AnimatedBuilder(
+                animation: _fadeAnimation,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _fadeAnimation.value,
+                    child: Container(
+                      margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.green.withValues(alpha: 0.1), Colors.blue.withValues(alpha: 0.05)],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Plant Care Tips',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Icon(Icons.lightbulb, color: Colors.orange, size: 16),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Best grown in bright, indirect sunlight',
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(Icons.schedule, color: Colors.blue, size: 16),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Water when top soil feels dry',
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                              ),
-                            ],
+                        color: Colors.white.withValues(alpha: 0.95),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.15),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+                        onPressed: () => Navigator.pop(context),
+                      ),
                     ),
-                    SizedBox(height: 80), // Extra space at bottom
-                  ],
+                  );
+                },
+              ),
+              actions: [
+                AnimatedBuilder(
+                  animation: _fadeAnimation,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _fadeAnimation.value,
+                      child: Container(
+                        margin: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.95),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.favorite_border, color: Colors.red),
+                          onPressed: () {},
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+              flexibleSpace: FlexibleSpaceBar(
+                background: _build3DImageSlider(),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: _buildContent(),
                 ),
               ),
             ),
@@ -529,22 +417,698 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
     );
   }
 
+  Widget _build3DImageSlider() {
+    final images = _getPlantImages();
+    
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.green.withValues(alpha: 0.1),
+            Colors.blue.withValues(alpha: 0.05),
+            Colors.purple.withValues(alpha: 0.1),
+          ],
+        ),
+      ),
+      child: Stack(
+        children: [
+          AnimatedBuilder(
+            animation: _floatingAnimation,
+            builder: (context, child) {
+              return Positioned(
+                top: 50 + _floatingAnimation.value,
+                right: 30,
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: _colorAnimation.value,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+              );
+            },
+          ),
+          AnimatedBuilder(
+            animation: _floatingAnimation,
+            builder: (context, child) {
+              return Positioned(
+                bottom: 100 - _floatingAnimation.value * 0.5,
+                left: 20,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              );
+            },
+          ),
+          PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentImageIndex = index;
+              });
+            },
+            itemCount: images.length,
+            itemBuilder: (context, index) {
+              return AnimatedBuilder(
+                animation: _pageController,
+                builder: (context, child) {
+                  double value = 0.0;
+                  if (_pageController.position.haveDimensions) {
+                    value = index.toDouble() - (_pageController.page ?? 0);
+                    value = (value * 0.038).clamp(-1, 1);
+                  }
+                  
+                  return Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.001)
+                      ..rotateY(value),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isImageExpanded = !_isImageExpanded;
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            transform: Matrix4.identity()
+                              ..scale(_isImageExpanded ? 1.05 : 1.0),
+                            child: _buildPlantImage(images[index]),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          if (images.length > 1)
+            Positioned(
+              bottom: 30,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  images.length,
+                  (index) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    width: _currentImageIndex == index ? 30 : 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: _currentImageIndex == index
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: _currentImageIndex == index
+                          ? [
+                              BoxShadow(
+                                color: Colors.white.withValues(alpha: 0.5),
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                              ),
+                            ]
+                          : null,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(35),
+                topRight: Radius.circular(35),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, -5),
+                  spreadRadius: 5,
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 50,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  AnimatedBuilder(
+                    animation: _slideAnimation,
+                    builder: (context, child) {
+                      return SlideTransition(
+                        position: _slideAnimation,
+                        child: ShaderMask(
+                          shaderCallback: (bounds) => const LinearGradient(
+                            colors: [Colors.green, Colors.teal],
+                          ).createShader(bounds),
+                          child: Text(
+                            widget.plant['name'] ?? 'Unknown Plant',
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  
+                  AnimatedBuilder(
+                    animation: _fadeAnimation,
+                    builder: (context, child) {
+                      return Opacity(
+                        opacity: _fadeAnimation.value,
+                        child: Text(
+                          widget.plant['scientific_name'] ?? '',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontStyle: FontStyle.italic,
+                            color: Colors.grey[600],
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  AnimatedBuilder(
+                    animation: _floatingAnimation,
+                    builder: (context, child) {
+                      return Transform.translate(
+                        offset: Offset(0, _floatingAnimation.value * 0.3),
+                        child: Container(
+                          width: double.infinity,
+                          height: 55,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF4CAF50), Color(0xFF45A049), Color(0xFF2E7D32)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF4CAF50).withValues(alpha: 0.4),
+                                blurRadius: 15,
+                                offset: const Offset(0, 8),
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () => _addToGarden(),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.add_circle,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                                const SizedBox(width: 12),
+                                const Text(
+                                  'Add to Garden',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  
+                  const SizedBox(height: 30),
+                  
+                  AnimatedBuilder(
+                    animation: _slideController,
+                    builder: (context, child) {
+                      return SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(-1, 0),
+                          end: Offset.zero,
+                        ).animate(CurvedAnimation(
+                          parent: _slideController,
+                          curve: Curves.easeOutCubic,
+                        )),
+                        child: const Text(
+                          'Plant Information',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  _buildEnhancedInfoGrid(),
+                  
+                  const SizedBox(height: 20),
+                  
+                  if (widget.plant['description'] != null && widget.plant['description'].isNotEmpty) ...[
+                    AnimatedBuilder(
+                      animation: _fadeAnimation,
+                      builder: (context, child) {
+                        return Opacity(
+                          opacity: _fadeAnimation.value,
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: Colors.grey[200]!,
+                                width: 1,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Description',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  widget.plant['description'],
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    height: 1.6,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                  
+                  _buildCareInformation(),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEnhancedInfoGrid() {
+    final infoItems = [
+      {'icon': Icons.water_drop, 'title': 'Watering', 'subtitle': widget.plant['water_requirement'] ?? 'Weekly', 'color': Colors.blue, 'gradient': [Colors.blue, Colors.lightBlue]},
+      {'icon': Icons.wb_sunny, 'title': 'Light', 'subtitle': widget.plant['light_requirement'] ?? 'Bright light', 'color': Colors.orange, 'gradient': [Colors.orange, Colors.deepOrange]},
+      {'icon': Icons.star, 'title': 'Difficulty', 'subtitle': widget.plant['difficulty'] ?? 'Easy', 'color': Colors.purple, 'gradient': [Colors.purple, Colors.deepPurple]},
+      {'icon': Icons.eco, 'title': 'Type', 'subtitle': 'Houseplant', 'color': Colors.green, 'gradient': [Colors.green, Colors.teal]},
+    ];
+    
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 1.6,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+      ),
+      itemCount: infoItems.length,
+      itemBuilder: (context, index) {
+        final item = infoItems[index];
+        return AnimatedBuilder(
+          animation: _slideController,
+          builder: (context, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: Offset(index.isEven ? -1 : 1, 0),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: _slideController,
+                curve: Interval(
+                  index * 0.1,
+                  0.5 + index * 0.1,
+                  curve: Curves.easeOutCubic,
+                ),
+              )),
+              child: _buildEnhanced3DInfoCard(
+                icon: item['icon'] as IconData,
+                title: item['title'] as String,
+                subtitle: item['subtitle'] as String,
+                color: item['color'] as Color,
+                gradient: item['gradient'] as List<Color>,
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildEnhanced3DInfoCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required List<Color> gradient,
+  }) {
+    return AnimatedBuilder(
+      animation: _floatingController,
+      builder: (context, child) {
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.001)
+            ..rotateX(0.1 * sin(_floatingController.value * 2 * 3.14159))
+            ..rotateY(0.05 * cos(_floatingController.value * 2 * 3.14159)),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white,
+                  color.withValues(alpha: 0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.2),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                  spreadRadius: 2,
+                ),
+                BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  blurRadius: 10,
+                  offset: const Offset(-5, -5),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: gradient,
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      icon,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCareInformation() {
+    return AnimatedBuilder(
+      animation: _slideController,
+      builder: (context, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 1),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: _slideController,
+            curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
+          )),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.green.withValues(alpha: 0.08),
+                  Colors.teal.withValues(alpha: 0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.green.withValues(alpha: 0.3),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.green.withValues(alpha: 0.1),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Colors.green, Colors.teal],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.green.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.spa, color: Colors.white, size: 24),
+                    ),
+                    const SizedBox(width: 16),
+                    const Text(
+                      'Care Tips',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _buildCareTip(Icons.lightbulb, 'Best grown in bright, indirect sunlight'),
+                _buildCareTip(Icons.schedule, 'Water when top soil feels dry'),
+                _buildCareTip(Icons.thermostat, 'Prefers temperatures between 18-25°C'),
+                _buildCareTip(Icons.air, 'Enjoys good air circulation'),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCareTip(IconData icon, String tip) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.green[600], size: 16),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              tip,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[700],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlantImage(String imageUrl) {
+    if (imageUrl.isEmpty) {
+      return Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.green[300]!, Colors.green[600]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: const Icon(
+          Icons.local_florist,
+          color: Colors.white,
+          size: 80,
+        ),
+      );
+    }
+
+    return Image.network(
+      imageUrl,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: Colors.grey[300],
+          child: const Center(
+            child: CircularProgressIndicator(color: Colors.green),
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green[300]!, Colors.green[600]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: const Icon(
+            Icons.local_florist,
+            color: Colors.white,
+            size: 80,
+          ),
+        );
+      },
+    );
+  }
+
   List<String> _getPlantImages() {
     List<String> images = [];
 
-    // Add main image
-    if (widget.plant['image_url'] != null &&
-        widget.plant['image_url'].isNotEmpty) {
+    if (widget.plant['image_url'] != null && widget.plant['image_url'].isNotEmpty) {
       images.add(widget.plant['image_url']);
     }
 
-    // Add additional images from API 'images' array
     if (widget.plant['images'] is List && widget.plant['images'].isNotEmpty) {
       for (var img in widget.plant['images']) {
         if (img != null && img.toString().isNotEmpty && images.length < 3) {
-          String imageUrl = img.toString();
-          // Clean URL if it has quotes or extra characters
-          imageUrl = imageUrl.replaceAll('"', '').trim();
+          String imageUrl = img.toString().replaceAll('"', '').trim();
           if (imageUrl.startsWith('http') && !images.contains(imageUrl)) {
             images.add(imageUrl);
           }
@@ -552,27 +1116,65 @@ class _PlantDetailScreenState extends State<_PlantDetailScreen> {
       }
     }
 
-    // Add from plantInfo if available
-    if (widget.plant['plantInfo'] is Map && images.length < 3) {
-      final plantInfo = widget.plant['plantInfo'] as Map;
-      if (plantInfo['images'] is List) {
-        for (var img in plantInfo['images']) {
-          if (img != null && img.toString().isNotEmpty && images.length < 3) {
-            String imageUrl = img.toString();
-            imageUrl = imageUrl.replaceAll('"', '').trim();
-            if (imageUrl.startsWith('http') && !images.contains(imageUrl)) {
-              images.add(imageUrl);
-            }
-          }
-        }
-      }
-    }
-
-    // If we have less than 3 unique images, use placeholders instead of duplicating
-    while (images.length < 3) {
-      images.add(''); // This will show placeholder icon
+    if (images.isEmpty) {
+      images.add(''); // Placeholder
     }
 
     return images.take(3).toList();
   }
+
+  void _addToGarden() {
+    try {
+      final controller = Get.find<GardenController>();
+      
+      controller.addPlantToGarden(
+        Plant(
+          id: widget.plant['name'].toString().replaceAll(' ', '_').toLowerCase(),
+          commonName: widget.plant['name'],
+          scientificName: widget.plant['scientific_name'],
+          category: 'houseplant',
+          family: 'Unknown',
+          description: widget.plant['description'] ?? 'Added from catalog',
+          imageUrls: widget.plant['image_url'].isNotEmpty ? [widget.plant['image_url']] : [],
+          tags: [widget.plant['difficulty']],
+          careRequirements: PlantCareRequirements(
+            water: WaterRequirement(
+              frequency: widget.plant['water_requirement'],
+              amount: 'medium',
+              notes: '',
+            ),
+            light: LightRequirement(
+              level: 'medium',
+              hoursPerDay: 6,
+              placement: 'indoor',
+            ),
+            soilType: 'Well-draining',
+            growthSeason: 'Spring',
+            temperature: TemperatureRange(minTemp: 18, maxTemp: 25),
+            fertilizer: 'Monthly',
+            pruning: 'As needed',
+          ),
+        ),
+      );
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${widget.plant['name']} added to your garden!'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to add plant to garden'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  double sin(double value) => math.sin(value);
+  double cos(double value) => math.cos(value);
 }
