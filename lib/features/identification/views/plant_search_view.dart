@@ -476,140 +476,590 @@ class _PlantSearchViewState extends State<PlantSearchView> {
   }
 }
 
-class _PlantDetailFullScreen extends StatelessWidget {
+class _PlantDetailFullScreen extends StatefulWidget {
   final Plant plant;
 
   const _PlantDetailFullScreen({required this.plant});
 
   @override
+  State<_PlantDetailFullScreen> createState() => _PlantDetailFullScreenState();
+}
+
+class _PlantDetailFullScreenState extends State<_PlantDetailFullScreen>
+    with TickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late PageController _pageController;
+  int _currentImageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+    _pageController = PageController();
+    
+    _fadeController.forward();
+    _slideController.forward();
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _slideController.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            plant.commonName,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.green[800],
+    final images = _getPlantImages();
+    
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      body: CustomScrollView(
+        slivers: [
+          _buildSliverAppBar(images),
+          SliverToBoxAdapter(
+            child: AnimatedBuilder(
+              animation: _slideController,
+              builder: (context, child) {
+                return SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0, 0.3),
+                    end: Offset.zero,
+                  ).animate(CurvedAnimation(
+                    parent: _slideController,
+                    curve: Curves.easeOutCubic,
+                  )),
+                  child: FadeTransition(
+                    opacity: _fadeController,
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildPlantHeader(),
+                          const SizedBox(height: 20),
+                          _buildQuickStats(),
+                          const SizedBox(height: 24),
+                          if (widget.plant.description.isNotEmpty) ...[
+                            _buildDescriptionSection(),
+                            const SizedBox(height: 24),
+                          ],
+                          _buildCareInformation(),
+                          const SizedBox(height: 24),
+                          _buildActionButton(),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.green[800]),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSliverAppBar(List<String> images) {
+    return SliverAppBar(
+      expandedHeight: 350,
+      pinned: true,
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leading: Container(
+        margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Plant Image
-              Container(
-                height: 250,
-                width: double.infinity,
-                margin: EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.grey[200],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: () {
-                    // Map plant names to correct asset paths
-                    String getAssetPath(String plantName) {
-                      final name = plantName.toLowerCase();
-                      if (name.contains('hibiscus')) return 'assets/images/hibiscus.jpg';
-                      if (name.contains('monstera')) return 'assets/images/Monstera Deliciosa.jpg';
-                      if (name.contains('snake')) return 'assets/images/Snake Plant.jpg';
-                      return 'assets/images/${plant.commonName}.jpg';
-                    }
-                    
-                    return Image.asset(
-                      getAssetPath(plant.commonName),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        if (plant.imageUrls.isNotEmpty) {
-                          return Image.network(
-                            plant.imageUrls.first,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.green.withValues(alpha: 0.1),
-                                child: Icon(Icons.local_florist, color: Colors.green, size: 60),
-                              );
-                            },
-                          );
-                        }
-                        return Container(
-                          color: Colors.green.withValues(alpha: 0.1),
-                          child: Icon(Icons.local_florist, color: Colors.green, size: 60),
-                        );
-                      },
+        child: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      flexibleSpace: FlexibleSpaceBar(
+        background: Stack(
+          children: [
+            PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() => _currentImageIndex = index);
+              },
+              itemCount: images.length,
+              itemBuilder: (context, index) {
+                return _buildPlantImage(images[index]);
+              },
+            ),
+            if (images.length > 1)
+              Positioned(
+                bottom: 20,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: images.asMap().entries.map((entry) {
+                    return Container(
+                      width: 8,
+                      height: 8,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _currentImageIndex == entry.key
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.5),
+                      ),
                     );
-                  }(),
+                  }).toList(),
                 ),
               ),
-              // Plant Info
-              Text(
-                plant.commonName,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              Text(
-                plant.scientificName,
-                style: TextStyle(fontStyle: FontStyle.italic, fontSize: 16, color: Colors.grey[600]),
-              ),
-              SizedBox(height: 16),
-              if (plant.description.isNotEmpty) ...[
-                Text(
-                  'Description',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  plant.description,
-                  style: TextStyle(fontSize: 14, height: 1.4),
-                ),
-                SizedBox(height: 16),
-              ],
-              Text('Category: ${plant.category}'),
-              Text('Family: ${plant.family}'),
-              SizedBox(height: 16),
-              Text(
-                'Care Requirements',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.water_drop, size: 16, color: Colors.green[700]),
-                        SizedBox(width: 8),
-                        Text('Water: ${plant.careRequirements.water.frequency}'),
-                      ],
-                    ),
-                    SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(Icons.wb_sunny, size: 16, color: Colors.green[700]),
-                        SizedBox(width: 8),
-                        Text('Light: ${plant.careRequirements.light.level}'),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20),
-            ],
-          ),
+          ],
         ),
       ),
     );
+  }
+
+  Widget _buildPlantHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.plant.commonName,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+            height: 1.2,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          widget.plant.scientificName,
+          style: TextStyle(
+            fontSize: 16,
+            fontStyle: FontStyle.italic,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            _buildTag(widget.plant.category, Colors.blue),
+            const SizedBox(width: 8),
+            _buildTag(widget.plant.family, Colors.purple),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTag(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Colors.blue.shade700,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickStats() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.green.withValues(alpha: 0.05),
+            Colors.teal.withValues(alpha: 0.02),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.green.withValues(alpha: 0.15),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          _buildStatItem(Icons.water_drop, 'Water', widget.plant.careRequirements.water.frequency),
+          _buildStatItem(Icons.wb_sunny, 'Light', widget.plant.careRequirements.light.level),
+          _buildStatItem(Icons.thermostat, 'Temp', '${widget.plant.careRequirements.temperature.minTemp}-${widget.plant.careRequirements.temperature.maxTemp}°C'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(IconData icon, String title, String subtitle) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Colors.green, Colors.teal],
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: Colors.white, size: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDescriptionSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Colors.green, Colors.teal],
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.info_outline, color: Colors.white, size: 18),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'About This Plant',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            widget.plant.description,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.5,
+              color: Colors.grey[700],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCareInformation() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.green.withValues(alpha: 0.06),
+            Colors.teal.withValues(alpha: 0.03),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.green.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Colors.green, Colors.teal],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.spa, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Care Requirements',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildCareItem(Icons.water_drop, 'Watering', widget.plant.careRequirements.water.frequency),
+          _buildCareItem(Icons.wb_sunny, 'Light Requirements', widget.plant.careRequirements.light.level),
+          _buildCareItem(Icons.grass, 'Soil Type', widget.plant.careRequirements.soilType),
+          _buildCareItem(Icons.eco, 'Fertilizer', widget.plant.careRequirements.fertilizer),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCareItem(IconData icon, String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.green[600], size: 16),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton() {
+    return Container(
+      width: double.infinity,
+      height: 50,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Colors.green, Colors.teal],
+        ),
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withValues(alpha: 0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: _addToGarden,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_circle_outline, color: Colors.white),
+            SizedBox(width: 8),
+            Text(
+              'Add to My Garden',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlantImage(String imageUrl) {
+    String getAssetPath(String plantName) {
+      final name = plantName.toLowerCase();
+      if (name.contains('hibiscus')) return 'assets/images/hibiscus.jpg';
+      if (name.contains('monstera')) return 'assets/images/Monstera Deliciosa.jpg';
+      if (name.contains('snake')) return 'assets/images/Snake Plant.jpg';
+      return 'assets/images/${widget.plant.commonName}.jpg';
+    }
+
+    if (imageUrl.isEmpty) {
+      return Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.green[300]!, Colors.green[600]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: const Icon(
+          Icons.local_florist,
+          color: Colors.white,
+          size: 60,
+        ),
+      );
+    }
+
+    return Image.asset(
+      getAssetPath(widget.plant.commonName),
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (context, error, stackTrace) {
+        if (widget.plant.imageUrls.isNotEmpty) {
+          return Image.network(
+            widget.plant.imageUrls.first,
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.green[300]!, Colors.green[600]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.local_florist,
+                  color: Colors.white,
+                  size: 60,
+                ),
+              );
+            },
+          );
+        }
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green[300]!, Colors.green[600]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: const Icon(
+            Icons.local_florist,
+            color: Colors.white,
+            size: 60,
+          ),
+        );
+      },
+    );
+  }
+
+  List<String> _getPlantImages() {
+    List<String> images = [];
+
+    if (widget.plant.imageUrls.isNotEmpty) {
+      images.addAll(widget.plant.imageUrls.take(3));
+    }
+
+    if (images.isEmpty) {
+      images.add('');
+    }
+
+    return images;
+  }
+
+  void _addToGarden() {
+    try {
+      final controller = Get.find<GardenController>();
+      
+      controller.addPlantToGarden(widget.plant);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${widget.plant.commonName} added to your garden!'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to add plant to garden'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 }
