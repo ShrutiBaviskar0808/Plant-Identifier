@@ -13,6 +13,7 @@ class LightTrackerView extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.orange[800],
+              fontSize: 18,
             ),
           ),
           backgroundColor: Colors.transparent,

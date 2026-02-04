@@ -13,6 +13,7 @@ class SmartRemindersView extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.blue[800],
+              fontSize: 18,
             ),
           ),
           backgroundColor: Colors.transparent,

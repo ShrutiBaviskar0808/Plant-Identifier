@@ -13,6 +13,7 @@ class GrowthStatsView extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
+              fontSize: 18,
             ),
           ),
           backgroundColor: Colors.transparent,

@@ -13,6 +13,7 @@ class SoilAnalysisView extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.brown[800],
+              fontSize: 18,
             ),
           ),
           backgroundColor: Colors.transparent,
