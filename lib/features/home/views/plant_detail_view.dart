@@ -97,7 +97,6 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
             ),
           ],
         ),
-        bottomNavigationBar: _buildBottomBar(),
       ),
     );
   }
@@ -196,17 +195,17 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
             // Get Care Plan Button
             Container(
               width: double.infinity,
-              height: 48,
+              height: 40,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
                 ),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
@@ -216,13 +215,13 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
                 child: const Text(
                   'Get Care Plan',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -378,7 +377,7 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -391,25 +390,29 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
               child: Icon(
                 icon,
                 color: color,
-                size: 16,
+                size: 14,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               title,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 10,
                 color: Colors.grey[600],
                 fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 2),
-            Text(
-              subtitle,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+            Flexible(
+              child: Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -418,61 +421,7 @@ class _PlantDetailViewState extends State<PlantDetailView> with TickerProviderSt
     );
   }
 
-  Widget _buildBottomBar() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 56,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF4CAF50), Color(0xFF45A049)],
-                ),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: const Text(
-                  'Add to Garden',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildErrorWidget() {
     return Container(
