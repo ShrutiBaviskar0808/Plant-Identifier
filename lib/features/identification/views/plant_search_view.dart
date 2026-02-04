@@ -238,9 +238,38 @@ class _PlantSearchViewState extends State<PlantSearchView> {
     // Map plant names to correct asset paths
     String getAssetPath(String plantName) {
       final name = plantName.toLowerCase();
-      if (name.contains('hibiscus')) return 'assets/images/hibiscus.jpg';
-      if (name.contains('monstera')) return 'assets/images/Monstera Deliciosa.jpg';
-      if (name.contains('snake')) return 'assets/images/Snake Plant.jpg';
+      
+      // Direct mappings for specific plants
+      final Map<String, String> plantImageMap = {
+        'hibiscus': 'assets/images/hibiscus.jpg',
+        'monstera deliciosa': 'assets/images/Monstera Deliciosa.jpg',
+        'monstera': 'assets/images/Monstera Deliciosa.jpg',
+        'snake plant': 'assets/images/Snake Plant.jpg',
+        'snake': 'assets/images/Snake Plant.jpg',
+        'sansevieria': 'assets/images/Snake Plant.jpg',
+        'pothos': 'assets/images/Pothos.jpg',
+        'peace lily': 'assets/images/Peace Lily.jpg',
+        'rubber plant': 'assets/images/Rubber Plant.jpg',
+        'spider plant': 'assets/images/Spider Plant.jpg',
+        'aloe vera': 'assets/images/Aloe vera.jpg',
+        'jade plant': 'assets/images/Jade Plant.jpg',
+        'zz plant': 'assets/images/ZZ Plant.jpg',
+        'fiddle leaf fig': 'assets/images/Fiddle Leaf Fig.jpg',
+      };
+      
+      // Check for exact matches first
+      if (plantImageMap.containsKey(name)) {
+        return plantImageMap[name]!;
+      }
+      
+      // Check for partial matches
+      for (String key in plantImageMap.keys) {
+        if (name.contains(key) || key.contains(name)) {
+          return plantImageMap[key]!;
+        }
+      }
+      
+      // Try direct asset path with plant name
       return 'assets/images/${plant.commonName}.jpg';
     }
     
@@ -952,9 +981,38 @@ class _PlantDetailFullScreenState extends State<_PlantDetailFullScreen>
   Widget _buildPlantImage(String imageUrl) {
     String getAssetPath(String plantName) {
       final name = plantName.toLowerCase();
-      if (name.contains('hibiscus')) return 'assets/images/hibiscus.jpg';
-      if (name.contains('monstera')) return 'assets/images/Monstera Deliciosa.jpg';
-      if (name.contains('snake')) return 'assets/images/Snake Plant.jpg';
+      
+      // Direct mappings for specific plants
+      final Map<String, String> plantImageMap = {
+        'hibiscus': 'assets/images/hibiscus.jpg',
+        'monstera deliciosa': 'assets/images/Monstera Deliciosa.jpg',
+        'monstera': 'assets/images/Monstera Deliciosa.jpg',
+        'snake plant': 'assets/images/Snake Plant.jpg',
+        'snake': 'assets/images/Snake Plant.jpg',
+        'sansevieria': 'assets/images/Snake Plant.jpg',
+        'pothos': 'assets/images/Pothos.jpg',
+        'peace lily': 'assets/images/Peace Lily.jpg',
+        'rubber plant': 'assets/images/Rubber Plant.jpg',
+        'spider plant': 'assets/images/Spider Plant.jpg',
+        'aloe vera': 'assets/images/Aloe vera.jpg',
+        'jade plant': 'assets/images/Jade Plant.jpg',
+        'zz plant': 'assets/images/ZZ Plant.jpg',
+        'fiddle leaf fig': 'assets/images/Fiddle Leaf Fig.jpg',
+      };
+      
+      // Check for exact matches first
+      if (plantImageMap.containsKey(name)) {
+        return plantImageMap[name]!;
+      }
+      
+      // Check for partial matches
+      for (String key in plantImageMap.keys) {
+        if (name.contains(key) || key.contains(name)) {
+          return plantImageMap[key]!;
+        }
+      }
+      
+      // Try direct asset path with plant name
       return 'assets/images/${widget.plant.commonName}.jpg';
     }
 
