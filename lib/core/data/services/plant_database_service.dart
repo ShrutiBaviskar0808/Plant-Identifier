@@ -22,6 +22,7 @@ class PlantDatabaseService {
         category: 'flowering',
         family: 'Malvaceae',
         description: 'Beautiful tropical flowering plant with large, colorful blooms.',
+        imageUrls: ['assets/images/hibiscus.jpg'],
         careRequirements: PlantCareRequirements(
           water: WaterRequirement(
             frequency: 'daily',
@@ -48,6 +49,7 @@ class PlantDatabaseService {
         category: 'houseplant',
         family: 'Araceae',
         description: 'Popular indoor plant known for its split leaves and easy care.',
+        imageUrls: ['assets/images/Monstera Deliciosa.jpg'],
         careRequirements: PlantCareRequirements(
           water: WaterRequirement(
             frequency: 'weekly',
@@ -74,6 +76,7 @@ class PlantDatabaseService {
         category: 'succulent',
         family: 'Asparagaceae',
         description: 'Low-maintenance succulent perfect for beginners.',
+        imageUrls: ['assets/images/Snake Plant.jpg'],
         careRequirements: PlantCareRequirements(
           water: WaterRequirement(
             frequency: 'bi-weekly',

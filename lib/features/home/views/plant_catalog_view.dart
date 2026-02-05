@@ -1057,6 +1057,33 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
       );
     }
 
+    // Check if it's an asset image
+    if (imageUrl.startsWith('assets/')) {
+      return Image.asset(
+        imageUrl,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.green[300]!, Colors.green[600]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: const Icon(
+              Icons.local_florist,
+              color: Colors.white,
+              size: 60,
+            ),
+          );
+        },
+      );
+    }
+
+    // Network image
     return Image.network(
       imageUrl,
       fit: BoxFit.cover,
@@ -1093,23 +1120,50 @@ class _EnhancedPlantDetailScreenState extends State<_EnhancedPlantDetailScreen> 
   List<String> _getPlantImages() {
     List<String> images = [];
 
+    // First check if this is a Plant object with imageUrls
+    if (widget.plant is Plant) {
+      final plant = widget.plant as Plant;
+      if (plant.imageUrls.isNotEmpty) {
+        images.addAll(plant.imageUrls.take(3));
+        return images;
+      }
+    }
+
+    // Check for image_url in map data
     if (widget.plant['image_url'] != null && widget.plant['image_url'].isNotEmpty) {
       images.add(widget.plant['image_url']);
     }
 
+    // Check for images array in map data
     if (widget.plant['images'] is List && widget.plant['images'].isNotEmpty) {
       for (var img in widget.plant['images']) {
         if (img != null && img.toString().isNotEmpty && images.length < 3) {
           String imageUrl = img.toString().replaceAll('"', '').trim();
-          if (imageUrl.startsWith('http') && !images.contains(imageUrl)) {
+          if ((imageUrl.startsWith('http') || imageUrl.startsWith('assets/')) && !images.contains(imageUrl)) {
             images.add(imageUrl);
           }
         }
       }
     }
 
+    // Fallback: check for specific plant names and use local assets
+    String plantName = '';
+    if (widget.plant is Plant) {
+      plantName = (widget.plant as Plant).commonName.toLowerCase();
+    } else if (widget.plant['name'] != null) {
+      plantName = widget.plant['name'].toString().toLowerCase();
+    }
+
     if (images.isEmpty) {
-      images.add('');
+      if (plantName.contains('hibiscus')) {
+        images.add('assets/images/hibiscus.jpg');
+      } else if (plantName.contains('monstera')) {
+        images.add('assets/images/Monstera Deliciosa.jpg');
+      } else if (plantName.contains('snake')) {
+        images.add('assets/images/Snake Plant.jpg');
+      } else {
+        images.add('');
+      }
     }
 
     return images.take(3).toList();
